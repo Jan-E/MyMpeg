@@ -1,0 +1,12 @@
+diff --git a/libavcodec/dcaenc.c b/libavcodec/dcaenc.c
+index 439be47..71da25b 100644
+--- a/libavcodec/dcaenc.c
++++ b/libavcodec/dcaenc.c
+@@ -959,7 +959,6 @@ AVCodec ff_dca_encoder = {
+     .priv_data_size        = sizeof(DCAContext),
+     .init                  = encode_init,
+     .encode2               = encode_frame,
+-    .capabilities          = CODEC_CAP_EXPERIMENTAL,
+     .sample_fmts           = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S32,
+                                                             AV_SAMPLE_FMT_NONE },
+     .long_name             = NULL_IF_CONFIG_SMALL("DCA (DTS Coherent Acoustics)"),

@@ -1,0 +1,13 @@
+diff --git a/libavcodec/crystalhd.c b/libavcodec/crystalhd.c
+index 5dee825..0ce856e 100644
+--- a/libavcodec/crystalhd.c
++++ b/libavcodec/crystalhd.c
+@@ -1166,7 +1166,7 @@ AVCodec ff_msmpeg4_crystalhd_decoder = {
+     .init           = init,
+     .close          = uninit,
+     .decode         = decode,
+-    .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_DELAY | CODEC_CAP_EXPERIMENTAL,
++    .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_DELAY ,
+     .flush          = flush,
+     .long_name      = NULL_IF_CONFIG_SMALL("MPEG-4 Part 2 Microsoft variant version 3 (CrystalHD acceleration)"),
+     .pix_fmts       = (const enum AVPixelFormat[]){AV_PIX_FMT_YUYV422, AV_PIX_FMT_NONE},
