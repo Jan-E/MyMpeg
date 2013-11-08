@@ -1,8 +1,8 @@
 diff --git a/libavcodec/vorbisenc.c b/libavcodec/vorbisenc.c
-index d685996..c5e9de2 100644
+index 9ef6296..2f4b78e 100644
 --- a/libavcodec/vorbisenc.c
 +++ b/libavcodec/vorbisenc.c
-@@ -1198,7 +1198,7 @@ AVCodec ff_vorbis_encoder = {
+@@ -1199,7 +1199,7 @@ AVCodec ff_vorbis_encoder = {
      .init           = vorbis_encode_init,
      .encode2        = vorbis_encode_frame,
      .close          = vorbis_encode_close,
@@ -10,4 +10,4 @@ index d685996..c5e9de2 100644
 +    .capabilities   = CODEC_CAP_DELAY ,
      .sample_fmts    = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_FLTP,
                                                       AV_SAMPLE_FMT_NONE },
-     .long_name      = NULL_IF_CONFIG_SMALL("Vorbis"),
+ };

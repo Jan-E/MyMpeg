@@ -1,14 +1,74 @@
-diff --git a/libavcodec/aacenc.c b/libavcodec/aacenc.c
-index 362f02b..462f1d3 100644
---- a/libavcodec/aacenc.c
-+++ b/libavcodec/aacenc.c
-@@ -818,8 +818,7 @@ AVCodec ff_aac_encoder = {
-     .encode2        = aac_encode_frame,
-     .close          = aac_encode_end,
-     .supported_samplerates = mpeg4audio_sample_rates,
--    .capabilities   = CODEC_CAP_SMALL_LAST_FRAME | CODEC_CAP_DELAY |
--                      CODEC_CAP_EXPERIMENTAL,
-+    .capabilities   = CODEC_CAP_SMALL_LAST_FRAME | CODEC_CAP_DELAY,
+diff --git a/libavcodec/avuienc.c b/libavcodec/avuienc.c
+index 49d0007..9276935 100644
+--- a/libavcodec/avuienc.c
++++ b/libavcodec/avuienc.c
+@@ -107,5 +107,6 @@ AVCodec ff_avui_encoder = {
+     .init         = avui_encode_init,
+     .encode2      = avui_encode_frame,
+     .close        = avui_encode_close,
++    .capabilities = CODEC_CAP_EXPERIMENTAL,
+     .pix_fmts     = (const enum AVPixelFormat[]){ AV_PIX_FMT_UYVY422, AV_PIX_FMT_NONE },
+ };
+diff --git a/libavcodec/crystalhd.c b/libavcodec/crystalhd.c
+index 8a5b75a..12a8f8e 100644
+--- a/libavcodec/crystalhd.c
++++ b/libavcodec/crystalhd.c
+@@ -1167,7 +1167,7 @@ AVCodec ff_msmpeg4_crystalhd_decoder = {
+     .init           = init,
+     .close          = uninit,
+     .decode         = decode,
+-    .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_DELAY ,
++    .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_DELAY | CODEC_CAP_EXPERIMENTAL,
+     .flush          = flush,
+     .pix_fmts       = (const enum AVPixelFormat[]){AV_PIX_FMT_YUYV422, AV_PIX_FMT_NONE},
+     .priv_class     = &msmpeg4_class,
+diff --git a/libavcodec/dcaenc.c b/libavcodec/dcaenc.c
+index 275ec2f..cb73f42 100644
+--- a/libavcodec/dcaenc.c
++++ b/libavcodec/dcaenc.c
+@@ -960,6 +960,7 @@ AVCodec ff_dca_encoder = {
+     .priv_data_size        = sizeof(DCAContext),
+     .init                  = encode_init,
+     .encode2               = encode_frame,
++    .capabilities          = CODEC_CAP_EXPERIMENTAL,
+     .sample_fmts           = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S32,
+                                                             AV_SAMPLE_FMT_NONE },
+     .supported_samplerates = sample_rates,
+diff --git a/libavcodec/libvpxenc.c b/libavcodec/libvpxenc.c
+index 2b0b6ea..0c112e8 100644
+--- a/libavcodec/libvpxenc.c
++++ b/libavcodec/libvpxenc.c
+@@ -867,7 +867,7 @@ AVCodec ff_libvpx_vp9_encoder = {
+     .init           = vp9_init,
+     .encode2        = vp8_encode,
+     .close          = vp8_free,
+-    .capabilities   = CODEC_CAP_DELAY | CODEC_CAP_AUTO_THREADS ,
++    .capabilities   = CODEC_CAP_DELAY | CODEC_CAP_AUTO_THREADS | CODEC_CAP_EXPERIMENTAL,
+     .pix_fmts       = (const enum AVPixelFormat[]){ AV_PIX_FMT_YUV420P, AV_PIX_FMT_NONE },
+     .priv_class     = &class_vp9,
+     .defaults       = defaults,
+diff --git a/libavcodec/s302menc.c b/libavcodec/s302menc.c
+index 477b1c0..a7e5b1d 100644
+--- a/libavcodec/s302menc.c
++++ b/libavcodec/s302menc.c
+@@ -172,6 +172,6 @@ AVCodec ff_s302m_encoder = {
+     .sample_fmts           = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S32,
+                                                             AV_SAMPLE_FMT_S16,
+                                                             AV_SAMPLE_FMT_NONE },
+-    .capabilities          = CODEC_CAP_VARIABLE_FRAME_SIZE ,
++    .capabilities          = CODEC_CAP_VARIABLE_FRAME_SIZE | CODEC_CAP_EXPERIMENTAL,
+     .supported_samplerates = (const int[]) { 48000, 0 },
+ };
+diff --git a/libavcodec/vorbisenc.c b/libavcodec/vorbisenc.c
+index 2f4b78e..9ef6296 100644
+--- a/libavcodec/vorbisenc.c
++++ b/libavcodec/vorbisenc.c
+@@ -1199,7 +1199,7 @@ AVCodec ff_vorbis_encoder = {
+     .init           = vorbis_encode_init,
+     .encode2        = vorbis_encode_frame,
+     .close          = vorbis_encode_close,
+-    .capabilities   = CODEC_CAP_DELAY ,
++    .capabilities   = CODEC_CAP_DELAY | CODEC_CAP_EXPERIMENTAL,
      .sample_fmts    = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_FLTP,
                                                       AV_SAMPLE_FMT_NONE },
-     .long_name      = NULL_IF_CONFIG_SMALL("AAC (Advanced Audio Coding)"),
+ };

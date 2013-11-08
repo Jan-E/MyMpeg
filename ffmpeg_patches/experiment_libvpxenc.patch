@@ -1,13 +1,13 @@
 diff --git a/libavcodec/libvpxenc.c b/libavcodec/libvpxenc.c
-index f5506f7..9d0bc1c 100644
+index 0c112e8..2b0b6ea 100644
 --- a/libavcodec/libvpxenc.c
 +++ b/libavcodec/libvpxenc.c
-@@ -811,7 +811,7 @@ AVCodec ff_libvpx_vp9_encoder = {
+@@ -867,7 +867,7 @@ AVCodec ff_libvpx_vp9_encoder = {
      .init           = vp9_init,
      .encode2        = vp8_encode,
      .close          = vp8_free,
 -    .capabilities   = CODEC_CAP_DELAY | CODEC_CAP_AUTO_THREADS | CODEC_CAP_EXPERIMENTAL,
 +    .capabilities   = CODEC_CAP_DELAY | CODEC_CAP_AUTO_THREADS ,
      .pix_fmts       = (const enum AVPixelFormat[]){ AV_PIX_FMT_YUV420P, AV_PIX_FMT_NONE },
-     .long_name      = NULL_IF_CONFIG_SMALL("libvpx VP9"),
      .priv_class     = &class_vp9,
+     .defaults       = defaults,
