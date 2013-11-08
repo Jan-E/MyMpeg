@@ -1,0 +1,12 @@
+diff --git a/libavcodec/libvpxdec.c b/libavcodec/libvpxdec.c
+index 897a68b..149c2bd 100644
+--- a/libavcodec/libvpxdec.c
++++ b/libavcodec/libvpxdec.c
+@@ -144,6 +144,6 @@ AVCodec ff_libvpx_vp9_decoder = {
+     .init           = vp9_init,
+     .close          = vp8_free,
+     .decode         = vp8_decode,
+-    .capabilities   = CODEC_CAP_AUTO_THREADS | CODEC_CAP_EXPERIMENTAL,
++    .capabilities   = CODEC_CAP_AUTO_THREADS,
+ };
+ #endif /* CONFIG_LIBVPX_VP9_DECODER */
