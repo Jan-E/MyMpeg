@@ -949,7 +949,8 @@ apply_ffmpeg_patch() {
  if [[ ! -e $patch_done_name ]]; then
    curl $url -O || exit 1
    echo "applying patch $patch_name"
-   patch -p1 < "$patch_name" && touch $patch_done_name && git diff > "/mnt/winshare/mympeg/ffmpeg_patches/$patch_name"
+   patch -p1 < "$patch_name" && touch $patch_done_name && git diff > "/mnt/winshare/mympeg/ffmpeg_patches/$patch_name" \
+     || git stash
    git commit -a -m applied
  else
    echo "patch $patch_name already applied"
