@@ -13,3 +13,4 @@ index b4a3ffb..f2c1362 100644
 +    */
      if (asf->is_streamed)
          put_chunk(s, 0x4424, s->packet_size, 0);
+ 
