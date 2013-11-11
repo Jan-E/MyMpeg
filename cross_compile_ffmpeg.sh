@@ -481,7 +481,7 @@ build_libvpx() {
 build_libutvideo() {
   download_and_unpack_file https://github.com/downloads/rdp/FFmpeg/utvideo-11.1.1-src.zip utvideo-11.1.1
   cd utvideo-11.1.1
-    apply_patch https://raw.github.com/rdp/mympeg/master/patches/utv.diff
+    apply_patch https://raw.github.com/Jan-E/mympeg/master/patches/utv.diff
     do_make_install "CROSS_PREFIX=$cross_prefix DESTDIR=$mingw_w64_x86_64_prefix prefix=" # prefix= to avoid it adding an extra /usr/local to it yikes
   cd ..
 }
