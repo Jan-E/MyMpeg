@@ -860,7 +860,7 @@ build_frei0r() {
     #cp include/frei0r.h $mingw_w64_x86_64_prefix/include
   #cd ..
   if [[ ! -f "$mingw_w64_x86_64_prefix/include/frei0r.h" ]]; then
-    curl https://raw.github.com/Jan-E/frei0r/master/include/frei0r.h > $mingw_w64_x86_64_prefix/include/frei0r.h || exit 1
+    curl https://raw.github.com/rdp/frei0r/master/include/frei0r.h > $mingw_w64_x86_64_prefix/include/frei0r.h || exit 1
   fi
 }
 
