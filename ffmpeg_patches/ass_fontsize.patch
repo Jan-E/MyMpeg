@@ -1,8 +1,8 @@
 diff --git a/libavcodec/ass.h b/libavcodec/ass.h
-index ef99b58..8b6b25c 100644
+index 2df38e6..541293b 100644
 --- a/libavcodec/ass.h
 +++ b/libavcodec/ass.h
-@@ -29,7 +29,7 @@
+@@ -30,7 +30,7 @@
   * @{
   */
  #define ASS_DEFAULT_FONT        "Arial"

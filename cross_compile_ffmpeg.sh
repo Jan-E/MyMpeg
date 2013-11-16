@@ -743,13 +743,13 @@ build_openssl() {
   export AR="${cross}ar"
   export RANLIB="${cross}ranlib"
   if [ "$bits_target" = "32" ]; then
-    do_configure "--prefix=$mingw_w64_x86_64_prefix no-shared no-asm mingw" ./Configure
+    do_configure "--prefix=$mingw_w64_x86_64_prefix no-shared mingw" ./Configure
   else
-    do_configure "--prefix=$mingw_w64_x86_64_prefix no-shared no-asm mingw64" ./Configure
+    do_configure "--prefix=$mingw_w64_x86_64_prefix no-shared mingw64" ./Configure
   fi
-  cpu_count=1
+#  cpu_count=1
   do_make_install
-  cpu_count=$original_cpu_count
+#  cpu_count=$original_cpu_count
   unset cross
   unset CC
   unset AR
