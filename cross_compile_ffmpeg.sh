@@ -747,9 +747,9 @@ build_openssl() {
   else
     do_configure "--prefix=$mingw_w64_x86_64_prefix no-shared mingw64" ./Configure
   fi
-#  cpu_count=1
+  cpu_count=1 # needed for libcrypto
   do_make_install
-#  cpu_count=$original_cpu_count
+  cpu_count=$original_cpu_count
   unset cross
   unset CC
   unset AR
