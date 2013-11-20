@@ -1,5 +1,5 @@
 diff --git a/libavcodec/avuienc.c b/libavcodec/avuienc.c
-index 9276935..49d0007 100644
+index eb0046c..10d0ad8 100644
 --- a/libavcodec/avuienc.c
 +++ b/libavcodec/avuienc.c
 @@ -107,6 +107,5 @@ AVCodec ff_avui_encoder = {
