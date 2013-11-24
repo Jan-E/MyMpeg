@@ -436,19 +436,17 @@ build_libpng() {
 build_libopenjpeg() {
   download_and_unpack_file http://openjpeg.googlecode.com/files/openjpeg_v1_4_sources_r697.tgz openjpeg_v1_4_sources_r697
   cd openjpeg_v1_4_sources_r697
-  export LIBS=-lpng
+# export LIBS=-lpng
   export LDFLAGS=-L$mingw_w64_x86_64_prefix/lib
   export CFLAGS=-I$mingw_w64_x86_64_prefix/include
-  generic_configure
+  generic_configure "--disable-png" # could not get libpng to work on centos systems
   sed -i "s/\/usr\/lib/\$\(prefix\)\/lib/" Makefile # install pkg_config to the right dir...
   sed -i "s/\/usr\/local\/lib/\$\(prefix\)\/lib/" Makefile # pnglibs = -L/usr/local/lib -lpng15 etc
   sed -i "s/\/usr\/local\/bin/\$\(prefix\)\/bin/" Makefile # LIBPNG_CONFIG = /usr/local/bin/libpng-config etc
   cpu_count=1 # this one can't build multi-threaded <sigh> kludge
   do_make_install
   cpu_count=$original_cpu_count
-# there is no .pc for openjpeg, so we add --extra-libs=-lpng to FFmpegs configure
-# sed -i 's/-lopenjpeg *$/-lopenjpeg -lpng/' "$PKG_CONFIG_PATH/openjpeg.pc"
-  unset LIBS
+# unset LIBS
   unset LDFLAGS
   export CFLAGS=$original_cflags # reset it
   cd .. 
