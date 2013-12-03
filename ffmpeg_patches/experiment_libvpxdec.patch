@@ -6,7 +6,7 @@ index 897a68b..149c2bd 100644
      .init           = vp9_init,
      .close          = vp8_free,
      .decode         = vp8_decode,
--    .capabilities   = CODEC_CAP_AUTO_THREADS | CODEC_CAP_EXPERIMENTAL,
-+    .capabilities   = CODEC_CAP_AUTO_THREADS,
+-    .capabilities   = CODEC_CAP_AUTO_THREADS | CODEC_CAP_DR1 | CODEC_CAP_EXPERIMENTAL,
++    .capabilities   = CODEC_CAP_AUTO_THREADS | CODEC_CAP_DR1,
  };
  #endif /* CONFIG_LIBVPX_VP9_DECODER */
