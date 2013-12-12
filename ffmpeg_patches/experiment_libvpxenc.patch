@@ -1,8 +1,8 @@
 diff --git a/libavcodec/libvpxenc.c b/libavcodec/libvpxenc.c
-index 85d1fba..2048250 100644
+index 65586cf..7f7f3c1 100644
 --- a/libavcodec/libvpxenc.c
 +++ b/libavcodec/libvpxenc.c
-@@ -867,7 +867,7 @@ AVCodec ff_libvpx_vp9_encoder = {
+@@ -868,7 +868,7 @@ AVCodec ff_libvpx_vp9_encoder = {
      .init           = vp9_init,
      .encode2        = vp8_encode,
      .close          = vp8_free,
