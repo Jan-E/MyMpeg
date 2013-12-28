@@ -1,5 +1,5 @@
 diff --git a/libavformat/asfenc.c b/libavformat/asfenc.c
-index b4a3ffb..f2c1362 100644
+index 8e343b3..f5ccd1b 100644
 --- a/libavformat/asfenc.c
 +++ b/libavformat/asfenc.c
 @@ -706,9 +706,9 @@ static void flush_packet(AVFormatContext *s)
