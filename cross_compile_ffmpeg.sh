@@ -991,7 +991,7 @@ build_ffmpeg() {
     cd $output_dir
   fi
   
-  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm.patch
+  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_new.patch
   apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/ass_fontsize.patch
   apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/subtitles_non_fatal.patch
   apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/asfenc.patch
