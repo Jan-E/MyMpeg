@@ -785,12 +785,12 @@ build_iconv() {
   generic_download_and_install http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz libiconv-1.14
 }
 
-build_freetype() { # 2.5.2 failed
-  download_and_unpack_file http://download.savannah.gnu.org/releases/freetype/freetype-2.5.0.tar.gz freetype-2.5.0
-  cd freetype-2.5.0
+build_freetype() {
+  download_and_unpack_file http://download.savannah.gnu.org/releases/freetype/freetype-2.5.2.tar.gz freetype-2.5.2
+  cd freetype-2.5.2
   generic_configure "--without-png"
   do_make_install
-  sed -i 's/Libs: -L${libdir} -lfreetype.*/Libs: -L${libdir} -lfreetype -lexpat -lpng/' "$PKG_CONFIG_PATH/freetype2.pc"
+  sed -i 's/Libs: -L${libdir} -lfreetype.*/Libs: -L${libdir} -lfreetype -lexpat/' "$PKG_CONFIG_PATH/freetype2.pc"
   cd ..
 }
 
@@ -1075,6 +1075,7 @@ build_dependencies() {
   build_iconv # mplayer I think needs it for freetype [just it though], vlc also wants it.  looks like ffmpeg can use it too...not sure what for :)
   build_gnutls # needs libnettle, can use iconv it appears
 
+  build_freetype
   build_frei0r
   build_libutvideo
   #build_libflite # too big for the distro...
@@ -1090,7 +1091,7 @@ build_dependencies() {
   build_orc
   build_libschroedinger # needs orc
   build_libxml2
-  build_libbluray
+  build_libbluray # uses freetype
   build_libjpeg_turbo # mplayer can use this, VLC qt might need it?
   build_libdvdcss
   build_libdvdread # vlc, possibly mplayer use it. needs dvdcss
@@ -1107,7 +1108,6 @@ build_dependencies() {
   build_zvbi
   build_libvpx
   build_vo_aacenc
-  build_freetype
   build_libexpat
   build_libilbc
   build_fontconfig # needs expat, might need freetype, can use iconv, but I believe doesn't currently
