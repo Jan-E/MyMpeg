@@ -788,9 +788,8 @@ build_iconv() {
 build_freetype() { # 2.5.2 failed
   download_and_unpack_file http://download.savannah.gnu.org/releases/freetype/freetype-2.5.0.tar.gz freetype-2.5.0
   cd freetype-2.5.0
-  export LIBS=-lpng
-  generic_configure_make_install
-  unset LIBS
+  generic_configure "--withou-png"
+  do_make_install
   sed -i 's/Libs: -L${libdir} -lfreetype.*/Libs: -L${libdir} -lfreetype -lexpat -lpng/' "$PKG_CONFIG_PATH/freetype2.pc"
   cd ..
 }
