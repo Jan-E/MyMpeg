@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-#!/usr/bin/env bash
 ################################################################################
 # ffmpeg windows cross compile helper/download script
 ################################################################################
@@ -526,12 +525,12 @@ build_libgsm() {
 }
 
 build_libopus() {
-  generic_download_and_install http://downloads.xiph.org/releases/opus/opus-1.0.3.tar.gz opus-1.0.3 
+  generic_download_and_install http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz opus-1.1 
 }
 
 build_libdvdnav() {
-  download_and_unpack_file http://dvdnav.mplayerhq.hu/releases/libdvdnav-4.2.0.tar.bz2 libdvdnav-4.2.0
-  cd libdvdnav-4.2.0
+  download_and_unpack_file http://dvdnav.mplayerhq.hu/releases/libdvdnav-4.2.1.tar.xz libdvdnav-4.2.1
+  cd libdvdnav-4.2.1
   if [[ ! -f ./configure ]]; then
     ./autogen.sh
   fi
@@ -545,8 +544,8 @@ build_libdvdcss() {
 }
 
 build_libdvdread() {
-  download_and_unpack_file http://dvdnav.mplayerhq.hu/releases/libdvdread-4.2.0.tar.bz2 libdvdread-4.2.0
-  cd libdvdread-4.2.0
+  download_and_unpack_file http://dvdnav.mplayerhq.hu/releases/libdvdread-4.2.1.tar.xz libdvdread-4.2.1
+  cd libdvdread-4.2.1
   if [[ ! -f ./configure ]]; then
     ./autogen.sh
   fi
@@ -571,7 +570,7 @@ build_glew() { # opengl stuff
 
 build_libopencore() {
   generic_download_and_install http://sourceforge.net/projects/opencore-amr/files/opencore-amr/opencore-amr-0.1.3.tar.gz/download opencore-amr-0.1.3
-  generic_download_and_install http://sourceforge.net/projects/opencore-amr/files/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz/download vo-amrwbenc-0.1.2
+  generic_download_and_install http://sourceforge.net/projects/opencore-amr/files/vo-amrwbenc/vo-amrwbenc-0.1.3.tar.gz/download vo-amrwbenc-0.1.3
 }
 
 build_win32_pthreads() {
@@ -597,7 +596,7 @@ build_libjpeg_turbo() {
 }
 
 build_libogg() {
-  generic_download_and_install http://downloads.xiph.org/releases/ogg/libogg-1.3.0.tar.gz libogg-1.3.0
+  generic_download_and_install http://downloads.xiph.org/releases/ogg/libogg-1.3.1.tar.gz libogg-1.3.1
 }
 
 build_libvorbis() {
@@ -650,7 +649,7 @@ build_gmp() {
 }
 
 build_orc() {
-  generic_download_and_install  http://code.entropywave.com/download/orc/orc-0.4.16.tar.gz orc-0.4.16
+  generic_download_and_install http://code.entropywave.com/download/orc/orc-0.4.18.tar.gz orc-0.4.18
 }
 
 build_libbluray() {
@@ -667,9 +666,9 @@ build_libschroedinger() {
   cd ..
 }
 
-build_gnutls() {
-  download_and_unpack_file ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/gnutls-3.2.5.tar.xz gnutls-3.2.5
-  cd gnutls-3.2.5
+build_gnutls() { # 3.2.8 failed
+  download_and_unpack_file ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/gnutls-3.2.7.tar.xz gnutls-3.2.7
+  cd gnutls-3.2.7
     generic_configure "--disable-cxx --disable-doc" # don't need the c++ version, in an effort to cut down on size... LODO test difference...
     do_make_install
   cd ..
@@ -717,7 +716,7 @@ build_libxvid() {
   fi
 }
 
-build_fontconfig() {
+build_fontconfig() { # 2.11.0 failed
   download_and_unpack_file http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.10.95.tar.gz fontconfig-2.10.95
   cd fontconfig-2.10.95
     generic_configure --disable-docs
@@ -737,8 +736,8 @@ build_libaacplus() {
 }
 
 build_openssl() {
-  download_and_unpack_file http://www.openssl.org/source/openssl-1.0.1e.tar.gz openssl-1.0.1e
-  cd openssl-1.0.1e
+  download_and_unpack_file http://www.openssl.org/source/openssl-1.0.1f.tar.gz openssl-1.0.1f
+  cd openssl-1.0.1f
   export cross="$cross_prefix"
   export CC="${cross}gcc"
   export AR="${cross}ar"
@@ -759,7 +758,7 @@ build_openssl() {
 }
 
 build_fdk_aac() {
-  #generic_download_and_install http://sourceforge.net/projects/opencore-amr/files/fdk-aac/fdk-aac-0.1.0.tar.gz/download fdk-aac-0.1.0
+  #generic_download_and_install http://sourceforge.net/projects/opencore-amr/files/fdk-aac/fdk-aac-0.1.3.tar.gz/download fdk-aac-0.1.3
   do_git_checkout https://github.com/mstorsjo/fdk-aac.git fdk-aac_git
   cd fdk-aac_git
     if [[ ! -f "configure" ]]; then
@@ -778,13 +777,13 @@ build_iconv() {
   generic_download_and_install http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz libiconv-1.14
 }
 
-build_freetype() {
-  generic_download_and_install http://download.savannah.gnu.org/releases/freetype/freetype-2.4.10.tar.gz freetype-2.4.10
+build_freetype() { # 2.5.2 failed
+  generic_download_and_install http://download.savannah.gnu.org/releases/freetype/freetype-2.5.0.tar.gz freetype-2.5.0
   sed -i 's/Libs: -L${libdir} -lfreetype.*/Libs: -L${libdir} -lfreetype -lexpat/' "$PKG_CONFIG_PATH/freetype2.pc"
 }
 
 build_vo_aacenc() {
-  generic_download_and_install http://sourceforge.net/projects/opencore-amr/files/vo-aacenc/vo-aacenc-0.1.2.tar.gz/download vo-aacenc-0.1.2
+  generic_download_and_install http://sourceforge.net/projects/opencore-amr/files/vo-aacenc/vo-aacenc-0.1.3.tar.gz/download vo-aacenc-0.1.3
 }
 
 build_sdl() {
@@ -847,7 +846,6 @@ build_libcaca() {
   cd ..
 }
 
-
 build_twolame() {
   generic_download_and_install http://sourceforge.net/projects/twolame/files/twolame/0.3.13/twolame-0.3.13.tar.gz/download twolame-0.3.13 "CPPFLAGS=-DLIBTWOLAME_STATIC"
 }
@@ -894,8 +892,6 @@ build_vlc() {
   done
   make package-win-common # not do_make, fails still at end, plus this way we get new vlc.exe's
   echo "created a file like ${PWD}/vlc-2.2.0-git/vlc.exe
-
-
 
 "
   cpu_count=$original_cpu_count
