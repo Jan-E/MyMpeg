@@ -19,7 +19,6 @@
 #
 # The GNU General Public License can be found in the LICENSE file.
 
-
 yes_no_sel () {
   unset user_input
   local question="$1"
@@ -71,7 +70,6 @@ check_missing_packages () {
   fi
 
 }
-
 
 intro() {
   cat <<EOL
@@ -412,8 +410,8 @@ build_qt() {
 }
 
 build_libsoxr() {
-  download_and_unpack_file http://sourceforge.net/projects/soxr/files/soxr-0.1.0-Source.tar.xz soxr-0.1.0-Source # not /download since apparently some tar's can't untar it without an extension?
-  cd soxr-0.1.0-Source
+  download_and_unpack_file http://sourceforge.net/projects/soxr/files/soxr-0.1.1-Source.tar.xz soxr-0.1.1-Source
+  cd soxr-0.1.1-Source
     do_cmake "-DHAVE_WORDS_BIGENDIAN_EXITCODE=0  -DBUILD_SHARED_LIBS:bool=off -DBUILD_TESTS:BOOL=OFF"
     do_make_install
   cd ..
@@ -436,6 +434,8 @@ build_libpng() {
 build_libopenjpeg() {
   download_and_unpack_file http://openjpeg.googlecode.com/files/openjpeg_v1_4_sources_r697.tgz openjpeg_v1_4_sources_r697
   cd openjpeg_v1_4_sources_r697
+# download_and_unpack_file http://openjpeg.googlecode.com/files/openjpeg-1.5.1.tar.gz openjpeg-1.5.1
+# cd openjpeg-1.5.1
 # export LIBS=-lpng
   export LDFLAGS=-L$mingw_w64_x86_64_prefix/lib
   export CFLAGS=-I$mingw_w64_x86_64_prefix/include
@@ -461,8 +461,6 @@ build_libopenjpeg() {
 }
 
 build_libvpx() {
-#  download_and_unpack_file http://webm.googlecode.com/files/libvpx-v1.2.0.tar.bz2 libvpx-v1.2.0
-#  cd libvpx-v1.2.0
   download_and_unpack_file http://ffmpeg.zeranoe.com/builds/source/external_libraries/libvpx-1.3.0.tar.xz libvpx-1.3.0
   cd libvpx-1.3.0
 #  do_git_checkout https://git.chromium.org/git/webm/libvpx.git "libvpx_git"
@@ -485,7 +483,6 @@ build_libutvideo() {
     do_make_install "CROSS_PREFIX=$cross_prefix DESTDIR=$mingw_w64_x86_64_prefix prefix=" # prefix= to avoid it adding an extra /usr/local to it yikes
   cd ..
 }
-
 
 build_libilbc() {
   do_git_checkout https://github.com/dekkers/libilbc.git libilbc_git
@@ -652,8 +649,20 @@ build_orc() {
   generic_download_and_install http://code.entropywave.com/download/orc/orc-0.4.18.tar.gz orc-0.4.18
 }
 
+build_libxml2() {
+  download_and_unpack_file ftp://xmlsoft.org/libxml2/libxml2-2.9.1.tar.gz libxml2-2.9.1
+  cd libxml2-2.9.1
+  generic_configure "--without-python"
+  do_make_install
+  cd ..
+}
+
 build_libbluray() {
-  generic_download_and_install ftp://ftp.videolan.org/pub/videolan/libbluray/0.2.3/libbluray-0.2.3.tar.bz2 libbluray-0.2.3
+  download_and_unpack_file ftp://ftp.videolan.org/pub/videolan/libbluray/0.5.0/libbluray-0.5.0.tar.bz2 libbluray-0.5.0
+  cd libbluray-0.5.0
+  generic_configure "--without-libxml2"
+  do_make_install
+  cd ..
 }
 
 build_libschroedinger() {
@@ -768,7 +777,6 @@ build_fdk_aac() {
   cd ..
 }
 
-
 build_libexpat() {
   generic_download_and_install http://sourceforge.net/projects/expat/files/expat/2.1.0/expat-2.1.0.tar.gz/download expat-2.1.0
 }
@@ -778,8 +786,13 @@ build_iconv() {
 }
 
 build_freetype() { # 2.5.2 failed
-  generic_download_and_install http://download.savannah.gnu.org/releases/freetype/freetype-2.5.0.tar.gz freetype-2.5.0
-  sed -i 's/Libs: -L${libdir} -lfreetype.*/Libs: -L${libdir} -lfreetype -lexpat/' "$PKG_CONFIG_PATH/freetype2.pc"
+  download_and_unpack_file http://download.savannah.gnu.org/releases/freetype/freetype-2.5.0.tar.gz freetype-2.5.0
+  cd freetype-2.5.0
+  export LIBS=-lpng
+  generic_configure_make_install
+  unset LIBS
+  sed -i 's/Libs: -L${libdir} -lfreetype.*/Libs: -L${libdir} -lfreetype -lexpat -lpng/' "$PKG_CONFIG_PATH/freetype2.pc"
+  cd ..
 }
 
 build_vo_aacenc() {
@@ -1077,6 +1090,7 @@ build_dependencies() {
   build_libtheora # needs libvorbis, libogg
   build_orc
   build_libschroedinger # needs orc
+  build_libxml2
   build_libbluray
   build_libjpeg_turbo # mplayer can use this, VLC qt might need it?
   build_libdvdcss
