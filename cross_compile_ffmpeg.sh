@@ -1081,6 +1081,7 @@ build_dependencies() {
   build_iconv # mplayer I think needs it for freetype [just it though], vlc also wants it.  looks like ffmpeg can use it too...not sure what for :)
   build_gnutls # needs libnettle, can use iconv it appears
 
+  build_libexpat
   build_freetype
   build_frei0r
   build_libutvideo
@@ -1114,7 +1115,6 @@ build_dependencies() {
   build_zvbi
   build_libvpx
   build_vo_aacenc
-  build_libexpat
   build_libilbc
   build_fontconfig # needs expat, might need freetype, can use iconv, but I believe doesn't currently
   build_libfribidi
