@@ -881,8 +881,9 @@ build_frei0r() {
 
 build_vidstab() {
 # do_git_checkout https://github.com/georgmartius/vid.stab.git vid.stab
-  do_git_checkout https://github.com/georgmartius/vid.stab.git vid.stab "f32cc"
-  cd vid.stab
+# cd vid.stab
+  download_and_unpack_file https://github.com/georgmartius/vid.stab/archive/release-0.98.tar.gz vid.stab-release-0.98
+  cd vid.stab-release-0.98
     do_cmake
     sed -i "s/SHARED/STATIC/" CMakeLists.txt # ??
     do_make_install 
