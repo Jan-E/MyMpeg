@@ -664,6 +664,7 @@ build_libbluray() {
   generic_configure "--without-libxml2"
   do_make_install
   unset LIBS
+  # add -lpng everywhere where -lfreetype is present
   sed -i 's/Libs: -L${libdir} -lbluray/Libs: -L${libdir} -lbluray -lfreetype -lexpat -lpng/' "$PKG_CONFIG_PATH/libbluray.pc"
   cd ..
 }
