@@ -788,15 +788,15 @@ build_iconv() {
 build_freetype() {
   download_and_unpack_file http://download.savannah.gnu.org/releases/freetype/freetype-2.5.2.tar.gz freetype-2.5.2
   cd freetype-2.5.2
-  export LIBPNG_LDFLAGS=-L$mingw_w64_x86_64_prefix/lib
-  export LIBPNG_CFLAGS=-I$mingw_w64_x86_64_prefix/include
-  export LIBS=-lpng
-  generic_configure
+# export LIBPNG_LDFLAGS=-L$mingw_w64_x86_64_prefix/lib
+# export LIBPNG_CFLAGS=-I$mingw_w64_x86_64_prefix/include
+# export LIBS=-lpng
+  generic_configure "--without-png"
   do_make_install
-  unset LIBPNG_LDFLAGS
-  unset LIBPNG_CFLAGS
-  unset LIBS
-  sed -i 's/Libs: -L${libdir} -lfreetype.*/Libs: -L${libdir} -lfreetype -lexpat -lpng/' "$PKG_CONFIG_PATH/freetype2.pc"
+# unset LIBPNG_LDFLAGS
+# unset LIBPNG_CFLAGS
+# unset LIBS
+  sed -i 's/Libs: -L${libdir} -lfreetype.*/Libs: -L${libdir} -lfreetype -lexpat/' "$PKG_CONFIG_PATH/freetype2.pc"
   cd ..
 }
 
