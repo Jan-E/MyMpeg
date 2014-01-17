@@ -794,7 +794,7 @@ build_freetype() {
   export LIBPNG_LDFLAGS=-L$mingw_w64_x86_64_prefix/lib
   export LIBPNG_CFLAGS=-I$mingw_w64_x86_64_prefix/include
   export LIBS=-lpng
-  generic_configure "--without-png"
+  generic_configure
   do_make_install
   unset LIBPNG_LDFLAGS
   unset LIBPNG_CFLAGS
