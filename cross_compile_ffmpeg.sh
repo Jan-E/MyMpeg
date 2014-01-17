@@ -735,7 +735,7 @@ build_fontconfig() { # 2.11.0 failed
     generic_configure --disable-docs
     do_make_install
   cd .. 
-  sed -i 's/-L${libdir} -lfontconfig[^l]*$/-L${libdir} -lfontconfig -lfreetype -lexpat =lpng/' "$PKG_CONFIG_PATH/fontconfig.pc"
+  sed -i 's/-L${libdir} -lfontconfig[^l]*$/-L${libdir} -lfontconfig -lfreetype -lexpat -lpng/' "$PKG_CONFIG_PATH/fontconfig.pc"
 }
 
 build_libaacplus() {
