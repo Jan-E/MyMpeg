@@ -660,8 +660,11 @@ build_libxml2() {
 build_libbluray() {
   download_and_unpack_file ftp://ftp.videolan.org/pub/videolan/libbluray/0.5.0/libbluray-0.5.0.tar.bz2 libbluray-0.5.0
   cd libbluray-0.5.0
+  export LIBS=-lpng
   generic_configure "--without-libxml2"
   do_make_install
+  unset LIBS
+  sed -i 's/Libs: -L${libdir} -lbluray/Libs: -L${libdir} -lbluray -lfreetype -lexpat -lpng/' "$PKG_CONFIG_PATH/libbluray.pc"
   cd ..
 }
 
@@ -788,14 +791,14 @@ build_iconv() {
 build_freetype() {
   download_and_unpack_file http://download.savannah.gnu.org/releases/freetype/freetype-2.5.2.tar.gz freetype-2.5.2
   cd freetype-2.5.2
-# export LIBPNG_LDFLAGS=-L$mingw_w64_x86_64_prefix/lib
-# export LIBPNG_CFLAGS=-I$mingw_w64_x86_64_prefix/include
-# export LIBS=-lpng
+  export LIBPNG_LDFLAGS=-L$mingw_w64_x86_64_prefix/lib
+  export LIBPNG_CFLAGS=-I$mingw_w64_x86_64_prefix/include
+  export LIBS=-lpng
   generic_configure "--without-png"
   do_make_install
-# unset LIBPNG_LDFLAGS
-# unset LIBPNG_CFLAGS
-# unset LIBS
+  unset LIBPNG_LDFLAGS
+  unset LIBPNG_CFLAGS
+  unset LIBS
   sed -i 's/Libs: -L${libdir} -lfreetype.*/Libs: -L${libdir} -lfreetype -lexpat/' "$PKG_CONFIG_PATH/freetype2.pc"
   cd ..
 }
