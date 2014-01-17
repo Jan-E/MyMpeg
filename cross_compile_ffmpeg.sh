@@ -1088,6 +1088,7 @@ build_dependencies() {
   build_gnutls # needs libnettle, can use iconv it appears
 
   build_freetype
+  build_libexpat
   build_frei0r
   build_libutvideo
   #build_libflite # too big for the distro...
@@ -1103,7 +1104,7 @@ build_dependencies() {
   build_orc
   build_libschroedinger # needs orc
   build_libxml2
-  build_libbluray # uses freetype
+  build_libbluray # uses freetype and expat
   build_libjpeg_turbo # mplayer can use this, VLC qt might need it?
   build_libdvdcss
   build_libdvdread # vlc, possibly mplayer use it. needs dvdcss
@@ -1120,7 +1121,6 @@ build_dependencies() {
   build_zvbi
   build_libvpx
   build_vo_aacenc
-  build_libexpat
   build_libilbc
   build_fontconfig # needs expat, might need freetype, can use iconv, but I believe doesn't currently
   build_libfribidi
