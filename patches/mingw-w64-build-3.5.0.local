@@ -486,11 +486,12 @@ make install || exit 1
 }
 
 build_binutils () {
-cd "$packages_dir" || exit 1
+cd "$pkgs_dir" || exit 1
 create_pkg_dirs 'binutils' || exit 1
 if [[ "$binutils_ver" != 'cvs' ]]; then
-  if [[ "$binutils_ver" = "$binutils_snapshot_ver" ]]; then
-    download_extract "binutils-$binutils_ver" "ftp://sourceware.org/pub/binutils/snapshots/binutils-$binutils_ver" 'tar.bz2'
+  if [[ "$binutils_ver" = "snapshot" ]]; then
+    download_extract "binutils" "ftp://sourceware.org/pub/binutils/snapshots/binutils" 'tar.bz2'
+    binutils_ver="$(find . -name binutils -type d)"; binutils_ver="${binutils_ver##*-}"; binutils_ver="${binutils_ver%%/*}"
   else
     download_extract "binutils-$binutils_ver" "ftp://ftp.gnu.org/gnu/binutils/binutils-$binutils_ver" 'tar.bz2'
   fi
@@ -501,7 +502,7 @@ else
     cvs update || exit 1
     read -r newmd5 _ < <(md5sum './CVS/Entries')
     if [[ "$oldmd5" != "$newmd5" ]]; then
-      rm -rf "$packages_dir/touch-files/binutils/binutils-cvs-$uname_m."*
+      rm -rf "$pkgs_dir/touch-files/binutils/binutils-cvs-$uname_m."*
     fi
     cd '..'
   else
