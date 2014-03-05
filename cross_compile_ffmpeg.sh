@@ -998,16 +998,19 @@ build_ffmpeg() {
     extra_configure_opts=""
   fi
 
-  extra_configure_opts="$extra_configure_opts --extra-cflags=$CFLAGS" # extra-cflags is not needed, but adds it to the console output which I lke
+  extra_configure_opts="$extra_configure_opts --extra-cflags=$CFLAGS" # extra-cflags is not needed, but adds it to the console output which I like
 
   # can't mix and match --enable-static --enable-shared unfortunately, or the final executable seems to just use shared if the're both present
+
+  # The doc says:
+  #  --enable-small           optimize for size instead of speed
   if [[ $shared == "shared" ]]; then
     do_git_checkout $git_url ${output_dir}_shared
-    extra_configure_opts="--enable-shared --disable-static --enable-small $extra_configure_opts"
+    extra_configure_opts="--enable-shared --disable-static $extra_configure_opts"
     cd ${output_dir}_shared
   else
     do_git_checkout $git_url $output_dir
-    extra_configure_opts="--enable-static --disable-shared --enable-small $extra_configure_opts"
+    extra_configure_opts="--enable-static --disable-shared $extra_configure_opts"
     cd $output_dir
   fi
   
