@@ -1,8 +1,8 @@
 diff --git a/libavcodec/s302menc.c b/libavcodec/s302menc.c
-index a7e5b1d..477b1c0 100644
+index 540ac29..af24930 100644
 --- a/libavcodec/s302menc.c
 +++ b/libavcodec/s302menc.c
-@@ -172,6 +172,6 @@ AVCodec ff_s302m_encoder = {
+@@ -173,6 +173,6 @@ AVCodec ff_s302m_encoder = {
      .sample_fmts           = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S32,
                                                              AV_SAMPLE_FMT_S16,
                                                              AV_SAMPLE_FMT_NONE },

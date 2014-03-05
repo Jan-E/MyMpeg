@@ -1,8 +1,8 @@
 diff --git a/libavcodec/vorbisenc.c b/libavcodec/vorbisenc.c
-index 9ef6296..2f4b78e 100644
+index fa6bccc..02ec2ab 100644
 --- a/libavcodec/vorbisenc.c
 +++ b/libavcodec/vorbisenc.c
-@@ -1199,7 +1199,7 @@ AVCodec ff_vorbis_encoder = {
+@@ -1201,7 +1201,7 @@ AVCodec ff_vorbis_encoder = {
      .init           = vorbis_encode_init,
      .encode2        = vorbis_encode_frame,
      .close          = vorbis_encode_close,

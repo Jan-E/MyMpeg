@@ -1,8 +1,8 @@
 diff --git a/libavcodec/dcaenc.c b/libavcodec/dcaenc.c
-index cb73f42..275ec2f 100644
+index 8d0655d..d050fc3 100644
 --- a/libavcodec/dcaenc.c
 +++ b/libavcodec/dcaenc.c
-@@ -960,7 +960,6 @@ AVCodec ff_dca_encoder = {
+@@ -961,7 +961,6 @@ AVCodec ff_dca_encoder = {
      .priv_data_size        = sizeof(DCAContext),
      .init                  = encode_init,
      .encode2               = encode_frame,
