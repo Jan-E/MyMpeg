@@ -350,6 +350,39 @@ generic_configure_make_install() {
   do_make_install
 }
 
+build_x265() {
+  local old_hg_version
+  if [[ -d x265 ]]; then
+    cd x265
+    if [[ $git_get_latest = "y" ]]; then
+      echo "doing hg pull -u x265"
+      old_hg_version=`hg --debug id -i`
+      hg pull -u || exit 1
+    else
+      echo "not doing hg pull x265"
+    fi
+  else
+    hg clone https://bitbucket.org/multicoreware/x265 || exit 1
+    cd x265
+    old_hg_version=`hg --debug id -i`
+  fi    
+  cd source
+
+  # hg checkout 9b0c9b # no longer needed...
+
+  local new_hg_version=`hg --debug id -i`  
+  if [[ "$old_hg_version" != "$new_hg_version" ]]; then
+    echo "got upstream hg changes, forcing rebuild...x265"
+    rm already*
+  else
+    echo "still at hg $new_hg_version x265"
+  fi
+
+  do_cmake "-DENABLE_SHARED=OFF"
+  do_make_install
+  cd ../..
+}
+
 #x264_profile_guided=y
 
 build_x264() {
@@ -1037,7 +1070,7 @@ build_ffmpeg() {
 
 # add --extra-cflags=$CFLAGS, though redundant, just so that FFmpeg lists what it used in its "info" output
 
-  config_options="--arch=$arch --target-os=mingw32 --cross-prefix=$cross_prefix --pkg-config=pkg-config --enable-gpl --enable-libx264 --enable-avisynth --enable-libxvid --enable-libmp3lame --enable-version3 --enable-zlib --enable-librtmp --enable-libvorbis --enable-libtheora --enable-libspeex --enable-libopenjpeg --enable-gnutls --enable-libgsm --enable-libfreetype --enable-libopus --disable-w32threads --enable-frei0r --enable-filter=frei0r --enable-libvo-aacenc --enable-bzlib --enable-libxavs --extra-cflags=-DPTW32_STATIC_LIB --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libvpx --enable-libilbc --disable-doc --prefix=$mingw_w64_x86_64_prefix $extra_configure_opts --extra-cflags=$CFLAGS" # other possibilities: --enable-w32threads --enable-libflite
+  config_options="--arch=$arch --target-os=mingw32 --cross-prefix=$cross_prefix --pkg-config=pkg-config --enable-gpl --enable-libx264 --enable-libx265 --enable-avisynth --enable-libxvid --enable-libmp3lame --enable-version3 --enable-zlib --enable-librtmp --enable-libvorbis --enable-libtheora --enable-libspeex --enable-libopenjpeg --enable-gnutls --enable-libgsm --enable-libfreetype --enable-libopus --disable-w32threads --enable-frei0r --enable-filter=frei0r --enable-libvo-aacenc --enable-bzlib --enable-libxavs --extra-cflags=-DPTW32_STATIC_LIB --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libvpx --enable-libilbc --disable-doc --prefix=$mingw_w64_x86_64_prefix $extra_configure_opts --extra-cflags=$CFLAGS" # other possibilities: --enable-w32threads --enable-libflite
   if [[ "$non_free" = "y" ]]; then
     config_options="$config_options --enable-nonfree --enable-libfdk-aac --enable-libfaac" # -- faac deemed too poor quality and becomes the default -- add it in and uncomment the build_faac line to include it --enable-openssl --enable-libaacplus
   else
@@ -1116,6 +1149,7 @@ build_dependencies() {
   build_libxavs
   build_libsoxr
   build_x264
+  build_x265
   build_lame
   build_twolame
   build_vidstab
