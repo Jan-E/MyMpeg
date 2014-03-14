@@ -823,8 +823,8 @@ build_iconv() {
 }
 
 build_freetype() {
-  download_and_unpack_file http://download.savannah.gnu.org/releases/freetype/freetype-2.5.2.tar.gz freetype-2.5.2
-  cd freetype-2.5.2
+  download_and_unpack_file http://download.savannah.gnu.org/releases/freetype/freetype-2.5.3.tar.gz freetype-2.5.3
+  cd freetype-2.5.3
 # export LIBPNG_LDFLAGS=-L$mingw_w64_x86_64_prefix/lib
 # export LIBPNG_CFLAGS=-I$mingw_w64_x86_64_prefix/include
 # export LIBS=-lpng
