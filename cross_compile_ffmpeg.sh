@@ -287,8 +287,7 @@ do_make_install() {
   local touch_name=$(get_small_touchfile_name already_ran_make_install "$extra_make_options")
   if [ ! -f $touch_name ]; then
     echo "make installing $cur_dir2 as $ PATH=$PATH make install $extra_make_options"
-    nice make install $extra_make_options || exit 1
-    touch $touch_name
+    nice make install $extra_make_options && touch $touch_name # only touch if the build was OK
   fi
 }
 
