@@ -1,8 +1,8 @@
 diff --git a/libavfilter/af_volume.c b/libavfilter/af_volume.c
-index 4ec78b1..7e4dd48 100644
+index 5dfec06..67aacfc 100644
 --- a/libavfilter/af_volume.c
 +++ b/libavfilter/af_volume.c
-@@ -51,6 +51,7 @@ static const char *const var_names[] = {
+@@ -54,6 +54,7 @@ static const char *const var_names[] = {
      "startt",              ///< time at start of stream
      "t",                   ///< time in the file of the frame
      "tb",                  ///< timebase
@@ -10,7 +10,7 @@ index 4ec78b1..7e4dd48 100644
      "volume",              ///< last set value
      NULL
  };
-@@ -62,6 +63,9 @@ static const char *const var_names[] = {
+@@ -65,6 +66,9 @@ static const char *const var_names[] = {
  static const AVOption volume_options[] = {
      { "volume", "set volume adjustment expression",
              OFFSET(volume_expr), AV_OPT_TYPE_STRING, { .str = "1.0" }, .flags = A|F },
@@ -20,7 +20,7 @@ index 4ec78b1..7e4dd48 100644
      { "precision", "select mathematical precision",
              OFFSET(precision), AV_OPT_TYPE_INT, { .i64 = PRECISION_FLOAT }, PRECISION_FIXED, PRECISION_DOUBLE, A|F, "precision" },
          { "fixed",  "select 8-bit fixed-point",     0, AV_OPT_TYPE_CONST, { .i64 = PRECISION_FIXED  }, INT_MIN, INT_MAX, A|F, "precision" },
-@@ -233,6 +237,12 @@ static av_cold void volume_init(VolumeContext *vol)
+@@ -242,6 +246,12 @@ static av_cold void volume_init(VolumeContext *vol)
          ff_volume_init_x86(vol);
  }
  
@@ -33,7 +33,7 @@ index 4ec78b1..7e4dd48 100644
  static int set_volume(AVFilterContext *ctx)
  {
      VolumeContext *vol = ctx->priv;
-@@ -254,8 +264,7 @@ static int set_volume(AVFilterContext *ctx)
+@@ -263,8 +273,7 @@ static int set_volume(AVFilterContext *ctx)
             precision_str[vol->precision]);
  
      if (vol->precision == PRECISION_FIXED) {
@@ -43,7 +43,7 @@ index 4ec78b1..7e4dd48 100644
          av_log(ctx, AV_LOG_VERBOSE, "volume_i:%d/255 ", vol->volume_i);
      }
      av_log(ctx, AV_LOG_VERBOSE, "volume:%f volume_dB:%f\n",
-@@ -283,6 +292,7 @@ static int config_output(AVFilterLink *outlink)
+@@ -292,6 +301,7 @@ static int config_output(AVFilterLink *outlink)
      vol->var_values[VAR_STARTPTS] =
      vol->var_values[VAR_STARTT] =
      vol->var_values[VAR_T] =
@@ -51,9 +51,9 @@ index 4ec78b1..7e4dd48 100644
      vol->var_values[VAR_VOLUME] = NAN;
  
      vol->var_values[VAR_NB_CHANNELS] = inlink->channels;
-@@ -327,6 +337,30 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
-     int64_t pos;
-     int ret;
+@@ -366,6 +376,30 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
+         av_frame_remove_side_data(buf, AV_FRAME_DATA_REPLAYGAIN);
+     }
  
 +    vol->var_values[VAR_META] = NAN;
 +    if (vol->metadata) {
@@ -83,7 +83,7 @@ index 4ec78b1..7e4dd48 100644
          vol->var_values[VAR_STARTPTS] = TS2D(buf->pts);
          vol->var_values[VAR_STARTT  ] = TS2T(buf->pts, inlink->time_base);
 diff --git a/libavfilter/af_volume.h b/libavfilter/af_volume.h
-index 10ef6fb..fce612e 100644
+index 9f81790..4fcb031 100644
 --- a/libavfilter/af_volume.h
 +++ b/libavfilter/af_volume.h
 @@ -54,6 +54,7 @@ enum VolumeVarName {
@@ -94,7 +94,7 @@ index 10ef6fb..fce612e 100644
      VAR_VOLUME,
      VAR_VARS_NB
  };
-@@ -76,6 +77,8 @@ typedef struct VolumeContext {
+@@ -84,6 +85,8 @@ typedef struct VolumeContext {
      void (*scale_samples)(uint8_t *dst, const uint8_t *src, int nb_samples,
                            int volume);
      int samples_align;
