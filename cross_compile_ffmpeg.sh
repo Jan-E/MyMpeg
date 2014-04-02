@@ -1110,7 +1110,12 @@ find_all_build_exes() {
 }
 
 build_dependencies() {
-  echo "PKG_CONFIG_PATH=$PKG_CONFIG_PATH" # debug
+  if [[ $shared == "shared" ]]; then
+    echo "PKG_CONFIG_PATH=$PKG_CONFIG_PATH"
+  else
+    # http://ffmpeg.zeranoe.com/forum/viewtopic.php?f=5&t=4&start=20#p5338
+    echo "PKG_CONFIG_PATH=$PKG_CONFIG_PATH --static"
+  fi
 #  build_win32_pthreads # vpx etc. depend on this--provided by the compiler build script now, so shouldn't have to build our own
   build_libdl # ffmpeg's frei0r implentation needs this
   build_zlib # rtmp depends on it [as well as ffmpeg's optional but handy --enable-zlib]
