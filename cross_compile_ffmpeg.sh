@@ -1053,7 +1053,6 @@ build_ffmpeg() {
   apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/movenc.patch
   apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/mpegvideo_enc.patch
   apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/swscale.patch
-  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/revert_dropping_frame_error.patch
 
   apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_aacenc.patch
   apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_avuienc.patch
