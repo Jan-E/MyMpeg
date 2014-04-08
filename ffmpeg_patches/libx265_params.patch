@@ -1,0 +1,13 @@
+diff --git a/libavcodec/libx265.c b/libavcodec/libx265.c
+index 1788f65..14abf0c 100644
+--- a/libavcodec/libx265.c
++++ b/libavcodec/libx265.c
+@@ -115,8 +115,6 @@ static av_cold int libx265_encode_init(AVCodecContext *avctx)
+     av_reduce(&sar_num, &sar_den,
+               avctx->sample_aspect_ratio.num,
+               avctx->sample_aspect_ratio.den, 4096);
+-    ctx->params->vui.bEnableVuiParametersPresentFlag = 1;
+-    ctx->params->vui.bEnableAspectRatioIdc           = 1;
+     ctx->params->vui.aspectRatioIdc                  = 255;
+     ctx->params->vui.sarWidth                        = sar_num;
+     ctx->params->vui.sarHeight                       = sar_den;

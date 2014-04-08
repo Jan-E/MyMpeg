@@ -1045,6 +1045,8 @@ build_ffmpeg() {
     extra_configure_opts="--enable-static --disable-shared $extra_configure_opts"
     cd $output_dir
   fi
+
+  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/libx265_params.patch
   
   apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_new.patch
   apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/ass_fontsize.patch
