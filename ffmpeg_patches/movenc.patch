@@ -1,8 +1,8 @@
 diff --git a/libavformat/movenc.c b/libavformat/movenc.c
-index 94acc94..bd62c40 100644
+index 808a2bc..7c9731f 100644
 --- a/libavformat/movenc.c
 +++ b/libavformat/movenc.c
-@@ -3358,7 +3358,9 @@ int ff_mov_write_packet(AVFormatContext *s, AVPacket *pkt)
+@@ -3368,7 +3368,9 @@ int ff_mov_write_packet(AVFormatContext *s, AVPacket *pkt)
              av_log(s, AV_LOG_ERROR, "Malformed AAC bitstream detected: "
                     "use audio bitstream filter 'aac_adtstoasc' to fix it "
                     "('-bsf:a aac_adtstoasc' option with ffmpeg)\n");

@@ -1094,6 +1094,75 @@ build_ffmpeg() {
   cd ..
 }
 
+build_ffmpeg_release() {
+  local type=$1
+  local shared=$2
+  local download_url="http://ffmpeg.org/releases/ffmpeg-2.2.1.tar.gz"
+  local output_dir="ffmpeg"
+
+  # FFmpeg 
+  local extra_configure_opts="--enable-libsoxr --enable-fontconfig --enable-libass --enable-libutvideo --enable-libbluray --enable-iconv --enable-libtwolame --extra-cflags=-DLIBTWOLAME_STATIC --enable-libzvbi --enable-libcaca --enable-libmodplug --extra-libs=-lstdc++ --extra-libs=-lpng --enable-libvidstab"
+  extra_configure_opts="$extra_configure_opts"
+  # can't mix and match --enable-static --enable-shared unfortunately, or the final executable seems to just use shared if the're both present
+
+  
+  if [[ $shared == "shared" ]]; then
+    download_and_unpack_file $download_url ${output_dir}_shared
+    extra_configure_opts="--enable-shared --disable-static $extra_configure_opts"
+    cd ${output_dir}_shared
+  else
+    download_and_unpack_file $download_url $output_dir
+    cd $output_dir
+  fi
+
+  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_new.patch
+  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/ass_fontsize.patch
+  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/subtitles_non_fatal.patch
+  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/asfenc.patch
+  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/movenc.patch
+  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/mpegvideo_enc.patch
+  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/swscale.patch
+  
+  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_aacenc.patch
+  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_avuienc.patch
+  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_crystalhd.patch
+  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_dcaenc.patch
+  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_s302menc.patch
+  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_vorbisenc.patch
+  
+  if [ "$bits_target" = "32" ]; then
+   local arch=x86
+  else
+   local arch=x86_64
+  fi
+
+  config_options="--arch=$arch --target-os=mingw32 --cross-prefix=$cross_prefix --pkg-config=pkg-config --enable-gpl --enable-libx264 --enable-libx265 --enable-avisynth --enable-libxvid --enable-libmp3lame --enable-version3 --enable-zlib --enable-librtmp --enable-libvorbis --enable-libtheora --enable-libspeex --enable-libopenjpeg --enable-gnutls --enable-libgsm --enable-libfreetype --enable-libopus --disable-w32threads --enable-frei0r --enable-filter=frei0r --enable-libvo-aacenc --enable-bzlib --enable-libxavs --extra-cflags=-DPTW32_STATIC_LIB --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libvpx --enable-libilbc --disable-doc --prefix=$mingw_w64_x86_64_prefix $extra_configure_opts" # other possibilities: --enable-w32threads --enable-libflite
+  if [[ "$non_free" = "y" ]]; then
+    config_options="$config_options --enable-nonfree --enable-libfdk-aac --enable-libfaac" # -- faac deemed too poor quality and becomes the default -- add it in and uncomment the build_faac line to include it --enable-openssl --enable-libaacplus
+  else
+    config_options="$config_options"
+  fi
+
+  if [[ "$native_build" = "y" ]]; then
+    config_options="$config_options --disable-runtime-cpudetect"
+    # TODO --cpu=host ... ?
+  else
+    config_options="$config_options --enable-runtime-cpudetect"
+  fi
+  
+  do_configure "$config_options"
+  rm -f */*.a */*.dll *.exe # just in case some dependency library has changed, force it to re-link even if the ffmpeg source hasn't changed...
+  rm already_ran_make*
+  echo "doing ffmpeg make $(pwd)"
+  do_make
+  if [[ $shared != "shared" ]]; then
+    do_make_install # install ffmpeg to get libavcodec libraries to be used as dependencies for other things, like vlc [XXX make this a config option?]
+  fi
+  echo "Done! You will find $bits_target bit $shared binaries in $(pwd)/{ffmpeg,ffprobe,ffplay,avconv,avprobe}*.exe"
+  ls -la *.exe
+  cd ..
+}
+
 find_all_build_exes() {
   found=""
 # NB that we're currently in the sandbox dir
@@ -1184,9 +1253,11 @@ build_apps() {
   fi
   if [[ $build_ffmpeg_shared = "y" ]]; then
     build_ffmpeg ffmpeg shared
+    build_ffmpeg_release ffmpeg shared
   fi
   if [[ $build_ffmpeg_static = "y" ]]; then
     build_ffmpeg ffmpeg
+    build_ffmpeg_release ffmpeg
   fi
   if [[ $build_libav = "y" ]]; then
     build_ffmpeg libav
