@@ -1098,7 +1098,7 @@ build_ffmpeg_release() {
   local type=$1
   local shared=$2
   local download_url="http://ffmpeg.org/releases/ffmpeg-2.2.1.tar.gz"
-  local output_dir="ffmpeg"
+  local output_dir="ffmpeg-2.2.1"
 
   # FFmpeg 
   local extra_configure_opts="--enable-libsoxr --enable-fontconfig --enable-libass --enable-libutvideo --enable-libbluray --enable-iconv --enable-libtwolame --extra-cflags=-DLIBTWOLAME_STATIC --enable-libzvbi --enable-libcaca --enable-libmodplug --extra-libs=-lstdc++ --extra-libs=-lpng --enable-libvidstab"
@@ -1252,12 +1252,12 @@ build_apps() {
     build_mplayer
   fi
   if [[ $build_ffmpeg_shared = "y" ]]; then
-    build_ffmpeg ffmpeg shared
     build_ffmpeg_release ffmpeg shared
+    build_ffmpeg ffmpeg shared
   fi
   if [[ $build_ffmpeg_static = "y" ]]; then
-    build_ffmpeg ffmpeg
     build_ffmpeg_release ffmpeg
+    build_ffmpeg ffmpeg
   fi
   if [[ $build_libav = "y" ]]; then
     build_ffmpeg libav
