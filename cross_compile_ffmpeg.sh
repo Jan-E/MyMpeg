@@ -1059,8 +1059,6 @@ build_ffmpeg() {
     cd $output_dir
   fi
 
-  apply_ffmpeg_patch http://git.videolan.org/?p=ffmpeg.git;a=patch;h=8945dcbb52b6b87e1e6479912cce89c7da54ec43
-  
   apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_new.patch
   apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/ass_fontsize.patch
   apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/subtitles_non_fatal.patch
@@ -1131,6 +1129,8 @@ build_ffmpeg_release() {
     cd $output_dir
   fi
 
+  apply_ffmpeg_release_patch http://git.videolan.org/?p=ffmpeg.git;a=patch;h=8945dcbb52b6b87e1e6479912cce89c7da54ec43
+  
   apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_new.patch
   apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/ass_fontsize.patch
   apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/subtitles_non_fatal.patch
