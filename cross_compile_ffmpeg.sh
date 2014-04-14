@@ -1121,10 +1121,12 @@ build_ffmpeg_release() {
   # can't mix and match --enable-static --enable-shared unfortunately, or the final executable seems to just use shared if the're both present
 
   if [[ $shared == "shared" ]]; then
+    rm -rf ${output_dir}_shared
     download_and_unpack_file $download_url ${output_dir}_shared
     extra_configure_opts="--enable-shared --disable-static $extra_configure_opts"
     cd ${output_dir}_shared
   else
+    rm -rf $output_dir
     download_and_unpack_file $download_url $output_dir
     cd $output_dir
   fi
