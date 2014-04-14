@@ -1059,20 +1059,20 @@ build_ffmpeg() {
     cd $output_dir
   fi
 
-  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_new.patch
-  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/ass_fontsize.patch
-  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/subtitles_non_fatal.patch
-  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/asfenc.patch
-  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/movenc.patch
-  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/mpegvideo_enc.patch
-  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/swscale.patch
-  
   apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_aacenc.patch
   apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_avuienc.patch
   apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_crystalhd.patch
   apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_dcaenc.patch
   apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_s302menc.patch
   apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_vorbisenc.patch
+  
+  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/ass_fontsize.patch
+  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/subtitles_non_fatal.patch
+  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/asfenc.patch
+  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/movenc.patch
+  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/mpegvideo_enc.patch
+  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/swscale.patch
+  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_new.patch
   
   if [ "$bits_target" = "32" ]; then
    local arch=x86
@@ -1134,14 +1134,6 @@ build_ffmpeg_release() {
   wget https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavcodec/libx265.c
   cd ..
   
-  apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_new.patch
-  apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/ass_fontsize.patch
-  apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/subtitles_non_fatal.patch
-  apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/asfenc.patch
-  apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/movenc.patch
-  apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/mpegvideo_enc.patch
-  apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/swscale.patch
-  
   apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_aacenc.patch
   apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_avuienc.patch
   apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_crystalhd.patch
@@ -1149,6 +1141,14 @@ build_ffmpeg_release() {
   apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_s302menc.patch
   apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_vorbisenc.patch
   
+  apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/ass_fontsize.patch
+  apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/subtitles_non_fatal.patch
+  apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/asfenc.patch
+  apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/movenc.patch
+  apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/mpegvideo_enc.patch
+  apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/swscale.patch
+  apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_new.patch
+
   if [ "$bits_target" = "32" ]; then
    local arch=x86
   else
