@@ -1021,7 +1021,7 @@ apply_ffmpeg_release_patch() {
  if [[ ! -e $patch_done_name ]]; then
    curl $url -O || exit 1
    echo "applying patch $patch_name"
-   patch -p1 < "$patch_name" && touch $patch_done_name && git diff > "/mnt/winshare/mympeg/ffmpeg_patches/$patch_name"
+   patch -p1 < "$patch_name" && touch $patch_done_name
  else
    echo "patch $patch_name already applied"
  fi
@@ -1059,6 +1059,8 @@ build_ffmpeg() {
     cd $output_dir
   fi
 
+  apply_ffmpeg_patch http://git.videolan.org/?p=ffmpeg.git;a=patch;h=8945dcbb52b6b87e1e6479912cce89c7da54ec43
+  
   apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_new.patch
   apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/ass_fontsize.patch
   apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/subtitles_non_fatal.patch
@@ -1118,7 +1120,6 @@ build_ffmpeg_release() {
   extra_configure_opts="$extra_configure_opts"
   # can't mix and match --enable-static --enable-shared unfortunately, or the final executable seems to just use shared if the're both present
 
-  
   if [[ $shared == "shared" ]]; then
     download_and_unpack_file $download_url ${output_dir}_shared
     extra_configure_opts="--enable-shared --disable-static $extra_configure_opts"
