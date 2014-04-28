@@ -143,7 +143,7 @@ install_cross_compiler() {
   if [[ -z $build_choice ]]; then
     pick_compiler_flavors
   fi
-  curl https://raw.github.com/Jan-E/mympeg/master/patches/mingw-w64-build-3.5.0.local -O  || exit 1
+  wget https://raw.github.com/Jan-E/mympeg/master/patches/mingw-w64-build-3.5.0.local || exit 1
   chmod u+x mingw-w64-build-3.5.0.local
   unset CFLAGS # don't want these for the compiler itself since it creates executables to run on the local box
   # pthreads version to avoid having to use cvs for it
