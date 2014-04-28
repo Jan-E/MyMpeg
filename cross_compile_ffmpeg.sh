@@ -306,7 +306,7 @@ apply_patch() {
  local patch_name=$(basename $url)
  local patch_done_name="$patch_name.done"
  if [[ ! -e $patch_done_name ]]; then
-   curl $url -O || exit 1
+   wget $url || exit 1
    echo "applying patch $patch_name"
    patch -p0 < "$patch_name" || exit 1
    touch $patch_done_name
@@ -321,7 +321,7 @@ download_and_unpack_file() {
   output_dir="$2"
   if [ ! -f "$output_dir/unpacked.successfully" ]; then
     echo "downloading $url"
-    curl "$url" -O -L || exit 1
+    wget "$url" || exit 1
     tar -xf "$output_name" || unzip $output_name || exit 1
     touch "$output_dir/unpacked.successfully" || exit 1
     rm "$output_name"
@@ -392,7 +392,7 @@ build_x264() {
     # TODO more march=native here?
     # TODO profile guided here option, with wine?
     do_configure "$configure_flags"
-    curl http://samples.mplayerhq.hu/yuv4mpeg2/example.y4m.bz2 -O || exit 1
+    wget http://samples.mplayerhq.hu/yuv4mpeg2/example.y4m.bz2 || exit 1
     rm example.y4m # in case it exists already...
     bunzip2 example.y4m.bz2 || exit 1
     # XXX does this kill git updates? maybe a more general fix, since vid.stab does also?
@@ -913,7 +913,7 @@ build_frei0r() {
     #cp include/frei0r.h $mingw_w64_x86_64_prefix/include
   #cd ..
   if [[ ! -f "$mingw_w64_x86_64_prefix/include/frei0r.h" ]]; then
-    curl https://raw.github.com/rdp/frei0r/master/include/frei0r.h > $mingw_w64_x86_64_prefix/include/frei0r.h || exit 1
+    wget https://raw.github.com/rdp/frei0r/master/include/frei0r.h > $mingw_w64_x86_64_prefix/include/frei0r.h || exit 1
   fi
 }
 
@@ -1004,7 +1004,7 @@ apply_ffmpeg_patch() {
  local patch_name=$(basename $url)
  local patch_done_name="$patch_name.my_patch"
  if [[ ! -e $patch_done_name ]]; then
-   curl $url -O || exit 1
+   wget $url || exit 1
    echo "applying patch $patch_name"
    patch -p1 < "$patch_name" && touch $patch_done_name && git diff > "/mnt/winshare/mympeg/ffmpeg_patches/$patch_name" \
      || git stash
@@ -1019,7 +1019,7 @@ apply_ffmpeg_release_patch() {
  local patch_name=$(basename $url)
  local patch_done_name="$patch_name.my_patch"
  if [[ ! -e $patch_done_name ]]; then
-   curl $url -O || exit 1
+   wget $url || exit 1
    echo "applying patch $patch_name"
    patch -p1 < "$patch_name" && touch $patch_done_name
  else
