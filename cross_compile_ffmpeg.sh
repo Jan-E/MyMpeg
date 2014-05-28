@@ -143,11 +143,11 @@ install_cross_compiler() {
   if [[ -z $build_choice ]]; then
     pick_compiler_flavors
   fi
-  wget https://raw.github.com/Jan-E/mympeg/master/patches/mingw-w64-build-3.5.0.local || exit 1
-  chmod u+x mingw-w64-build-3.5.0.local
+  wget https://raw.github.com/Jan-E/mympeg/master/patches/mingw-w64-build-3.5.8.local || exit 1
+  chmod u+x mingw-w64-build-3.5.8.local
   unset CFLAGS # don't want these for the compiler itself since it creates executables to run on the local box
   # pthreads version to avoid having to use cvs for it
-  nice ./mingw-w64-build-3.5.0.local --clean-build --disable-shared --default-configure  --pthreads-w32-ver=2-9-1 --cpu-count=$gcc_cpu_count --build-type=$build_choice || exit 1 # --disable-shared allows c++ to be distributed at all...which seemed necessary for some random dependency...
+  nice ./mingw-w64-build-3.5.8.local --clean-build --disable-shared --default-configure  --pthreads-w32-ver=2-9-1 --cpu-count=$gcc_cpu_count --build-type=$build_choice || exit 1 # --disable-shared allows c++ to be distributed at all...which seemed necessary for some random dependency...
   export CFLAGS=$original_cflags # reset it
   if [ -d mingw-w64-x86_64 ]; then
     touch mingw-w64-x86_64/compiler.done
@@ -1110,8 +1110,8 @@ build_ffmpeg() {
 build_ffmpeg_release() {
   local type=$1
   local shared=$2
-  local download_url="http://ffmpeg.org/releases/ffmpeg-2.2.1.tar.gz"
-  local output_dir="ffmpeg-2.2.1"
+  local download_url="http://ffmpeg.org/releases/ffmpeg-2.2.2.tar.gz"
+  local output_dir="ffmpeg-2.2.2"
 
   # FFmpeg 
   local extra_configure_opts="--enable-libsoxr --enable-fontconfig --enable-libass --enable-libutvideo --enable-libbluray --enable-iconv --enable-libtwolame --extra-cflags=-DLIBTWOLAME_STATIC --enable-libzvbi --enable-libcaca --enable-libmodplug --extra-libs=-lstdc++ --extra-libs=-lpng --enable-libvidstab"
@@ -1129,10 +1129,10 @@ build_ffmpeg_release() {
     cd $output_dir
   fi
 
-  cd libavcodec
-  rm -f libx265.c
-  wget https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavcodec/libx265.c
-  cd ..
+# cd libavcodec
+# rm -f libx265.c
+# wget https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavcodec/libx265.c
+# cd ..
   
   apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_aacenc.patch
   apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_avuienc.patch
@@ -1396,3 +1396,4 @@ fi
 for file in $(find_all_build_exes); do
   echo "built $file"
 done
+	
