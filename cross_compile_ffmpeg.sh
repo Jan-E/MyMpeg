@@ -1042,7 +1042,6 @@ build_ffmpeg() {
     output_dir="libav_git"
     extra_configure_opts=""
   fi
-
   extra_configure_opts="$extra_configure_opts"
 
   # can't mix and match --enable-static --enable-shared unfortunately, or the final executable seems to just use shared if the're both present
@@ -1055,7 +1054,6 @@ build_ffmpeg() {
     cd ${output_dir}_shared
   else
     do_git_checkout $git_url $output_dir
-    extra_configure_opts="--enable-static --disable-shared $extra_configure_opts"
     cd $output_dir
   fi
 
@@ -1129,11 +1127,6 @@ build_ffmpeg_release() {
     cd $output_dir
   fi
 
-# cd libavcodec
-# rm -f libx265.c
-# wget https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/libavcodec/libx265.c
-# cd ..
-  
   apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_aacenc.patch
   apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_avuienc.patch
   apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_crystalhd.patch
@@ -1396,4 +1389,3 @@ fi
 for file in $(find_all_build_exes); do
   echo "built $file"
 done
-	
