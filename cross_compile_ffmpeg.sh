@@ -464,17 +464,18 @@ build_libpng() {
 }
 
 build_libopenjpeg() {
-  download_and_unpack_file http://openjpeg.googlecode.com/files/openjpeg_v1_4_sources_r697.tgz openjpeg_v1_4_sources_r697
-  cd openjpeg_v1_4_sources_r697
-# download_and_unpack_file http://openjpeg.googlecode.com/files/openjpeg-1.5.1.tar.gz openjpeg-1.5.1
-# cd openjpeg-1.5.1
-# export LIBS=-lpng
+# download_and_unpack_file http://openjpeg.googlecode.com/files/openjpeg_v1_4_sources_r697.tgz openjpeg_v1_4_sources_r697
+# cd openjpeg_v1_4_sources_r697
+  download_and_unpack_file http://openjpeg.googlecode.com/files/openjpeg-1.5.1.tar.gz openjpeg-1.5.1
+  cd openjpeg-1.5.1
+  export LIBS=-lpng
   export LDFLAGS=-L$mingw_w64_x86_64_prefix/lib
   export CFLAGS=-I$mingw_w64_x86_64_prefix/include
   generic_configure "--disable-png" # could not get libpng to work on centos systems
   sed -i "s/\/usr\/lib/\$\(prefix\)\/lib/" Makefile # install pkg_config to the right dir...
   sed -i "s/\/usr\/local\/lib/\$\(prefix\)\/lib/" Makefile # pnglibs = -L/usr/local/lib -lpng15 etc
   sed -i "s/\/usr\/local\/bin/\$\(prefix\)\/bin/" Makefile # LIBPNG_CONFIG = /usr/local/bin/libpng-config etc
+  sed -i "s/SUBDIRS = libopenjpeg applications doc/SUBDIRS = libopenjpeg/" Makefile # do not build .exe and doc
   cpu_count=1 # this one can't build multi-threaded <sigh> kludge
   do_make_install
   cpu_count=$original_cpu_count
