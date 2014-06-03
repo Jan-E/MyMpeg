@@ -712,8 +712,8 @@ build_libschroedinger() {
 }
 
 build_gnutls() { # 3.2.8 failed
-  download_and_unpack_file ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/gnutls-3.2.7.tar.xz gnutls-3.2.7
-  cd gnutls-3.2.7
+  download_and_unpack_file ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/gnutls-3.2.15.tar.xz gnutls-3.2.15
+  cd gnutls-3.2.15
     generic_configure "--disable-cxx --disable-doc" # don't need the c++ version, in an effort to cut down on size... LODO test difference...
     do_make_install
   cd ..
