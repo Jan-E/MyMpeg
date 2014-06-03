@@ -890,7 +890,8 @@ build_libmodplug() {
 
 build_libcaca() {
   local cur_dir2=$(pwd)/libcaca-0.99.beta18
-  download_and_unpack_file http://caca.zoy.org/files/libcaca/libcaca-0.99.beta18.tar.gz libcaca-0.99.beta18
+# download_and_unpack_file http://caca.zoy.org/files/libcaca/libcaca-0.99.beta18.tar.gz libcaca-0.99.beta18
+  download_and_unpack_file http://ffmpeg.zeranoe.com/builds/source/external_libraries/libcaca-0.99.beta18.tar.xz libcaca-0.99.beta18
   cd libcaca-0.99.beta18
   cd caca
     sed -i "s/__declspec(dllexport)//g" *.h # get rid of the declspec lines otherwise the build will fail for undefined symbols
