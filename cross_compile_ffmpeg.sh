@@ -629,7 +629,7 @@ build_libogg() {
 }
 
 build_libvorbis() {
-  generic_download_and_install http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.3.tar.gz libvorbis-1.3.3
+  generic_download_and_install http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.4.tar.gz libvorbis-1.3.4
 }
 
 build_libspeex() {
@@ -762,8 +762,8 @@ build_libxvid() {
 }
 
 build_fontconfig() { # 2.11.0 failed
-  download_and_unpack_file http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.10.95.tar.gz fontconfig-2.10.95
-  cd fontconfig-2.10.95
+  download_and_unpack_file http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.1.tar.gz fontconfig-2.11.1
+  cd fontconfig-2.11.1
     generic_configure --disable-docs
     do_make_install
   cd .. 
