@@ -460,7 +460,7 @@ build_libxavs() {
 }
 
 build_libpng() {
-  generic_download_and_install http://download.sourceforge.net/libpng/libpng-1.5.14.tar.xz libpng-1.5.14
+  generic_download_and_install http://download.sourceforge.net/libpng/libpng-1.5.18.tar.xz libpng-1.5.18
 }
 
 build_libopenjpeg() {
@@ -693,7 +693,7 @@ build_libschroedinger() {
   cd ..
 }
 
-build_gnutls() { # 3.2.8 failed
+build_gnutls() {
   download_and_unpack_file ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/gnutls-3.2.15.tar.xz gnutls-3.2.15
   cd gnutls-3.2.15
     generic_configure "--disable-cxx --disable-doc" # don't need the c++ version, in an effort to cut down on size... LODO test difference...
@@ -727,7 +727,7 @@ build_zlib() {
 }
 
 build_libxvid() {
-  download_and_unpack_file http://downloads.xvid.org/downloads/xvidcore-1.3.2.tar.gz xvidcore
+  download_and_unpack_file http://downloads.xvid.org/downloads/xvidcore-1.3.3.tar.gz xvidcore
   cd xvidcore/build/generic
   if [ "$bits_target" = "64" ]; then
     local config_opts="--build=x86_64-unknown-linux-gnu --disable-assembly" # kludgey work arounds for 64 bit
@@ -865,7 +865,7 @@ build_zvbi() {
 }
 
 build_libmodplug() {
-  generic_download_and_install http://sourceforge.net/projects/modplug-xmms/files/libmodplug/0.8.8.4/libmodplug-0.8.8.4.tar.gz/download libmodplug-0.8.8.4
+  generic_download_and_install http://sourceforge.net/projects/modplug-xmms/files/libmodplug/0.8.8.5/libmodplug-0.8.8.5.tar.gz/download libmodplug-0.8.8.5
   # unfortunately this sed isn't enough, though I think it should be [so we add --extra-libs=-lstdc++ to FFmpegs configure] http://trac.ffmpeg.org/ticket/1539
   sed -i 's/-lmodplug.*/-lmodplug -lstdc++/' "$PKG_CONFIG_PATH/libmodplug.pc" # huh ?? c++?
 }
