@@ -781,8 +781,8 @@ build_libaacplus() {
 }
 
 build_openssl() {
-  download_and_unpack_file http://www.openssl.org/source/openssl-1.0.1g.tar.gz openssl-1.0.1g
-  cd openssl-1.0.1g
+  download_and_unpack_file http://www.openssl.org/source/openssl-1.0.1h.tar.gz openssl-1.0.1h
+  cd openssl-1.0.1h
   export cross="$cross_prefix"
   export CC="${cross}gcc"
   export AR="${cross}ar"

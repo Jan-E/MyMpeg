@@ -1,5 +1,5 @@
 diff --git a/libavcodec/dcaenc.c b/libavcodec/dcaenc.c
-index 8d0655d..d050fc3 100644
+index 905cdc9..179cea4 100644
 --- a/libavcodec/dcaenc.c
 +++ b/libavcodec/dcaenc.c
 @@ -961,7 +961,6 @@ AVCodec ff_dca_encoder = {
