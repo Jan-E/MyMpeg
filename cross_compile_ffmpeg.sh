@@ -356,7 +356,7 @@ build_x265() {
     if [[ $git_get_latest = "y" ]]; then
       echo "doing hg pull -u x265"
       old_hg_version=`hg --debug id -i`
-      hg pull -u || exit 1
+      hg pull -u
     else
       echo "not doing hg pull x265"
     fi
@@ -368,6 +368,7 @@ build_x265() {
   cd source
 
   # hg checkout 9b0c9b # no longer needed...
+
 
   local new_hg_version=`hg --debug id -i`  
   if [[ "$old_hg_version" != "$new_hg_version" ]]; then
