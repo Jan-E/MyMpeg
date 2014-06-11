@@ -367,9 +367,6 @@ build_x265() {
   fi    
   cd source
 
-  # hg checkout 9b0c9b # no longer needed...
-
-
   local new_hg_version=`hg --debug id -i`  
   if [[ "$old_hg_version" != "$new_hg_version" ]]; then
     echo "got upstream hg changes, forcing rebuild...x265"
@@ -735,15 +732,18 @@ build_libxvid() {
   fi
   do_configure "--host=$host_target --prefix=$mingw_w64_x86_64_prefix $config_opts" # no static option...
   sed -i "s/-mno-cygwin//" platform.inc # remove old compiler flag that now apparently breaks us
+
+  cpu_count=1 # possibly can't build this multi-thread ? http://betterlogic.com/roger/2014/02/xvid-build-woe/
   do_make_install
+  cpu_count=$original_cpu_count
   cd ../../..
-  # force a static build after the fact
-  if [[ -f "$mingw_w64_x86_64_prefix/lib/xvidcore.dll" ]]; then
-    rm $mingw_w64_x86_64_prefix/lib/xvidcore.dll || exit 1
+
+  # force a static build after the fact by only installing the .a file
+  if [[ -f "$mingw_w64_x86_64_prefix/lib/xvidcore.dll.a" ]]; then
+    rm $mingw_w64_x86_64_prefix/lib/xvidcore.dll.a || exit 1
     mv $mingw_w64_x86_64_prefix/lib/xvidcore.a $mingw_w64_x86_64_prefix/lib/libxvidcore.a || exit 1
   fi
 }
-
 build_fontconfig() { # 2.11.0 failed
   download_and_unpack_file http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.1.tar.gz fontconfig-2.11.1
   cd fontconfig-2.11.1
