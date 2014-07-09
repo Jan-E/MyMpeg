@@ -1,8 +1,8 @@
 diff --git a/libavcodec/crystalhd.c b/libavcodec/crystalhd.c
-index 3f4502b..0a7f58f 100644
+index 45b2d46..01f9d7b 100644
 --- a/libavcodec/crystalhd.c
 +++ b/libavcodec/crystalhd.c
-@@ -1167,7 +1167,7 @@ AVCodec ff_msmpeg4_crystalhd_decoder = {
+@@ -1170,7 +1170,7 @@ AVCodec ff_msmpeg4_crystalhd_decoder = {
      .init           = init,
      .close          = uninit,
      .decode         = decode,
