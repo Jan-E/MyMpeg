@@ -412,7 +412,10 @@ build_librtmp() {
   do_make_install "CRYPTO=GNUTLS OPT=-O2 CROSS_COMPILE=$cross_prefix SHARED=no prefix=$mingw_w64_x86_64_prefix"
   #make install CRYPTO=GNUTLS OPT='-O2 -g' "CROSS_COMPILE=$cross_prefix" SHARED=no "prefix=$mingw_w64_x86_64_prefix" || exit 1
   sed -i 's/-lrtmp -lz/-lrtmp -lwinmm -lz/' "$PKG_CONFIG_PATH/librtmp.pc"
-  cd ../..
+  cd ..
+   # TODO do_make here instead...
+   make SYS=mingw CRYPTO=GNUTLS OPT=-O2 CROSS_COMPILE=$cross_prefix SHARED=no LIB_GNUTLS="`pkg-config --libs gnutls` -lz" || exit 1
+  cd ..
 }
 
 build_qt() {
@@ -537,34 +540,30 @@ build_libopus() {
   generic_download_and_install http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz opus-1.1 
 }
 
+build_libdvdread() {
+  download_and_unpack_file http://dvdnav.mplayerhq.hu/releases/libdvdread-4.9.9.tar.xz libdvdread-4.9.9 
+  cd libdvdread-4.9.9
+  generic_configure "CFLAGS=-DHAVE_DVDCSS_DVDCSS_H LDFLAGS=-ldvdcss" # vlc patch: "--enable-libdvdcss" # XXX ask how I'm *supposed* to do this to the dvdread peeps [svn?]
+  #apply_patch https://raw.githubusercontent.com/rdp/ffmpeg-windows-build-helpers/master/patches/dvdread-win32.patch # has been reported to them...
+  do_make_install 
+  #sed -i "s/-ldvdread.*/-ldvdread -ldvdcss/" $mingw_w64_x86_64_prefix/bin/dvdread-config # ??? related to vlc patch, above, probably
+  sed -i 's/-ldvdread.*/-ldvdread -ldvdcss/' "$PKG_CONFIG_PATH/dvdread.pc"
+  cd ..
+}
+
 build_libdvdnav() {
   download_and_unpack_file http://dvdnav.mplayerhq.hu/releases/libdvdnav-4.2.1.tar.xz libdvdnav-4.2.1
   cd libdvdnav-4.2.1
   if [[ ! -f ./configure ]]; then
     ./autogen.sh
   fi
-  generic_configure "--with-dvdread-config=$mingw_w64_x86_64_prefix/bin/dvdread-config"
+  generic_configure
   do_make_install 
   cd ..
 }
 
 build_libdvdcss() {
   generic_download_and_install http://download.videolan.org/pub/videolan/libdvdcss/1.2.13/libdvdcss-1.2.13.tar.bz2 libdvdcss-1.2.13
-}
-
-build_libdvdread() {
-  download_and_unpack_file http://dvdnav.mplayerhq.hu/releases/libdvdread-4.2.1.tar.xz libdvdread-4.2.1
-  cd libdvdread-4.2.1
-  if [[ ! -f ./configure ]]; then
-    ./autogen.sh
-  fi
-
-  generic_configure "CFLAGS=-DHAVE_DVDCSS_DVDCSS_H LDFLAGS=-ldvdcss" # vlc patch: "--enable-libdvdcss" # XXX ask how I'm *supposed* to do this to the dvdread peeps [svn?]
-  apply_patch https://raw.github.com/Jan-E/mympeg/master/patches/dvdread-win32.patch # XXX ???
-  do_make_install 
-  sed -i "s/-ldvdread.*/-ldvdread -ldvdcss/" $mingw_w64_x86_64_prefix/bin/dvdread-config
-  sed -i 's/-ldvdread.*/-ldvdread -ldvdcss/' "$PKG_CONFIG_PATH/dvdread.pc"
-  cd ..
 }
 
 build_glew() { # opengl stuff
@@ -692,8 +691,8 @@ build_libschroedinger() {
 }
 
 build_gnutls() {
-  download_and_unpack_file ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/gnutls-3.2.15.tar.xz gnutls-3.2.15
-  cd gnutls-3.2.15
+  download_and_unpack_file ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/gnutls-3.2.16.tar.xz gnutls-3.2.16
+  cd gnutls-3.2.16
     generic_configure "--disable-cxx --disable-doc" # don't need the c++ version, in an effort to cut down on size... LODO test difference...
     do_make_install
   cd ..
