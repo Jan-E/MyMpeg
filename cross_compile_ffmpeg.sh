@@ -495,6 +495,10 @@ build_libvpx() {
   cd ..
 }
 
+build_wavpack() {
+  generic_download_and_install http://wavpack.com/wavpack-4.70.0.tar.bz2 wavpack-4.70.0
+}
+
 build_libutvideo() {
   download_and_unpack_file https://github.com/downloads/rdp/FFmpeg/utvideo-11.1.1-src.zip utvideo-11.1.1
   cd utvideo-11.1.1
@@ -748,6 +752,7 @@ build_libxvid() {
     mv $mingw_w64_x86_64_prefix/lib/xvidcore.a $mingw_w64_x86_64_prefix/lib/libxvidcore.a || exit 1
   fi
 }
+
 build_fontconfig() { # 2.11.0 failed
   download_and_unpack_file http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.1.tar.gz fontconfig-2.11.1
   cd fontconfig-2.11.1
@@ -1235,6 +1240,7 @@ build_dependencies() {
   build_libfribidi
   build_libass # needs freetype, needs fribidi, needs fontconfig
   build_libopenjpeg
+  build_wavpack
   build_libwebp
   if [[ "$non_free" = "y" ]]; then
     build_fdk_aac
