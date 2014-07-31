@@ -673,8 +673,8 @@ build_libxml2() {
 }
 
 build_libbluray() {
-  download_and_unpack_file ftp://ftp.videolan.org/pub/videolan/libbluray/0.5.0/libbluray-0.5.0.tar.bz2 libbluray-0.5.0
-  cd libbluray-0.5.0
+  download_and_unpack_file ftp://ftp.videolan.org/pub/videolan/libbluray/0.6.0/libbluray-0.6.0.tar.bz2 libbluray-0.6.0
+  cd libbluray-0.6.0
   export LIBS=-lpng
   generic_configure "--without-libxml2"
   do_make_install
