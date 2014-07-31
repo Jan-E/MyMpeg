@@ -475,6 +475,10 @@ build_libopenjpeg() {
   cd ..
 }
 
+build_libwebp() {
+  generic_download_and_install http://downloads.webmproject.org/releases/webp/libwebp-0.4.1.tar.gz libwebp-0.4.1
+}
+
 build_libvpx() {
   download_and_unpack_file http://ffmpeg.zeranoe.com/builds/source/external_libraries/libvpx-1.3.0.tar.xz libvpx-1.3.0
   cd libvpx-1.3.0
@@ -640,7 +644,7 @@ build_libfribidi() {
 }
 
 build_libass() {
-  generic_download_and_install http://libass.googlecode.com/files/libass-0.10.2.tar.gz libass-0.10.2
+  generic_download_and_install https://github.com/libass/libass/releases/download/0.11.2/libass-0.11.2.tar.xz libass-0.11.2
   sed -i 's/-lass -lm/-lass -lfribidi -lm/' "$PKG_CONFIG_PATH/libass.pc"
 }
 
@@ -691,6 +695,7 @@ build_libschroedinger() {
 }
 
 build_gnutls() {
+  # rtmpdumo does not work with 3.2.16
   download_and_unpack_file ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/gnutls-3.2.15.tar.xz gnutls-3.2.15
   cd gnutls-3.2.15
     generic_configure "--disable-cxx --disable-doc" # don't need the c++ version, in an effort to cut down on size... LODO test difference...
@@ -888,16 +893,17 @@ build_twolame() {
 }
 
 build_frei0r() {
-  #download_and_unpack_file http://www.piksel.no/frei0r/releases/frei0r-plugins-1.3.tar.gz frei0r-1.3
-  #cd frei0r-1.3
-    #do_configure " --build=mingw32  --host=$host_target --prefix=$mingw_w64_x86_64_prefix --disable-static --enable-shared" # see http://ffmpeg.zeranoe.com/forum/viewtopic.php?f=5&t=312
-    #do_make_install
-    # we rely on external dll's for this one, so only need the header to enable it, for now
-    #cp include/frei0r.h $mingw_w64_x86_64_prefix/include
-  #cd ..
-  if [[ ! -f "$mingw_w64_x86_64_prefix/include/frei0r.h" ]]; then
-    wget https://raw.github.com/rdp/frei0r/master/include/frei0r.h && cp frei0r.h $mingw_w64_x86_64_prefix/include || exit 1
-  fi
+  # http://ffmpeg.zeranoe.com/forum/viewtopic.php?f=5&t=312&sid=9f4b95387d88cb2a62b5ec1e98f43edc&start=10#p3467
+  do_git_checkout http://code.dyne.org/frei0r frei0r_git 10d8360
+  cd frei0r_git
+    ./autogen.sh
+    do_configure " --build=mingw32 --host=$host_target --prefix=$mingw_w64_x86_64_prefix --enable-static --disable-shared"
+    do_make_install
+    cp include/frei0r.h $mingw_w64_x86_64_prefix/include
+  cd ..
+  #if [[ ! -f "$mingw_w64_x86_64_prefix/include/frei0r.h" ]]; then
+  #  wget https://raw.github.com/rdp/frei0r/master/include/frei0r.h && cp frei0r.h $mingw_w64_x86_64_prefix/include || exit 1
+  #fi
 }
 
 build_vidstab() {
@@ -1061,7 +1067,7 @@ build_ffmpeg() {
    local arch=x86_64
   fi
 
-  config_options="--arch=$arch --target-os=mingw32 --cross-prefix=$cross_prefix --pkg-config=pkg-config --enable-gpl --enable-libx264 --enable-libx265 --enable-avisynth --enable-libxvid --enable-libmp3lame --enable-version3 --enable-zlib --enable-librtmp --enable-libvorbis --enable-libtheora --enable-libspeex --enable-libopenjpeg --enable-gnutls --enable-libgsm --enable-libfreetype --enable-libopus --disable-w32threads --enable-frei0r --enable-filter=frei0r --enable-libvo-aacenc --enable-bzlib --enable-libxavs --extra-cflags=-DPTW32_STATIC_LIB --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libvpx --enable-libilbc --disable-doc --prefix=$mingw_w64_x86_64_prefix $extra_configure_opts" # other possibilities: --enable-w32threads --enable-libflite
+  config_options="--arch=$arch --target-os=mingw32 --cross-prefix=$cross_prefix --pkg-config=pkg-config --enable-gpl --enable-libx264 --enable-libx265 --enable-avisynth --enable-libxvid --enable-libmp3lame --enable-version3 --enable-zlib --enable-librtmp --enable-libvorbis --enable-libtheora --enable-libspeex --enable-libopenjpeg --enable-libwebp --enable-gnutls --enable-libgsm --enable-libfreetype --enable-libopus --disable-w32threads --enable-frei0r --enable-filter=frei0r --enable-libvo-aacenc --enable-bzlib --enable-libxavs --extra-cflags=-DPTW32_STATIC_LIB --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libvpx --enable-libilbc --disable-doc --prefix=$mingw_w64_x86_64_prefix $extra_configure_opts" # other possibilities: --enable-w32threads --enable-libflite
   if [[ "$non_free" = "y" ]]; then
     config_options="$config_options --enable-nonfree --enable-libfdk-aac --enable-libfaac" # -- faac deemed too poor quality and becomes the default -- add it in and uncomment the build_faac line to include it --enable-openssl --enable-libaacplus
   else
@@ -1131,7 +1137,7 @@ build_ffmpeg_release() {
    local arch=x86_64
   fi
 
-  config_options="--arch=$arch --target-os=mingw32 --cross-prefix=$cross_prefix --pkg-config=pkg-config --enable-gpl --enable-libx264 --enable-libx265 --enable-avisynth --enable-libxvid --enable-libmp3lame --enable-version3 --enable-zlib --enable-librtmp --enable-libvorbis --enable-libtheora --enable-libspeex --enable-libopenjpeg --enable-gnutls --enable-libgsm --enable-libfreetype --enable-libopus --disable-w32threads --enable-frei0r --enable-filter=frei0r --enable-libvo-aacenc --enable-bzlib --enable-libxavs --extra-cflags=-DPTW32_STATIC_LIB --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libvpx --enable-libilbc --disable-doc --prefix=$mingw_w64_x86_64_prefix $extra_configure_opts" # other possibilities: --enable-w32threads --enable-libflite
+  config_options="--arch=$arch --target-os=mingw32 --cross-prefix=$cross_prefix --pkg-config=pkg-config --enable-gpl --enable-libx264 --enable-libx265 --enable-avisynth --enable-libxvid --enable-libmp3lame --enable-version3 --enable-zlib --enable-librtmp --enable-libvorbis --enable-libtheora --enable-libspeex --enable-libopenjpeg --enable-libwebp --enable-gnutls --enable-libgsm --enable-libfreetype --enable-libopus --disable-w32threads --enable-frei0r --enable-filter=frei0r --enable-libvo-aacenc --enable-bzlib --enable-libxavs --extra-cflags=-DPTW32_STATIC_LIB --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libvpx --enable-libilbc --disable-doc --prefix=$mingw_w64_x86_64_prefix $extra_configure_opts" # other possibilities: --enable-w32threads --enable-libflite
   if [[ "$non_free" = "y" ]]; then
     config_options="$config_options --enable-nonfree --enable-libfdk-aac --enable-libfaac" # -- faac deemed too poor quality and becomes the default -- add it in and uncomment the build_faac line to include it --enable-openssl --enable-libaacplus
   else
@@ -1229,6 +1235,7 @@ build_dependencies() {
   build_libfribidi
   build_libass # needs freetype, needs fribidi, needs fontconfig
   build_libopenjpeg
+  build_libwebp
   if [[ "$non_free" = "y" ]]; then
     build_fdk_aac
     build_faac # not included for now, too poor quality :)
