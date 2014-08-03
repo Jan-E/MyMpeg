@@ -549,29 +549,30 @@ build_libopus() {
 }
 
 build_libdvdread() {
-  download_and_unpack_file http://dvdnav.mplayerhq.hu/releases/libdvdread-4.9.9.tar.xz libdvdread-4.9.9 
-  cd libdvdread-4.9.9
-  generic_configure "CFLAGS=-DHAVE_DVDCSS_DVDCSS_H LDFLAGS=-ldvdcss" # vlc patch: "--enable-libdvdcss" # XXX ask how I'm *supposed* to do this to the dvdread peeps [svn?]
-  #apply_patch https://raw.githubusercontent.com/rdp/ffmpeg-windows-build-helpers/master/patches/dvdread-win32.patch # has been reported to them...
-  do_make_install 
-  #sed -i "s/-ldvdread.*/-ldvdread -ldvdcss/" $mingw_w64_x86_64_prefix/bin/dvdread-config # ??? related to vlc patch, above, probably
-  sed -i 's/-ldvdread.*/-ldvdread -ldvdcss/' "$PKG_CONFIG_PATH/dvdread.pc"
+  libdvdread_version="5.0.0"
+  download_and_unpack_file http://download.videolan.org/pub/videolan/libdvdread/$libdvdread_version/libdvdread-$libdvdread_version.tar.bz2 libdvdread-$libdvdread_version
+  cd libdvdread-$libdvdread_version
+    generic_configure "CFLAGS=-DHAVE_DVDCSS_DVDCSS_H LDFLAGS=-ldvdcss" # vlc patch: "--enable-libdvdcss" # XXX ask how I'm *supposed* to do this to the dvdread peeps [svn?]
+    do_make_install 
+    sed -i 's/-ldvdread.*/-ldvdread -ldvdcss/' "$PKG_CONFIG_PATH/dvdread.pc"
   cd ..
 }
 
 build_libdvdnav() {
-  download_and_unpack_file http://dvdnav.mplayerhq.hu/releases/libdvdnav-4.2.1.tar.xz libdvdnav-4.2.1
-  cd libdvdnav-4.2.1
-  if [[ ! -f ./configure ]]; then
-    ./autogen.sh
-  fi
-  generic_configure
-  do_make_install 
+  libdvdnav_version="5.0.0"
+  download_and_unpack_file http://download.videolan.org/pub/videolan/libdvdnav/$libdvdnav_version/libdvdnav-$libdvdnav_version.tar.bz2 libdvdnav-$libdvdnav_version
+  cd libdvdnav-$libdvdnav_version
+    if [[ ! -f ./configure ]]; then
+      ./autogen.sh
+    fi
+    generic_configure
+    do_make_install 
   cd ..
 }
 
 build_libdvdcss() {
-  generic_download_and_install http://download.videolan.org/pub/videolan/libdvdcss/1.2.13/libdvdcss-1.2.13.tar.bz2 libdvdcss-1.2.13
+  libdvdnav_version="1.2.13"
+  generic_download_and_install http://download.videolan.org/pub/videolan/libdvdcss/$libdvdnav_version/libdvdcss-$libdvdnav_version.tar.bz2 libdvdcss-$libdvdnav_version
 }
 
 build_glew() { # opengl stuff
