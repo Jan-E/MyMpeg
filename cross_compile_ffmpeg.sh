@@ -905,14 +905,17 @@ build_twolame() {
 }
 
 build_frei0r() {
-  do_git_checkout http://code.dyne.org/frei0r frei0r_git 10d8360
+  # http://ffmpeg.zeranoe.com/forum/viewtopic.php?f=5&t=312&sid=9f4b95387d88cb2a62b5ec1e98f43edc&start=10#p3467
+  do_git_checkout http://code.dyne.org/frei0r frei0r_git 7fd7bb1
   cd frei0r_git
     ./autogen.sh
-	cd src
-      sed -i "s/\.so/\.a/g" Makefile.in # install the generated .a files (in lib/frei0r-1). But are they used anyway, anywhere?
-	cd ..
-    do_configure " --build=mingw32 --host=$host_target --prefix=$mingw_w64_x86_64_prefix --enable-static --disable-shared"
+    do_cmake
     do_make_install
+	#cd src
+    #  sed -i "s/\.so/\.a/g" Makefile.in # install the generated .a files (in lib/frei0r-1). But are they used anyway, anywhere?
+	#cd ..
+    #do_configure " --build=mingw32 --host=$host_target --prefix=$mingw_w64_x86_64_prefix --enable-static --enable-shared"
+    #do_make_install
   cd ..
   #if [[ ! -f "$mingw_w64_x86_64_prefix/include/frei0r.h" ]]; then
   #  wget https://raw.github.com/rdp/frei0r/master/include/frei0r.h && cp frei0r.h $mingw_w64_x86_64_prefix/include || exit 1
