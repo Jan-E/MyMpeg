@@ -1,6 +1,6 @@
-diff -uprN gme-0.6.0.orig/gme/blargg_source.h gme-0.6.0/gme/blargg_source.h
---- gme-0.6.0.orig/gme/blargg_source.h	2010-02-10 17:47:38.000000000 -0500
-+++ gme-0.6.0/gme/blargg_source.h	2014-05-13 02:33:14.189177590 -0400
+diff -uprN game-music-emu-0.6.0.orig/gme/blargg_source.h game-music-emu-0.6.0/gme/blargg_source.h
+--- game-music-emu-0.6.0.orig/gme/blargg_source.h	2010-02-10 17:47:38.000000000 -0500
++++ game-music-emu-0.6.0/gme/blargg_source.h	2014-05-13 02:33:14.189177590 -0400
 @@ -89,9 +89,7 @@ typedef unsigned char byte;
  
  // Setup compiler defines useful for exporting required public API symbols in gme.cpp
@@ -12,9 +12,9 @@ diff -uprN gme-0.6.0.orig/gme/blargg_source.h gme-0.6.0/gme/blargg_source.h
          #define BLARGG_EXPORT __attribute__((visibility ("default")))
      #else
          #define BLARGG_EXPORT
-diff -uprN gme-0.6.0.orig/gme/CMakeLists.txt gme-0.6.0/gme/CMakeLists.txt
---- gme-0.6.0.orig/gme/CMakeLists.txt	2012-05-27 16:48:53.000000000 -0400
-+++ gme-0.6.0/gme/CMakeLists.txt	2014-05-13 01:51:57.288316451 -0400
+diff -uprN game-music-emu-0.6.0.orig/gme/CMakeLists.txt game-music-emu-0.6.0/gme/CMakeLists.txt
+--- game-music-emu-0.6.0.orig/gme/CMakeLists.txt	2012-05-27 16:48:53.000000000 -0400
++++ game-music-emu-0.6.0/gme/CMakeLists.txt	2014-05-13 01:51:57.288316451 -0400
 @@ -143,7 +143,7 @@ add_definitions(-DBLARGG_BUILD_DLL)
  include_directories(${CMAKE_CURRENT_BINARY_DIR})
  

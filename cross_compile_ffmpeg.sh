@@ -949,7 +949,10 @@ build_gme() {
   download_and_unpack_file http://game-music-emu.googlecode.com/files/game-music-emu-0.6.0.tar.bz2 game-music-emu-0.6.0
   cd game-music-emu-0.6.0
     do_cmake
-    apply_patch https://raw.github.com/Jan-E/mympeg/master/patches/gme_static.patch
+  cd ..
+  pwd
+  apply_patch https://raw.github.com/Jan-E/mympeg/master/patches/gme_static.patch
+  cd game-music-emu-0.6.0
     do_make_install 
   cd .. 
 }
