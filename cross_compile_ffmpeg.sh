@@ -250,7 +250,7 @@ do_configure() {
   local english_name=$(basename $cur_dir2)
   local touch_name=$(get_small_touchfile_name already_configured "$configure_options $configure_name")
   if [ ! -f "$touch_name" ]; then
-    make clean # just in case
+    #make clean # just in case
     #make uninstall # does weird things when run under ffmpeg src
     if [ -f bootstrap.sh ]; then
       ./bootstrap.sh
@@ -259,7 +259,7 @@ do_configure() {
     echo "configuring $english_name ($PWD) as $ PATH=$PATH $configure_name $configure_options"
     nice "$configure_name" $configure_options || exit 1
     touch -- "$touch_name"
-    make clean # just in case
+    #make clean # just in case
   else
     echo "already configured $(basename $cur_dir2)" 
   fi
@@ -888,10 +888,10 @@ build_libmodplug() {
 }
 
 build_libcaca() {
-  local cur_dir2=$(pwd)/libcaca-0.99.beta18
-# download_and_unpack_file http://caca.zoy.org/files/libcaca/libcaca-0.99.beta18.tar.gz libcaca-0.99.beta18
-  download_and_unpack_file http://ffmpeg.zeranoe.com/builds/source/external_libraries/libcaca-0.99.beta18.tar.xz libcaca-0.99.beta18
-  cd libcaca-0.99.beta18
+  libcaca_version="0.99.beta18"
+# download_and_unpack_file http://ffmpeg.zeranoe.com/builds/source/external_libraries/libcaca-0.99.beta18.tar.xz libcaca-0.99.beta18
+  download_and_unpack_file http://caca.zoy.org/files/libcaca/libcaca-$libcaca_version.tar.gz libcaca-$libcaca_version
+  cd libcaca-$libcaca_version
   cd caca
     sed -i "s/__declspec(dllexport)//g" *.h # get rid of the declspec lines otherwise the build will fail for undefined symbols
     sed -i "s/__declspec(dllimport)//g" *.h 
@@ -931,6 +931,27 @@ build_vidstab() {
     sed -i "s/SHARED/STATIC/" CMakeLists.txt # ??
     do_make_install 
   cd ..
+}
+
+build_libsndfile() {
+  generic_download_and_install http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.25.tar.gz libsndfile-1.0.25
+}
+
+build_bs2b() {
+  download_and_unpack_file http://sourceforge.net/projects/bs2b/files/libbs2b/3.1.0/libbs2b-3.1.0.tar.bz2/download libbs2b-3.1.0
+  cd libbs2b-3.1.0
+    sed -i "s/bin_PROGRAMS =/# bin_PROGRAMS =/" src/Makefile.in  
+    generic_configure_make_install
+  cd ..
+}
+
+build_gme() {
+  download_and_unpack_file http://game-music-emu.googlecode.com/files/game-music-emu-0.6.0.tar.bz2 game-music-emu-0.6.0
+  cd game-music-emu-0.6.0
+    do_cmake
+    sed -i "s/SHARED/STATIC/" gme/CMakeLists.txt
+    do_make_install 
+  cd .. 
 }
 
 build_vlc() {
@@ -1039,7 +1060,7 @@ build_ffmpeg() {
   local output_dir="ffmpeg_git"
 
   # FFmpeg 
-  local extra_configure_opts="--enable-libsoxr --enable-fontconfig --enable-libass --enable-libutvideo --enable-libbluray --enable-iconv --enable-libtwolame --extra-cflags=-DLIBTWOLAME_STATIC --enable-libzvbi --enable-libcaca --enable-libmodplug --extra-libs=-lstdc++ --extra-libs=-lpng --enable-libvidstab"
+  local extra_configure_opts="--enable-libsoxr --enable-fontconfig --enable-libass --enable-libutvideo --enable-libbluray --enable-iconv --enable-libtwolame --extra-cflags=-DLIBTWOLAME_STATIC --enable-libzvbi --enable-libcaca --enable-libmodplug --enable-libbs2b --enable-libgme --extra-libs=-lstdc++ --extra-libs=-lpng --enable-libvidstab"
 
   if [[ $type = "libav" ]]; then
     # libav [ffmpeg fork]  has a few missing options?
@@ -1117,7 +1138,7 @@ build_ffmpeg_release() {
   local output_dir="ffmpeg-2.3.1"
 
   # FFmpeg 
-  local extra_configure_opts="--enable-libsoxr --enable-fontconfig --enable-libass --enable-libutvideo --enable-libbluray --enable-iconv --enable-libtwolame --extra-cflags=-DLIBTWOLAME_STATIC --enable-libzvbi --enable-libcaca --enable-libmodplug --extra-libs=-lstdc++ --extra-libs=-lpng --enable-libvidstab"
+  local extra_configure_opts="--enable-libsoxr --enable-fontconfig --enable-libass --enable-libutvideo --enable-libbluray --enable-iconv --enable-libtwolame --extra-cflags=-DLIBTWOLAME_STATIC --enable-libzvbi --enable-libcaca --enable-libmodplug --enable-libbs2b --enable-libgme --extra-libs=-lstdc++ --extra-libs=-lpng --enable-libvidstab"
   extra_configure_opts="$extra_configure_opts"
   # can't mix and match --enable-static --enable-shared unfortunately, or the final executable seems to just use shared if the're both present
 
@@ -1253,6 +1274,9 @@ build_dependencies() {
   build_libopenjpeg
   build_wavpack
   build_libwebp
+  build_libsndfile
+  build_bs2b
+  build_gme
   if [[ "$non_free" = "y" ]]; then
     build_fdk_aac
     build_faac # not included for now, too poor quality :)
