@@ -143,7 +143,7 @@ install_cross_compiler() {
   if [[ -z $build_choice ]]; then
     pick_compiler_flavors
   fi
-  wget https://raw.github.com/Jan-E/mympeg/master/patches/mingw-w64-build-3.6.0.local || exit 1
+  wget https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/mingw-w64-build-3.6.0.local || exit 1
   chmod 755 mingw-w64-build-3.6.0.local
   unset CFLAGS # don't want these for the compiler itself since it creates executables to run on the local box
   # pthreads version to avoid having to use cvs for it
@@ -427,8 +427,8 @@ build_qt() {
 #  download_and_unpack_file http://download.qt-project.org/archive/qt/4.8/4.8.1/qt-everywhere-opensource-src-4.8.1.tar.gz qt-everywhere-opensource-src-4.8.1
 #  cd qt-everywhere-opensource-src-4.8.1
 
-    apply_patch https://raw.github.com/Jan-E/mympeg/master/patches/imageformats.patch
-    apply_patch https://raw.github.com/Jan-E/mympeg/master/patches/qt-win64.patch
+    apply_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/imageformats.patch
+    apply_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/qt-win64.patch
     # vlc's configure options...mostly
     do_configure "-static -release -fast -no-exceptions -no-stl -no-sql-sqlite -no-qt3support -no-gif -no-libmng -qt-libjpeg -no-libtiff -no-qdbus -no-openssl -no-webkit -sse -no-script -no-multimedia -no-phonon -opensource -no-scripttools -no-opengl -no-script -no-scripttools -no-declarative -no-declarative-debug -opensource -no-s60 -host-little-endian -confirm-license -xplatform win32-g++ -device-option CROSS_COMPILE=$cross_prefix -prefix $mingw_w64_x86_64_prefix -prefix-install -nomake examples"
     make sub-src
@@ -502,7 +502,7 @@ build_wavpack() {
 build_libutvideo() {
   download_and_unpack_file https://github.com/downloads/rdp/FFmpeg/utvideo-11.1.1-src.zip utvideo-11.1.1
   cd utvideo-11.1.1
-    apply_patch https://raw.github.com/Jan-E/mympeg/master/patches/utv.diff
+    apply_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/utv.diff
     do_make_install "CROSS_PREFIX=$cross_prefix DESTDIR=$mingw_w64_x86_64_prefix prefix=" # prefix= to avoid it adding an extra /usr/local to it yikes
   cd ..
 }
@@ -520,7 +520,7 @@ build_libilbc() {
 build_libflite() {
   download_and_unpack_file http://www.speech.cs.cmu.edu/flite/packed/flite-1.4/flite-1.4-release.tar.bz2 flite-1.4-release
   cd flite-1.4-release
-   apply_patch https://raw.github.com/Jan-E/mympeg/master/patches/flite_64.diff
+   apply_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/flite_64.diff
    sed -i "s|i386-mingw32-|$cross_prefix|" configure*
    generic_configure
    do_make
@@ -536,7 +536,7 @@ build_libflite() {
 build_libgsm() {
   download_and_unpack_file http://www.quut.com/gsm/gsm-1.0.13.tar.gz gsm-1.0-pl13
   cd gsm-1.0-pl13
-  apply_patch https://raw.github.com/Jan-E/mympeg/master/patches/libgsm.patch
+  apply_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/libgsm.patch
   do_make "CC=${cross_prefix}gcc AR=${cross_prefix}ar RANLIB=${cross_prefix}ranlib INSTALL_ROOT=${mingw_w64_x86_64_prefix}"
   cp lib/libgsm.a $mingw_w64_x86_64_prefix/lib || exit 1
   mkdir -p $mingw_w64_x86_64_prefix/include/gsm
@@ -641,7 +641,7 @@ build_libfribidi() {
   download_and_unpack_file http://fribidi.org/download/fribidi-0.19.4.tar.bz2 fribidi-0.19.4
   cd fribidi-0.19.4
     # make it export symbols right...
-    apply_patch https://raw.github.com/Jan-E/mympeg/master/patches/fribidi.diff
+    apply_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/fribidi.diff
     generic_configure
     do_make_install
   cd ..
@@ -726,7 +726,7 @@ build_libnettle() {
 build_bzlib2() {
   download_and_unpack_file http://www.bzip.org/1.0.6/bzip2-1.0.6.tar.gz bzip2-1.0.6
   cd bzip2-1.0.6
-    apply_patch https://raw.github.com/Jan-E/mympeg/master/patches/bzip2_cross_compile.diff
+    apply_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/bzip2_cross_compile.diff
     do_make "CC=$(echo $cross_prefix)gcc AR=$(echo $cross_prefix)ar PREFIX=$mingw_w64_x86_64_prefix RANLIB=$(echo $cross_prefix)ranlib libbz2.a bzip2 bzip2recover install"
   cd ..
 }
@@ -867,8 +867,8 @@ build_zvbi() {
   export CFLAGS=-DPTW32_STATIC_LIB # seems needed XXX
   download_and_unpack_file http://sourceforge.net/projects/zapping/files/zvbi/0.2.34/zvbi-0.2.34.tar.bz2/download zvbi-0.2.34
   cd zvbi-0.2.34
-    apply_patch https://raw.github.com/Jan-E/mympeg/master/patches/zvbi-win32.patch
-    apply_patch https://raw.github.com/Jan-E/mympeg/master/patches/zvbi-ioctl.patch
+    apply_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/zvbi-win32.patch
+    apply_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/zvbi-ioctl.patch
     export LIBS=-lpng
     generic_configure " --disable-dvb --disable-bktr --disable-nls --disable-proxy --without-doxygen" # thanks vlc!
     unset LIBS
@@ -950,7 +950,7 @@ build_gme() {
   cd game-music-emu-0.6.0
     do_cmake
   cd ..
-  apply_patch https://raw.github.com/Jan-E/mympeg/master/patches/gme_static.patch
+  apply_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/gme_static.patch
   cd game-music-emu-0.6.0
     do_make_install 
   cd .. 
@@ -1085,20 +1085,20 @@ build_ffmpeg() {
     cd $output_dir
   fi
 
-  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_aacenc.patch
-  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_avuienc.patch
-  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_crystalhd.patch
-  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_dcaenc.patch
-  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_s302menc.patch
-  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_vorbisenc.patch
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_aacenc.patch
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_avuienc.patch
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_crystalhd.patch
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_dcaenc.patch
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_s302menc.patch
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_vorbisenc.patch
   
-  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/ass_fontsize.patch
-  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/subtitles_non_fatal.patch
-  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/asfenc.patch
-  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/movenc.patch
-  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/mpegvideo_enc.patch
-  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/swscale.patch
-  apply_ffmpeg_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_new.patch
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/ass_fontsize.patch
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/subtitles_non_fatal.patch
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/asfenc.patch
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/movenc.patch
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/mpegvideo_enc.patch
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/swscale.patch
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_new.patch
   
   if [ "$bits_target" = "32" ]; then
    local arch=x86
@@ -1155,20 +1155,20 @@ build_ffmpeg_release() {
     cd $output_dir
   fi
 
-  apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_aacenc.patch
-  apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_avuienc.patch
-  apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_crystalhd.patch
-  apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_dcaenc.patch
-  apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_s302menc.patch
-  apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_vorbisenc.patch
+  apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_aacenc.patch
+  apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_avuienc.patch
+  apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_crystalhd.patch
+  apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_dcaenc.patch
+  apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_s302menc.patch
+  apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_vorbisenc.patch
   
-  apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/ass_fontsize.patch
-  apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/subtitles_non_fatal.patch
-  apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/asfenc.patch
-  apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/movenc.patch
-  apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/mpegvideo_enc.patch
-  apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/swscale.patch
-  apply_ffmpeg_release_patch https://raw.github.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_new.patch
+  apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/ass_fontsize.patch
+  apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/subtitles_non_fatal.patch
+  apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/asfenc.patch
+  apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/movenc.patch
+  apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/mpegvideo_enc.patch
+  apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/swscale.patch
+  apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_new.patch
 
   if [ "$bits_target" = "32" ]; then
    local arch=x86
