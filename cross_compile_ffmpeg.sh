@@ -950,7 +950,6 @@ build_gme() {
   cd game-music-emu-0.6.0
     do_cmake
   cd ..
-  pwd
   apply_patch https://raw.github.com/Jan-E/mympeg/master/patches/gme_static.patch
   cd game-music-emu-0.6.0
     do_make_install 
