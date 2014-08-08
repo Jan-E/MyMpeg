@@ -571,7 +571,8 @@ build_libdvdnav() {
 }
 
 build_libdvdcss() {
-  libdvdnav_version="1.2.13"
+  # http://git.videolan.org/gitweb.cgi/vlc.git/?a=commit;h=fe07d496fc7fe3ce9d9cd642c3066f46dcf29778
+  libdvdnav_version="1.3.0"
   generic_download_and_install http://download.videolan.org/pub/videolan/libdvdcss/$libdvdnav_version/libdvdcss-$libdvdnav_version.tar.bz2 libdvdcss-$libdvdnav_version
 }
 
@@ -911,15 +912,7 @@ build_frei0r() {
     ./autogen.sh
     do_cmake
     do_make_install
-	#cd src
-    #  sed -i "s/\.so/\.a/g" Makefile.in # install the generated .a files (in lib/frei0r-1). But are they used anyway, anywhere?
-	#cd ..
-    #do_configure " --build=mingw32 --host=$host_target --prefix=$mingw_w64_x86_64_prefix --enable-static --enable-shared"
-    #do_make_install
   cd ..
-  #if [[ ! -f "$mingw_w64_x86_64_prefix/include/frei0r.h" ]]; then
-  #  wget https://raw.github.com/rdp/frei0r/master/include/frei0r.h && cp frei0r.h $mingw_w64_x86_64_prefix/include || exit 1
-  #fi
 }
 
 build_vidstab() {
