@@ -685,14 +685,15 @@ build_libxml2() {
 }
 
 build_libbluray() {
-  download_and_unpack_file ftp://ftp.videolan.org/pub/videolan/libbluray/0.6.0/libbluray-0.6.0.tar.bz2 libbluray-0.6.0
-  cd libbluray-0.6.0
-  export LIBS=-lpng
-  generic_configure "--without-libxml2"
-  do_make_install
-  unset LIBS
-  # add -lpng everywhere where -lfreetype is present
-  sed -i 's/Libs: -L${libdir} -lbluray/Libs: -L${libdir} -lbluray -lfreetype -lexpat -lpng/' "$PKG_CONFIG_PATH/libbluray.pc"
+  libbluray_version="0.6.1"
+  download_and_unpack_file ftp://ftp.videolan.org/pub/videolan/libbluray/$libbluray_version/libbluray-$libbluray_version.tar.bz2 libbluray-$libbluray_version
+  cd libbluray-$libbluray_version
+    export LIBS=-lpng
+    generic_configure "--without-libxml2"
+    do_make_install
+    unset LIBS
+    # add -lpng everywhere where -lfreetype is present
+    sed -i 's/Libs: -L${libdir} -lbluray/Libs: -L${libdir} -lbluray -lfreetype -lexpat -lpng/' "$PKG_CONFIG_PATH/libbluray.pc"
   cd ..
 }
 
