@@ -572,8 +572,8 @@ build_libdvdnav() {
 
 build_libdvdcss() {
   # http://git.videolan.org/gitweb.cgi/vlc.git/?a=commit;h=fe07d496fc7fe3ce9d9cd642c3066f46dcf29778
-  libdvdnav_version="1.3.0"
-  generic_download_and_install http://download.videolan.org/pub/videolan/libdvdcss/$libdvdnav_version/libdvdcss-$libdvdnav_version.tar.bz2 libdvdcss-$libdvdnav_version
+  libdvdcss_version="1.3.0"
+  generic_download_and_install http://download.videolan.org/pub/videolan/libdvdcss/$libdvdcss_version/libdvdcss-$libdvdcss_version.tar.bz2 libdvdcss-$libdvdcss_version
 }
 
 build_glew() { # opengl stuff
@@ -782,8 +782,9 @@ build_libaacplus() {
 }
 
 build_openssl() {
-  download_and_unpack_file http://www.openssl.org/source/openssl-1.0.1h.tar.gz openssl-1.0.1h
-  cd openssl-1.0.1h
+  openssl_version="1.0.1i"
+  download_and_unpack_file http://www.openssl.org/source/openssl-$openssl_version.tar.gz openssl-$openssl_version
+  cd openssl-$openssl_version
   export cross="$cross_prefix"
   export CC="${cross}gcc"
   export AR="${cross}ar"
