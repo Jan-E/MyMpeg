@@ -1129,16 +1129,21 @@ build_ffmpeg() {
 }
 
 build_ffmpeg_release() {
+  local version="2.3.2"
+  local prev_version="2.3.1"
   local type=$1
   local shared=$2
-  local download_url="http://ffmpeg.org/releases/ffmpeg-2.3.1.tar.gz"
-  local output_dir="ffmpeg-2.3.1"
+  local download_url="http://ffmpeg.org/releases/ffmpeg-$version.tar.gz"
+  local output_dir="ffmpeg-$version"
+  local prev_output_dir="ffmpeg-$prev_version"
 
   # FFmpeg 
   local extra_configure_opts="--enable-libsoxr --enable-fontconfig --enable-libass --enable-libutvideo --enable-libbluray --enable-iconv --enable-libtwolame --extra-cflags=-DLIBTWOLAME_STATIC --enable-libzvbi --enable-libcaca --enable-libmodplug --enable-libbs2b --enable-libgme --extra-libs=-lstdc++ --extra-libs=-lpng --enable-libvidstab"
   extra_configure_opts="$extra_configure_opts"
   # can't mix and match --enable-static --enable-shared unfortunately, or the final executable seems to just use shared if the're both present
 
+  rm -rf ${prev_output_dir}_shared
+  rm -rf $prev_output_dir
   if [[ $shared == "shared" ]]; then
     rm -rf ${output_dir}_shared
     download_and_unpack_file $download_url ${output_dir}_shared
