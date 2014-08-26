@@ -708,9 +708,12 @@ build_libschroedinger() {
 }
 
 build_gnutls() {
-  # rtmpdumo does not work with 3.2.16
-  download_and_unpack_file ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/gnutls-3.2.15.tar.xz gnutls-3.2.15
-  cd gnutls-3.2.15
+  # rtmpdump does not work with 3.2.16
+  gnutls_version="3.2.17"
+  prev_gnutls_version="3.2.15"
+  rm -rf gnutls-$prev_gnutls_version
+  download_and_unpack_file ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/gnutls-$gnutls_version.tar.xz gnutls-$gnutls_version
+  cd gnutls-$gnutls_version
     generic_configure "--disable-cxx --disable-doc" # don't need the c++ version, in an effort to cut down on size... LODO test difference...
     do_make_install
   cd ..
