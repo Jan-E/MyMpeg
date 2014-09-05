@@ -143,11 +143,11 @@ install_cross_compiler() {
   if [[ -z $build_choice ]]; then
     pick_compiler_flavors
   fi
-  wget https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/mingw-w64-build-3.6.0.local || exit 1
-  chmod 755 mingw-w64-build-3.6.0.local
+  wget https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/mingw-w64-build-3.6.2.local || exit 1
+  chmod 755 mingw-w64-build-3.6.2.local
   unset CFLAGS # don't want these for the compiler itself since it creates executables to run on the local box
   # pthreads version to avoid having to use cvs for it
-  nice ./mingw-w64-build-3.6.0.local --build-type=multi --clean-build --disable-shared --enable-gendef --default-configure  --pthreads-w32-ver=2-9-1 --cpu-count=$gcc_cpu_count --build-type=$build_choice || exit 1 # --disable-shared allows c++ to be distributed at all...which seemed necessary for some random dependency...
+  nice ./mingw-w64-build-3.6.2.local --build-type=multi --clean-build --disable-shared --enable-gendef --default-configure  --pthreads-w32-ver=2-9-1 --cpu-count=$gcc_cpu_count --build-type=$build_choice || exit 1 # --disable-shared allows c++ to be distributed at all...which seemed necessary for some random dependency...
   export CFLAGS=$original_cflags # reset it
   if [ -d mingw-w64-x86_64 ]; then
     touch mingw-w64-x86_64/compiler.done
@@ -559,7 +559,9 @@ build_libdvdread() {
 }
 
 build_libdvdnav() {
-  libdvdnav_version="5.0.0"
+  libdvdnav_prev_version="5.0.0"
+  libdvdnav_version="5.0.1"
+  rm -rf libdvdnav-$libdvdnav_prev_version
   download_and_unpack_file http://download.videolan.org/pub/videolan/libdvdnav/$libdvdnav_version/libdvdnav-$libdvdnav_version.tar.bz2 libdvdnav-$libdvdnav_version
   cd libdvdnav-$libdvdnav_version
     if [[ ! -f ./configure ]]; then
@@ -1060,7 +1062,7 @@ build_ffmpeg() {
   local output_dir="ffmpeg_git"
 
   # FFmpeg 
-  local extra_configure_opts="--enable-libsoxr --enable-fontconfig --enable-libass --enable-libutvideo --enable-libbluray --enable-iconv --enable-libtwolame --extra-cflags=-DLIBTWOLAME_STATIC --enable-libzvbi --enable-libcaca --enable-libmodplug --enable-libbs2b --enable-libgme --extra-libs=-lstdc++ --extra-libs=-lpng --enable-libvidstab"
+  local extra_configure_opts="--enable-libsoxr --enable-fontconfig --enable-libass --enable-libutvideo --enable-libbluray --enable-iconv --enable-libtwolame --extra-cflags=-DLIBTWOLAME_STATIC --enable-libzvbi --enable-libcaca --enable-libbs2b --enable-libgme --extra-libs=-lstdc++ --extra-libs=-lpng --enable-libvidstab"
 
   if [[ $type = "libav" ]]; then
     # libav [ffmpeg fork]  has a few missing options?
