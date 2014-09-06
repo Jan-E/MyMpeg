@@ -545,7 +545,11 @@ build_libgsm() {
 }
 
 build_libopus() {
-  generic_download_and_install http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz opus-1.1 
+  download_and_unpack_file http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz opus-1.1
+  cd opus-1.1
+    apply_patch https://raw.githubusercontent.com/rdp/ffmpeg-windows-build-helpers/master/patches/opus11.patch # allow it to work with shared builds
+    generic_configure_make_install 
+  cd ..
 }
 
 build_libdvdread() {
@@ -627,7 +631,7 @@ build_libspeex() {
   download_and_unpack_file http://downloads.xiph.org/releases/speex/speex-1.2rc1.tar.gz speex-1.2rc1
   cd speex-1.2rc1
     # http://git.videolan.org/gitweb.cgi/vlc/vlc-2.2.git/?a=commit;h=084076224f289e5e4842fbcab506c8d6fbbc97b7
-	# explicitely disable ogg
+    # explicitely disable ogg
     generic_configure "--without-ogg"
     do_make_install
   cd ..
@@ -1071,8 +1075,8 @@ build_ffmpeg() {
   local shared=$2
   local git_url="https://github.com/FFmpeg/FFmpeg.git"
   local output_dir="ffmpeg_git"
+  rm -rf $output_dir
 
-  # FFmpeg 
   local extra_configure_opts="--enable-libsoxr --enable-fontconfig --enable-libass --enable-libutvideo --enable-libbluray --enable-iconv --enable-libtwolame --extra-cflags=-DLIBTWOLAME_STATIC --enable-libzvbi --enable-libcaca --enable-libmodplug --enable-libbs2b --enable-libgme --extra-libs=-lstdc++ --extra-libs=-lpng --enable-libvidstab"
 
   if [[ $type = "libav" ]]; then
@@ -1081,20 +1085,23 @@ build_ffmpeg() {
     output_dir="libav_git"
     extra_configure_opts=""
   fi
-  extra_configure_opts="$extra_configure_opts"
 
   # can't mix and match --enable-static --enable-shared unfortunately, or the final executable seems to just use shared if the're both present
-
-  # The doc says:
-  #  --enable-small           optimize for size instead of speed
   if [[ $shared == "shared" ]]; then
-    do_git_checkout $git_url ${output_dir}_shared
+    output_dir=${output_dir}_shared
+    rm -rf $output_dir
+    # d6af706 = latest avcodec-55.dll
+    do_git_checkout $git_url ${output_dir} d6af706
+    final_install_dir=`pwd`/${output_dir}.installed
+    rm -rf $final_install_dir
     extra_configure_opts="--enable-shared --disable-static $extra_configure_opts"
-    cd ${output_dir}_shared
+    # avoid installing this to system?
+    extra_configure_opts="$extra_configure_opts --prefix=$final_install_dir"
   else
     do_git_checkout $git_url $output_dir
-    cd $output_dir
+    extra_configure_opts="--enable-static --disable-shared $extra_configure_opts"
   fi
+  cd $output_dir
 
   apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_aacenc.patch
   apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_avuienc.patch
@@ -1117,7 +1124,7 @@ build_ffmpeg() {
    local arch=x86_64
   fi
 
-  config_options="--arch=$arch --target-os=mingw32 --cross-prefix=$cross_prefix --pkg-config=pkg-config --enable-gpl --enable-libx264 --enable-libx265 --enable-avisynth --enable-libxvid --enable-libmp3lame --enable-version3 --enable-zlib --enable-librtmp --enable-libvorbis --enable-libtheora --enable-libspeex --enable-libopenjpeg --enable-gnutls --enable-libgsm --enable-libfreetype --enable-libopus --disable-w32threads --enable-frei0r --enable-filter=frei0r --enable-libvo-aacenc --enable-bzlib --enable-libxavs --extra-cflags=-DPTW32_STATIC_LIB --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libilbc --disable-doc --prefix=$mingw_w64_x86_64_prefix $extra_configure_opts" # other possibilities: --enable-w32threads --enable-libflite
+  config_options="--arch=$arch --target-os=mingw32 --cross-prefix=$cross_prefix --pkg-config=pkg-config --enable-gpl --enable-libx264 --enable-libx265 --enable-avisynth --enable-libxvid --enable-libmp3lame --enable-version3 --enable-zlib --enable-librtmp --enable-libvorbis --enable-libtheora --enable-libspeex --enable-libopenjpeg --enable-gnutls --enable-libgsm --enable-libfreetype --disable-w32threads --enable-frei0r --enable-filter=frei0r --enable-libvo-aacenc --enable-bzlib --enable-libxavs --extra-cflags=-DPTW32_STATIC_LIB --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libilbc --disable-doc --prefix=$mingw_w64_x86_64_prefix $extra_configure_opts" # other possibilities: --enable-w32threads --enable-libflite
   if [[ "$non_free" = "y" ]]; then
     config_options="$config_options --enable-nonfree --enable-libfdk-aac --enable-libfaac" # -- faac deemed too poor quality and becomes the default -- add it in and uncomment the build_faac line to include it --enable-openssl --enable-libaacplus
   else
@@ -1137,9 +1144,7 @@ build_ffmpeg() {
   rm already_ran_make*
   echo "doing ffmpeg make $(pwd)"
   do_make
-  if [[ $shared != "shared" ]]; then
-    do_make_install # install ffmpeg to get libavcodec libraries to be used as dependencies for other things, like vlc [XXX make this a config option?]
-  fi
+  do_make_install # install ffmpeg to get libavcodec libraries to be used as dependencies for other things, like vlc [XXX make this a config option?]
   echo "Done! You will find $bits_target bit $shared binaries in $(pwd)/{ffmpeg,ffprobe,ffplay}*.exe"
   ls -la *.exe
   cd ..
@@ -1162,10 +1167,10 @@ build_ffmpeg_release() {
   rm -rf ${prev_output_dir}_shared
   rm -rf $prev_output_dir
   if [[ $shared == "shared" ]]; then
-    rm -rf ${output_dir}_shared
-    download_and_unpack_file $download_url ${output_dir}_shared
+    rm -rf ${output_dir}
+    download_and_unpack_file $download_url ${output_dir}
     extra_configure_opts="--enable-shared --disable-static $extra_configure_opts"
-    cd ${output_dir}_shared
+    cd ${output_dir}
   else
     rm -rf $output_dir
     download_and_unpack_file $download_url $output_dir
@@ -1315,7 +1320,7 @@ build_apps() {
     build_mplayer
   fi
   if [[ $build_ffmpeg_shared = "y" ]]; then
-    build_ffmpeg_release ffmpeg shared
+#   build_ffmpeg_release ffmpeg shared
     build_ffmpeg ffmpeg shared
   fi
   if [[ $build_ffmpeg_static = "y" ]]; then
