@@ -641,8 +641,11 @@ build_libtheora() {
 
 build_libfribidi() {
   # generic_download_and_install http://fribidi.org/download/fribidi-0.19.5.tar.bz2 fribidi-0.19.5 # got report of still failing?
-  download_and_unpack_file http://fribidi.org/download/fribidi-0.19.4.tar.bz2 fribidi-0.19.4
-  cd fribidi-0.19.4
+  fribidi_prev_version=0.19.4
+  fribidi_version=0.19.5
+  rm -rf $fribidi_prev_version
+  download_and_unpack_file http://fribidi.org/download/fribidi-$fribidi_version.tar.bz2 fribidi-$fribidi_version
+  cd fribidi-$fribidi_version
     # make it export symbols right...
     apply_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/fribidi.diff
     generic_configure
@@ -1070,7 +1073,7 @@ build_ffmpeg() {
   local output_dir="ffmpeg_git"
 
   # FFmpeg 
-  local extra_configure_opts="--enable-libsoxr --enable-fontconfig --enable-libass --enable-libutvideo --enable-libbluray --enable-iconv --enable-libtwolame --extra-cflags=-DLIBTWOLAME_STATIC --enable-libzvbi --enable-libcaca --enable-libbs2b --enable-libgme --extra-libs=-lstdc++ --extra-libs=-lpng --enable-libvidstab"
+  local extra_configure_opts="--enable-libsoxr --enable-fontconfig --enable-libass --enable-libutvideo --enable-libbluray --enable-iconv --enable-libtwolame --extra-cflags=-DLIBTWOLAME_STATIC --enable-libzvbi --enable-libcaca --enable-libmodplug --enable-libbs2b --enable-libgme --extra-libs=-lstdc++ --extra-libs=-lpng --enable-libvidstab"
 
   if [[ $type = "libav" ]]; then
     # libav [ffmpeg fork]  has a few missing options?
@@ -1128,6 +1131,7 @@ build_ffmpeg() {
     config_options="$config_options --enable-runtime-cpudetect"
   fi
   
+  sed -i -e 's/require_pkg_config libmodplug libmodplug\/modplug\.h ModPlug_Load/require libmodplug libmodplug\/modplug\.h ModPlug_Load -lmodplug/' configure
   do_configure "$config_options"
   rm -f */*.a */*.dll *.exe # just in case some dependency library has changed, force it to re-link even if the ffmpeg source hasn't changed...
   rm already_ran_make*
@@ -1136,7 +1140,7 @@ build_ffmpeg() {
   if [[ $shared != "shared" ]]; then
     do_make_install # install ffmpeg to get libavcodec libraries to be used as dependencies for other things, like vlc [XXX make this a config option?]
   fi
-  echo "Done! You will find $bits_target bit $shared binaries in $(pwd)/{ffmpeg,ffprobe,ffplay,avconv,avprobe}*.exe"
+  echo "Done! You will find $bits_target bit $shared binaries in $(pwd)/{ffmpeg,ffprobe,ffplay}*.exe"
   ls -la *.exe
   cd ..
 }
@@ -1151,7 +1155,7 @@ build_ffmpeg_release() {
   local prev_output_dir="ffmpeg-$prev_version"
 
   # FFmpeg 
-  local extra_configure_opts="--enable-libsoxr --enable-fontconfig --enable-libass --enable-libutvideo --enable-libbluray --enable-iconv --enable-libtwolame --extra-cflags=-DLIBTWOLAME_STATIC --enable-libzvbi --enable-libcaca --enable-libmodplug --enable-libbs2b --enable-libgme --extra-libs=-lstdc++ --extra-libs=-lpng --enable-libvidstab"
+  local extra_configure_opts="--enable-libsoxr --enable-fontconfig --enable-libass --enable-libutvideo --enable-libbluray --enable-iconv --enable-libtwolame --extra-cflags=-DLIBTWOLAME_STATIC --enable-libzvbi --enable-libcaca --enable-libmodplug --enable-libmodplug --enable-libbs2b --enable-libgme --extra-libs=-lstdc++ --extra-libs=-lpng --enable-libvidstab"
   extra_configure_opts="$extra_configure_opts"
   # can't mix and match --enable-static --enable-shared unfortunately, or the final executable seems to just use shared if the're both present
 
@@ -1203,6 +1207,7 @@ build_ffmpeg_release() {
     config_options="$config_options --enable-runtime-cpudetect"
   fi
   
+  sed -i -e 's/require_pkg_config libmodplug libmodplug\/modplug\.h ModPlug_Load/require libmodplug libmodplug\/modplug\.h ModPlug_Load -lmodplug/' configure
   do_configure "$config_options"
   rm -f */*.a */*.dll *.exe # just in case some dependency library has changed, force it to re-link even if the ffmpeg source hasn't changed...
   rm already_ran_make*
@@ -1211,7 +1216,7 @@ build_ffmpeg_release() {
   if [[ $shared != "shared" ]]; then
     do_make_install # install ffmpeg to get libavcodec libraries to be used as dependencies for other things, like vlc [XXX make this a config option?]
   fi
-  echo "Done! You will find $bits_target bit $shared binaries in $(pwd)/{ffmpeg,ffprobe,ffplay,avconv,avprobe}*.exe"
+  echo "Done! You will find $bits_target bit $shared binaries in $(pwd)/{ffmpeg,ffprobe,ffplay}*.exe"
   ls -la *.exe
   cd ..
 }
