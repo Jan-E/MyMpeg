@@ -547,7 +547,7 @@ build_libgsm() {
 build_libopus() {
   download_and_unpack_file http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz opus-1.1
   cd opus-1.1
-    apply_patch https://raw.githubusercontent.com/rdp/ffmpeg-windows-build-helpers/master/patches/opus11.patch # allow it to work with shared builds
+    apply_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/opus11.patch # allow it to work with shared builds
     generic_configure_make_install 
   cd ..
 }
