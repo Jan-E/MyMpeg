@@ -868,7 +868,15 @@ build_faac() {
 }
 
 build_lame() {
-  generic_download_and_install http://sourceforge.net/projects/lame/files/lame/3.99/lame-3.99.5.tar.gz/download lame-3.99.5
+  download_and_unpack_file http://sourceforge.net/projects/lame/files/lame/3.99/lame-3.99.5.tar.gz/download lame-3.99.5
+  cd lame-3.99.5
+    # http://www.linuxfromscratch.org/blfs/view/svn/multimedia/lame.html
+    if [[ "$bits_target" = "32" ]]; then
+      sed -i -e '/xmmintrin\.h/d' configure
+    fi
+    generic_configure
+    do_make_install
+  cd ..
 }
 
 build_zvbi() {
