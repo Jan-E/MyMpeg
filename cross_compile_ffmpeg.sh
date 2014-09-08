@@ -670,8 +670,12 @@ build_libass() {
 }
 
 build_gmp() {
-  download_and_unpack_file ftp://ftp.gnu.org/gnu/gmp/gmp-5.1.3.tar.bz2 gmp-5.1.3
-  cd gmp-5.1.3
+  gmp_prev_version_dir="5.1.3"
+  gmp_version="6.0.0a"
+  gmp_version_dir="6.0.0"
+  rm -rf $gmp_prev_version_dir
+  download_and_unpack_file ftp://ftp.gnu.org/gnu/gmp/gmp-$gmp_version.tar.bz2 gmp-$gmp_version_dir
+  cd gmp-$gmp_version_dir
     export CC_FOR_BUILD=/usr/bin/gcc
     export CPP_FOR_BUILD=usr/bin/cpp
     generic_configure "ABI=$bits_target"
@@ -1086,7 +1090,7 @@ build_ffmpeg() {
   fi
 
   # can't mix and match --enable-static --enable-shared unfortunately, or the final executable seems to just use shared if the're both present
-  if [[ $shared == "shared" ]]; then
+  if [[ $shared = "shared" ]] || [[ $shared = "minimal" ]]; then
     output_dir=${output_dir}_shared
     # d6af706 = latest avcodec-55.dll
     do_git_checkout $git_url ${output_dir} d6af706
@@ -1130,9 +1134,14 @@ build_ffmpeg() {
     config_options="$config_options"
   fi
 
+  # minimal static build plus x264, x265 & faac
+  if [[ $shared = "ministat" ]]; then
+    config_options="$build_options --enable-static --disable-shared --enable-pthreads --enable-avisynth --enable-libgme --enable-libmodplug --enable-libx264 --enable-libx265 --enable-nonfree --enable-libfaac"
+  fi
+
   # minimal build for php_av.dll
-  if [[ $shared == "minimal" ]]; then
-    config_options="$build_options --enable-shared --disable-static"
+  if [[ $shared = "minimal" ]]; then
+    config_options="$build_options --enable-shared --disable-static --enable-pthreads --enable-avisynth --enable-libgme --enable-libmodplug"
     # avoid installing this to system
 	cd ..
     final_install_dir=`pwd`/${output_dir}.installed
@@ -1175,7 +1184,7 @@ build_ffmpeg_release() {
 
   rm -rf ${prev_output_dir}_shared
   rm -rf $prev_output_dir
-  if [[ $shared == "shared" ]]; then
+  if [[ $shared = "shared" ]]; then
     download_and_unpack_file $download_url ${output_dir}
     extra_configure_opts="--enable-shared --disable-static $extra_configure_opts"
     cd ${output_dir}
@@ -1248,7 +1257,7 @@ find_all_build_exes() {
 }
 
 build_dependencies() {
-  if [[ $shared == "shared" ]]; then
+  if [[ $shared = "shared" ]]; then
     echo "PKG_CONFIG_PATH=$PKG_CONFIG_PATH"
   else
     # http://ffmpeg.zeranoe.com/forum/viewtopic.php?f=5&t=4&start=20#p5338
@@ -1329,6 +1338,10 @@ build_apps() {
   if [[ $build_ffmpeg_shared = "m" ]]; then
     build_ffmpeg ffmpeg minimal
 #   build_ffmpeg_release ffmpeg minimal
+  fi
+  if [[ $build_ffmpeg_static = "m" ]]; then
+    build_ffmpeg ffmpeg ministat
+#   build_ffmpeg_release ffmpeg ministat
   fi
   if [[ $build_ffmpeg_shared = "y" ]]; then
     build_ffmpeg ffmpeg shared
