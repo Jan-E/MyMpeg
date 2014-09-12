@@ -349,33 +349,80 @@ generic_configure_make_install() {
   do_make_install
 }
 
-build_x265() {
-  local old_hg_version
-  if [[ -d x265 ]]; then
-    cd x265
-    if [[ $git_get_latest = "y" ]]; then
-      echo "doing hg pull -u x265"
-      old_hg_version=`hg --debug id -i`
-      hg pull -u
+build_libx265() {
+  if [[ $prefer_stable = "n" ]]; then
+    local old_hg_version
+    if [[ -d x265 ]]; then
+      cd x265
+      if [[ $git_get_latest = "y" ]]; then
+        echo "doing hg pull -u x265"
+        old_hg_version=`hg --debug id -i`
+        hg pull -u || exit 1
+        hg update || exit 1 # guess you need this too if no new changes are brought down [what the...]
+      else
+        echo "not doing hg pull x265"
+        old_hg_version=`hg --debug id -i`
+      fi
     else
-      echo "not doing hg pull x265"
+      hg clone https://bitbucket.org/multicoreware/x265 || exit 1
+      cd x265
+      old_hg_version=none-yet
+    fi
+    cd source
+
+    # hg checkout 9b0c9b # no longer needed, but once was...
+
+    local new_hg_version=`hg --debug id -i`  
+    if [[ "$old_hg_version" != "$new_hg_version" ]]; then
+      echo "got upstream hg changes, forcing rebuild...x265"
+      rm already*
+    else
+      echo "still at hg $new_hg_version x265"
     fi
   else
-    hg clone https://bitbucket.org/multicoreware/x265 || exit 1
-    cd x265
-    old_hg_version=`hg --debug id -i`
-  fi    
-  cd source
+    local old_hg_version
+    if [[ -d x265 ]]; then
+      cd x265
+      if [[ $git_get_latest = "y" ]]; then
+        echo "doing hg pull -u x265"
+        old_hg_version=`hg --debug id -i`
+        hg pull -u || exit 1
+        hg update || exit 1 # guess you need this too if no new changes are brought down [what the...]
+      else
+        echo "not doing hg pull x265"
+        old_hg_version=`hg --debug id -i`
+      fi
+    else
+      hg clone https://bitbucket.org/multicoreware/x265 -r stable || exit 1
+      cd x265
+      old_hg_version=none-yet
+    fi
+    cd source
 
-  local new_hg_version=`hg --debug id -i`  
-  if [[ "$old_hg_version" != "$new_hg_version" ]]; then
-    echo "got upstream hg changes, forcing rebuild...x265"
-    rm already*
-  else
-    echo "still at hg $new_hg_version x265"
+    # hg checkout 9b0c9b # no longer needed, but once was...
+
+    local new_hg_version=`hg --debug id -i`  
+    if [[ "$old_hg_version" != "$new_hg_version" ]]; then
+      echo "got upstream hg changes, forcing rebuild...x265"
+      rm already*
+    else
+      echo "still at hg $new_hg_version x265"
+    fi
   fi
-
-  do_cmake "-DENABLE_SHARED=OFF"
+  
+  local cmake_params="-DENABLE_SHARED=OFF"
+  if [[ $high_bitdepth == "y" ]]; then
+    cmake_params="$cmake_params -DHIGH_BIT_DEPTH=ON" # Enable 10 bits (main10) and 12 bits (???) per pixels profiles.
+    if grep "DHIGH_BIT_DEPTH=0" CMakeFiles/cli.dir/flags.make; then
+      rm already_ran_cmake_* #Last build was not high bitdepth. Forcing rebuild.
+    fi
+  else
+    if grep "DHIGH_BIT_DEPTH=1" CMakeFiles/cli.dir/flags.make; then
+      rm already_ran_cmake_* #Last build was high bitdepth. Forcing rebuild.
+    fi
+  fi
+  
+  do_cmake "$cmake_params" 
   do_make_install
   cd ../..
 }
@@ -1092,6 +1139,7 @@ build_ffmpeg() {
   # can't mix and match --enable-static --enable-shared unfortunately, or the final executable seems to just use shared if the're both present
   if [[ $shared = "shared" ]] || [[ $shared = "minimal" ]]; then
     output_dir=${output_dir}_shared
+	rm -rf ${output_dir}
     # d6af706 = latest avcodec-55.dll
     do_git_checkout $git_url ${output_dir} d6af706
     final_install_dir=`pwd`/${output_dir}.installed
@@ -1100,6 +1148,7 @@ build_ffmpeg() {
     # avoid installing this to system
     extra_configure_opts="$extra_configure_opts --prefix=$final_install_dir"
   else
+	rm -rf ${output_dir}
     do_git_checkout $git_url $output_dir
     extra_configure_opts="--enable-static --disable-shared $extra_configure_opts"
   fi
@@ -1299,7 +1348,7 @@ build_dependencies() {
   build_libxavs
   build_libsoxr
   build_x264
-  build_x265
+  build_libx265
   build_lame
   build_twolame
   build_vidstab
