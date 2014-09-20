@@ -745,7 +745,9 @@ build_libxml2() {
 }
 
 build_libbluray() {
-  libbluray_version="0.6.1"
+  libbluray_prev_version="0.6.1"
+  libbluray_version="0.6.2"
+  rm -rf $libbluray_prev_version
   download_and_unpack_file ftp://ftp.videolan.org/pub/videolan/libbluray/$libbluray_version/libbluray-$libbluray_version.tar.bz2 libbluray-$libbluray_version
   cd libbluray-$libbluray_version
     export LIBS=-lpng
@@ -1218,8 +1220,8 @@ build_ffmpeg() {
 }
 
 build_ffmpeg_release() {
-  local version="2.3.3"
-  local prev_version="2.3.2"
+  local version="2.4"
+  local prev_version="2.3.3"
   local type=$1
   local shared=$2
   local download_url="http://ffmpeg.org/releases/ffmpeg-$version.tar.gz"
