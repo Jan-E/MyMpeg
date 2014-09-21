@@ -760,7 +760,7 @@ build_libbluray() {
 }
 
 build_libschroedinger() {
-  download_and_unpack_file http://diracvideo.org/download/schroedinger/schroedinger-1.0.11.tar.gz schroedinger-1.0.11
+  download_and_unpack_file http://diracvideo.org/download/schroedinger/schroedinger-1.0.11.tar.gz schroedinger-1.0.11 || download_and_unpack_file http://ffmpeg.zeranoe.com/builds/source/external_libraries/schroedinger-1.0.11.tar.xz schroedinger-1.0.11
   cd schroedinger-1.0.11
     generic_configure
     sed -i 's/testsuite//' Makefile
