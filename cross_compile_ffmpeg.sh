@@ -691,14 +691,13 @@ build_libtheora() {
 }
 
 build_libfribidi() {
-  # generic_download_and_install http://fribidi.org/download/fribidi-0.19.5.tar.bz2 fribidi-0.19.5 # got report of still failing?
   fribidi_prev_version=0.19.5
   fribidi_version=0.19.6
   rm -rf $fribidi_prev_version
   download_and_unpack_file http://download.videolan.org/contrib/fribidi-$fribidi_version.tar.bz2 fribidi-$fribidi_version
   cd fribidi-$fribidi_version
     # make it export symbols right...
-    apply_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/fribidi.diff
+    # apply_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/fribidi.diff
     generic_configure
     do_make_install
   cd ..
@@ -1261,6 +1260,7 @@ build_ffmpeg_release() {
   apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/mpegvideo_enc.patch
   apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/swscale.patch
   apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_new.patch
+  apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/libilbc.patch
 
   if [ "$bits_target" = "32" ]; then
    local arch=x86
