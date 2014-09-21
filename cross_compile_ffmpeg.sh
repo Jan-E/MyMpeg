@@ -733,7 +733,7 @@ build_gmp() {
 }
 
 build_orc() {
-  generic_download_and_install http://code.entropywave.com/download/orc/orc-0.4.18.tar.gz orc-0.4.18
+  generic_download_and_install http://gstreamer.freedesktop.org/src/orc/orc-0.4.22.tar.xz # http://code.entropywave.com/download/orc/orc-0.4.18.tar.gz orc-0.4.18
 }
 
 build_libxml2() {
