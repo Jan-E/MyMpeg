@@ -940,9 +940,12 @@ build_lame() {
 }
 
 build_zvbi() {
+  zvbi_prev_version="0.2.34"
+  zvbi_version="0.2.35"
+  rm -rf zvbi-$zvbi_prev_version
   export CFLAGS=-DPTW32_STATIC_LIB # seems needed XXX
-  download_and_unpack_file http://sourceforge.net/projects/zapping/files/zvbi/0.2.34/zvbi-0.2.34.tar.bz2/download zvbi-0.2.34
-  cd zvbi-0.2.34
+  download_and_unpack_file http://sourceforge.net/projects/zapping/files/zvbi/$zvbi_version/zvbi-$zvbi_version.tar.bz2/download zvbi-$zvbi_version
+  cd zvbi-$zvbi_version
     apply_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/zvbi-win32.patch
     apply_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/zvbi-ioctl.patch
     export LIBS=-lpng
