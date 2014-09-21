@@ -692,10 +692,10 @@ build_libtheora() {
 
 build_libfribidi() {
   # generic_download_and_install http://fribidi.org/download/fribidi-0.19.5.tar.bz2 fribidi-0.19.5 # got report of still failing?
-  fribidi_prev_version=0.19.4
-  fribidi_version=0.19.5
+  fribidi_prev_version=0.19.5
+  fribidi_version=0.19.6
   rm -rf $fribidi_prev_version
-  download_and_unpack_file http://fribidi.org/download/fribidi-$fribidi_version.tar.bz2 fribidi-$fribidi_version
+  download_and_unpack_file http://download.videolan.org/contrib/fribidi-$fribidi_version.tar.bz2 fribidi-$fribidi_version
   cd fribidi-$fribidi_version
     # make it export symbols right...
     apply_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/fribidi.diff
