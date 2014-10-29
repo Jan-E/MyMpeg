@@ -846,25 +846,27 @@ build_libaacplus() {
 }
 
 build_openssl() {
-  openssl_version="1.0.1i"
+  openssl_prev_version="1.0.1i"
+  openssl_version="1.0.1j"
+  rm -rf openssl-$openssl_prev_version
   download_and_unpack_file http://www.openssl.org/source/openssl-$openssl_version.tar.gz openssl-$openssl_version
   cd openssl-$openssl_version
-  export cross="$cross_prefix"
-  export CC="${cross}gcc"
-  export AR="${cross}ar"
-  export RANLIB="${cross}ranlib"
-  if [ "$bits_target" = "32" ]; then
-    do_configure "--prefix=$mingw_w64_x86_64_prefix no-shared mingw" ./Configure
-  else
-    do_configure "--prefix=$mingw_w64_x86_64_prefix no-shared mingw64" ./Configure
-  fi
-  cpu_count=1 # needed for libcrypto
-  do_make_install
-  cpu_count=$original_cpu_count
-  unset cross
-  unset CC
-  unset AR
-  unset RANLIB
+    export cross="$cross_prefix"
+    export CC="${cross}gcc"
+    export AR="${cross}ar"
+    export RANLIB="${cross}ranlib"
+    if [ "$bits_target" = "32" ]; then
+      do_configure "--prefix=$mingw_w64_x86_64_prefix no-shared mingw" ./Configure
+    else
+      do_configure "--prefix=$mingw_w64_x86_64_prefix no-shared mingw64" ./Configure
+    fi
+    cpu_count=1 # needed for libcrypto
+    do_make_install
+    cpu_count=$original_cpu_count
+    unset cross
+    unset CC
+    unset AR
+    unset RANLIB
   cd ..
 }
 
