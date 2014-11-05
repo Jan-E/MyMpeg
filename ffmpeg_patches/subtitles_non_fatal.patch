@@ -1,5 +1,5 @@
 diff --git a/libavcodec/utils.c b/libavcodec/utils.c
-index 97e75c8..9ddb8d1 100644
+index 5c7885a..4088721 100644
 --- a/libavcodec/utils.c
 +++ b/libavcodec/utils.c
 @@ -2753,8 +2753,6 @@ int avcodec_decode_subtitle2(AVCodecContext *avctx, AVSubtitle *sub,
