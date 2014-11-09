@@ -1,7 +1,7 @@
-diff --git a/libAACdec/include/aacdecoder_lib.h b/libAACdec/include/aacdecoder_lib.h
+diff --git libAACdec/include/aacdecoder_lib.h libAACdec/include/aacdecoder_lib.h
 index 1e90777..fe8d157 100644
---- a/libAACdec/include/aacdecoder_lib.h
-+++ b/libAACdec/include/aacdecoder_lib.h
+--- libAACdec/include/aacdecoder_lib.h
++++ libAACdec/include/aacdecoder_lib.h
 @@ -433,6 +433,15 @@ typedef enum {
  typedef enum
  {
