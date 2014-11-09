@@ -1,0 +1,20 @@
+diff --git a/libAACdec/include/aacdecoder_lib.h b/libAACdec/include/aacdecoder_lib.h
+index 1e90777..fe8d157 100644
+--- a/libAACdec/include/aacdecoder_lib.h
++++ b/libAACdec/include/aacdecoder_lib.h
+@@ -433,6 +433,15 @@ typedef enum {
+ typedef enum
+ {
+   AAC_PCM_OUTPUT_INTERLEAVED              = 0x0000,  /*!< PCM output mode (1: interleaved (default); 0: not interleaved). */
++  AAC_PCM_OUTPUT_CHANNELS                 = 0x0001,  /*!< Number of PCM output channels (if different from encoded audio channels, downmixing or
++                                                          upmixing is applied). \n
++                                                          -1: Disable up-/downmixing. The decoder output contains the same number of channels as the
++                                                              encoded bitstream. \n
++                                                           1: The decoder performs a mono matrix mix-down if the encoded audio channels are greater
++                                                              than one. Thus it ouputs always exact one channel. \n
++                                                           2: The decoder performs a stereo matrix mix-down if the encoded audio channels are greater
++                                                              than two. If the encoded audio channels are smaller than two the decoder duplicates the
++                                                              output. Thus it ouputs always exact two channels. \n */
+   AAC_PCM_DUAL_CHANNEL_OUTPUT_MODE        = 0x0002,  /*!< Defines how the decoder processes two channel signals: \n
+                                                           0: Leave both signals as they are (default). \n
+                                                           1: Create a dual mono output signal from channel 1. \n
