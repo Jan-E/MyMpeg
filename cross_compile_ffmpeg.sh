@@ -872,9 +872,10 @@ build_openssl() {
 
 build_fdk_aac() {
   #generic_download_and_install http://sourceforge.net/projects/opencore-amr/files/fdk-aac/fdk-aac-0.1.3.tar.gz/download fdk-aac-0.1.3
-  do_git_checkout https://github.com/mstorsjo/fdk-aac.git fdk-aac_git
+  #do_git_checkout https://github.com/mstorsjo/fdk-aac.git fdk-aac_git
+  do_git_checkout git://git.code.sf.net/p/opencore-amr/fdk-aac fdk-aac_git
   cd fdk-aac_git
-    apply_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/fdkaac_channels.patch
+    #apply_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/fdkaac_channels.patch
     if [[ ! -f "configure" ]]; then
       autoreconf -fiv
     fi
