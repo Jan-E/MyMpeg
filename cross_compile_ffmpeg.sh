@@ -770,8 +770,8 @@ build_libschroedinger() {
 
 build_gnutls() {
   # rtmpdump does not work with 3.2.16
-  gnutls_version="3.2.17"
-  prev_gnutls_version="3.2.15"
+  gnutls_version="3.2.18"
+  prev_gnutls_version="3.2.20"
   rm -rf gnutls-$prev_gnutls_version
   download_and_unpack_file ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/gnutls-$gnutls_version.tar.xz gnutls-$gnutls_version
   cd gnutls-$gnutls_version
