@@ -508,7 +508,7 @@ build_libxavs() {
 }
 
 build_libpng() {
-  generic_download_and_install http://download.sourceforge.net/libpng/libpng-1.5.18.tar.xz libpng-1.5.18
+  generic_download_and_install http://download.sourceforge.net/libpng/libpng-1.5.19.tar.xz libpng-1.5.19
 }
 
 build_libopenjpeg() {
@@ -711,7 +711,7 @@ build_libfribidi() {
 }
 
 build_libass() {
-  generic_download_and_install https://github.com/libass/libass/releases/download/0.11.2/libass-0.11.2.tar.xz libass-0.11.2
+  generic_download_and_install https://github.com/libass/libass/releases/download/0.12.0/libass-0.12.0.tar.xz libass-0.12.0
   sed -i 's/-lass -lm/-lass -lfribidi -lm/' "$PKG_CONFIG_PATH/libass.pc"
 }
 
@@ -770,8 +770,8 @@ build_libschroedinger() {
 
 build_gnutls() {
   # rtmpdump does not work with 3.2.16
-  gnutls_version="3.2.18"
-  prev_gnutls_version="3.2.20"
+  gnutls_version="3.2.20"
+  prev_gnutls_version="3.2.17"
   rm -rf gnutls-$prev_gnutls_version
   download_and_unpack_file ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/gnutls-$gnutls_version.tar.xz gnutls-$gnutls_version
   cd gnutls-$gnutls_version
