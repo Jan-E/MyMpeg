@@ -1,5 +1,5 @@
 diff --git a/libavfilter/af_volume.c b/libavfilter/af_volume.c
-index 9900d22..e36dbdd 100644
+index 4809ae7..e105da8 100644
 --- a/libavfilter/af_volume.c
 +++ b/libavfilter/af_volume.c
 @@ -54,6 +54,7 @@ static const char *const var_names[] = {
@@ -20,7 +20,7 @@ index 9900d22..e36dbdd 100644
      { "precision", "select mathematical precision",
              OFFSET(precision), AV_OPT_TYPE_INT, { .i64 = PRECISION_FLOAT }, PRECISION_FIXED, PRECISION_DOUBLE, A|F, "precision" },
          { "fixed",  "select 8-bit fixed-point",     0, AV_OPT_TYPE_CONST, { .i64 = PRECISION_FIXED  }, INT_MIN, INT_MAX, A|F, "precision" },
-@@ -246,6 +250,12 @@ static av_cold void volume_init(VolumeContext *vol)
+@@ -250,6 +254,12 @@ static av_cold void volume_init(VolumeContext *vol)
          ff_volume_init_x86(vol);
  }
  
@@ -33,7 +33,7 @@ index 9900d22..e36dbdd 100644
  static int set_volume(AVFilterContext *ctx)
  {
      VolumeContext *vol = ctx->priv;
-@@ -267,8 +277,7 @@ static int set_volume(AVFilterContext *ctx)
+@@ -271,8 +281,7 @@ static int set_volume(AVFilterContext *ctx)
             precision_str[vol->precision]);
  
      if (vol->precision == PRECISION_FIXED) {
@@ -43,7 +43,7 @@ index 9900d22..e36dbdd 100644
          av_log(ctx, AV_LOG_VERBOSE, "volume_i:%d/255 ", vol->volume_i);
      }
      av_log(ctx, AV_LOG_VERBOSE, "volume:%f volume_dB:%f\n",
-@@ -296,6 +305,7 @@ static int config_output(AVFilterLink *outlink)
+@@ -300,6 +309,7 @@ static int config_output(AVFilterLink *outlink)
      vol->var_values[VAR_STARTPTS] =
      vol->var_values[VAR_STARTT] =
      vol->var_values[VAR_T] =
@@ -51,7 +51,7 @@ index 9900d22..e36dbdd 100644
      vol->var_values[VAR_VOLUME] = NAN;
  
      vol->var_values[VAR_NB_CHANNELS] = inlink->channels;
-@@ -379,6 +389,30 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
+@@ -383,6 +393,30 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
          av_frame_remove_side_data(buf, AV_FRAME_DATA_REPLAYGAIN);
      }
  
@@ -83,7 +83,7 @@ index 9900d22..e36dbdd 100644
          vol->var_values[VAR_STARTPTS] = TS2D(buf->pts);
          vol->var_values[VAR_STARTT  ] = TS2T(buf->pts, inlink->time_base);
 diff --git a/libavfilter/af_volume.h b/libavfilter/af_volume.h
-index e78e042..ca8a70c 100644
+index 53a328e..d60ea50 100644
 --- a/libavfilter/af_volume.h
 +++ b/libavfilter/af_volume.h
 @@ -54,6 +54,7 @@ enum VolumeVarName {
