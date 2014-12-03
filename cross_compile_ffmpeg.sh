@@ -508,7 +508,10 @@ build_libxavs() {
 }
 
 build_libpng() {
-  generic_download_and_install http://download.sourceforge.net/libpng/libpng-1.5.19.tar.xz libpng-1.5.19
+  libpng_prev_version=1.5.19
+  libpng_version=1.5.20
+  rm -rf libpng-$libpng_prev_version
+  generic_download_and_install http://download.sourceforge.net/libpng/libpng-$libpng_version.tar.xz libpng-$libpng_version
 }
 
 build_libopenjpeg() {
