@@ -526,7 +526,10 @@ build_libopenjpeg() {
 }
 
 build_libwebp() {
-  generic_download_and_install http://downloads.webmproject.org/releases/webp/libwebp-0.4.1.tar.gz libwebp-0.4.1
+  webp_prev_version=0.4.1
+  webp_version=0.4.2
+  rm -rf libwebp-$webp_prev_version
+  generic_download_and_install http://downloads.webmproject.org/releases/webp/libwebp-$webp_version.tar.gz libwebp-$webp_version
 }
 
 build_libvpx() {
