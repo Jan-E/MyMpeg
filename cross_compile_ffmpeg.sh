@@ -1158,7 +1158,7 @@ build_ffmpeg() {
     output_dir=${output_dir}_shared
 	rm -rf ${output_dir}
     # d6af706 = latest avcodec-55.dll
-    do_git_checkout $git_url ${output_dir} d6af706
+    do_git_checkout $git_url ${output_dir} # d6af706
     final_install_dir=`pwd`/${output_dir}.installed
     rm -rf $final_install_dir
     extra_configure_opts="--enable-shared --disable-static $extra_configure_opts"
@@ -1202,12 +1202,12 @@ build_ffmpeg() {
 
   # minimal static build plus x264, x265 & faac
   if [[ $shared = "ministat" ]]; then
-    config_options="$build_options --enable-static --disable-shared --enable-pthreads --enable-avisynth --enable-libgme --enable-libmodplug --enable-libx264 --enable-libx265 --enable-nonfree --enable-libfaac"
+    config_options="$build_options --enable-static --disable-shared --enable-pthreads --enable-avisynth --enable-libgme --enable-libmodplug --enable-libx264 --enable-libx265 --enable-nonfree --enable-libfaac --disable-doc"
   fi
 
   # minimal build for php_av.dll
   if [[ $shared = "minimal" ]]; then
-    config_options="$build_options --enable-shared --disable-static --enable-pthreads --enable-avisynth --enable-libgme --enable-libmodplug"
+    config_options="$build_options --enable-shared --disable-static --enable-pthreads --enable-avisynth --enable-libgme --enable-libmodplug --disable-doc"
     # avoid installing this to system
 	cd ..
     final_install_dir=`pwd`/${output_dir}.installed
