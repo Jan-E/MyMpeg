@@ -508,8 +508,8 @@ build_libxavs() {
 }
 
 build_libpng() {
-  libpng_prev_version=1.5.19
-  libpng_version=1.5.20
+  libpng_prev_version=1.5.20
+  libpng_version=1.5.21
   rm -rf libpng-$libpng_prev_version
   generic_download_and_install http://download.sourceforge.net/libpng/libpng-$libpng_version.tar.xz libpng-$libpng_version
 }
@@ -1238,8 +1238,8 @@ build_ffmpeg() {
 }
 
 build_ffmpeg_release() {
-  local version="2.5.2"
-  local prev_version="2.5.1"
+  local version="2.5.3"
+  local prev_version="2.5.2"
   local type=$1
   local shared=$2
   local download_url="http://ffmpeg.org/releases/ffmpeg-$version.tar.gz"
