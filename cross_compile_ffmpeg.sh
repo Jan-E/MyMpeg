@@ -120,7 +120,7 @@ What version of MinGW-w64 would you like to build or update?
   3. Win64 (64-bit only)
   4. Exit
 EOF
-    echo -n 'Input your choice [1-5]: '
+    echo -n 'Input your choice [1-4]: '
     read build_choice
   done
   case "$build_choice" in
@@ -778,9 +778,8 @@ build_libschroedinger() {
 }
 
 build_gnutls() {
-  # rtmpdump does not work with 3.2.16
-  gnutls_version="3.2.20"
-  prev_gnutls_version="3.2.17"
+  gnutls_version="3.2.21"
+  prev_gnutls_version="3.2.20"
   rm -rf gnutls-$prev_gnutls_version
   download_and_unpack_file ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/gnutls-$gnutls_version.tar.xz gnutls-$gnutls_version
   cd gnutls-$gnutls_version
