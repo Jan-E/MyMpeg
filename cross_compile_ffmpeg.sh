@@ -684,11 +684,14 @@ build_libvorbis() {
 }
 
 build_libspeex() {
-  download_and_unpack_file http://downloads.xiph.org/releases/speex/speex-1.2rc1.tar.gz speex-1.2rc1
-  cd speex-1.2rc1
-    # http://git.videolan.org/gitweb.cgi/vlc/vlc-2.2.git/?a=commit;h=084076224f289e5e4842fbcab506c8d6fbbc97b7
-    # explicitely disable ogg
-    generic_configure "--without-ogg"
+  speex_prev_version="1.2rc1"
+  speex_version="1.2rc2"
+  rm -rf speex-$speex_prev_version
+  download_and_unpack_file http://downloads.xiph.org/releases/speex/speex-$speex_version.tar.gz speex-$speex_version
+  cd speex-$speex_version
+	# http://git.videolan.org/gitweb.cgi/vlc/vlc-2.2.git/?p=vlc/vlc-2.2.git;a=commitdiff;h=ea1927e79317b60a931c7bfff246914aac9d6a7a
+	# speex: avoid automatically depending on ogg
+    generic_configure "--disable-binaries"
     do_make_install
   cd ..
 }  
@@ -700,9 +703,9 @@ build_libtheora() {
 }
 
 build_libfribidi() {
-  fribidi_prev_version=0.19.5
-  fribidi_version=0.19.6
-  rm -rf $fribidi_prev_version
+  fribidi_prev_version="0.19.5"
+  fribidi_version="0.19.6"
+  rm -rf fribidi-$fribidi_prev_version
   download_and_unpack_file http://download.videolan.org/contrib/fribidi-$fribidi_version.tar.bz2 fribidi-$fribidi_version
   cd fribidi-$fribidi_version
     # make it export symbols right...
@@ -720,7 +723,10 @@ build_libfribidi() {
 }
 
 build_libass() {
-  generic_download_and_install https://github.com/libass/libass/releases/download/0.12.0/libass-0.12.0.tar.xz libass-0.12.0
+  libass_prev_version="0.12.0"
+  libass_version="0.12.1"
+  rm -rf libass-$libass_prev_version
+  generic_download_and_install https://github.com/libass/libass/releases/download/$libass_version/libass-$libass_version.tar.xz libass-$libass_version
   sed -i 's/-lass -lm/-lass -lfribidi -lm/' "$PKG_CONFIG_PATH/libass.pc"
 }
 
@@ -728,7 +734,7 @@ build_gmp() {
   gmp_prev_version_dir="5.1.3"
   gmp_version="6.0.0a"
   gmp_version_dir="6.0.0"
-  rm -rf $gmp_prev_version_dir
+  rm -rf gmp-$gmp_prev_version_dir
   download_and_unpack_file ftp://ftp.gnu.org/gnu/gmp/gmp-$gmp_version.tar.bz2 gmp-$gmp_version_dir
   cd gmp-$gmp_version_dir
     export CC_FOR_BUILD=/usr/bin/gcc
@@ -745,8 +751,11 @@ build_orc() {
 }
 
 build_libxml2() {
-  download_and_unpack_file ftp://xmlsoft.org/libxml2/libxml2-2.9.1.tar.gz libxml2-2.9.1
-  cd libxml2-2.9.1
+  libxml2_prev_version="2.9.1"
+  libxml2_version="2.9.2"
+  rm -rf libxml2-$libxml2_prev_version
+  download_and_unpack_file ftp://xmlsoft.org/libxml2/libxml2-$libxml2_version.tar.gz libxml2-$libxml2_version
+  cd libxml2-$libxml2_version
   generic_configure "--without-python"
   do_make_install
   cd ..
@@ -755,7 +764,7 @@ build_libxml2() {
 build_libbluray() {
   libbluray_prev_version="0.6.1"
   libbluray_version="0.6.2"
-  rm -rf $libbluray_prev_version
+  rm -rf libbluray-$libbluray_prev_version
   download_and_unpack_file ftp://ftp.videolan.org/pub/videolan/libbluray/$libbluray_version/libbluray-$libbluray_version.tar.bz2 libbluray-$libbluray_version
   cd libbluray-$libbluray_version
     export LIBS=-lpng
