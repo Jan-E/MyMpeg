@@ -609,7 +609,9 @@ build_libopus() {
 }
 
 build_libdvdread() {
-  libdvdread_version="5.0.0"
+  libdvdread_prev_version="5.0.0"
+  libdvdread_version="5.0.2"
+  rm -rf libdvdread-$libdvdread_prev_version
   download_and_unpack_file http://download.videolan.org/pub/videolan/libdvdread/$libdvdread_version/libdvdread-$libdvdread_version.tar.bz2 libdvdread-$libdvdread_version
   cd libdvdread-$libdvdread_version
     generic_configure "CFLAGS=-DHAVE_DVDCSS_DVDCSS_H LDFLAGS=-ldvdcss" # vlc patch: "--enable-libdvdcss" # XXX ask how I'm *supposed* to do this to the dvdread peeps [svn?]
@@ -619,8 +621,8 @@ build_libdvdread() {
 }
 
 build_libdvdnav() {
-  libdvdnav_prev_version="5.0.0"
-  libdvdnav_version="5.0.1"
+  libdvdnav_prev_version="5.0.1"
+  libdvdnav_version="5.0.3"
   rm -rf libdvdnav-$libdvdnav_prev_version
   download_and_unpack_file http://download.videolan.org/pub/videolan/libdvdnav/$libdvdnav_version/libdvdnav-$libdvdnav_version.tar.bz2 libdvdnav-$libdvdnav_version
   cd libdvdnav-$libdvdnav_version
@@ -633,8 +635,9 @@ build_libdvdnav() {
 }
 
 build_libdvdcss() {
-  # http://git.videolan.org/gitweb.cgi/vlc.git/?a=commit;h=fe07d496fc7fe3ce9d9cd642c3066f46dcf29778
-  libdvdcss_version="1.3.0"
+  libdvdcss_prev_version="1.3.0"
+  libdvdcss_version="1.3.99"
+  rm -rf libdvdcss-$libdvdcss_prev_version
   generic_download_and_install http://download.videolan.org/pub/videolan/libdvdcss/$libdvdcss_version/libdvdcss-$libdvdcss_version.tar.bz2 libdvdcss-$libdvdcss_version
 }
 
@@ -762,8 +765,8 @@ build_libxml2() {
 }
 
 build_libbluray() {
-  libbluray_prev_version="0.6.1"
-  libbluray_version="0.6.2"
+  libbluray_prev_version="0.6.2"
+  libbluray_version="0.7.0"
   rm -rf libbluray-$libbluray_prev_version
   download_and_unpack_file ftp://ftp.videolan.org/pub/videolan/libbluray/$libbluray_version/libbluray-$libbluray_version.tar.bz2 libbluray-$libbluray_version
   cd libbluray-$libbluray_version
