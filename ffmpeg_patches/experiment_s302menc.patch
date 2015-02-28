@@ -1,5 +1,5 @@
 diff --git a/libavcodec/s302menc.c b/libavcodec/s302menc.c
-index 540ac29..af24930 100644
+index e738f09..2b78b21 100644
 --- a/libavcodec/s302menc.c
 +++ b/libavcodec/s302menc.c
 @@ -173,6 +173,6 @@ AVCodec ff_s302m_encoder = {
