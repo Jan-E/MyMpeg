@@ -1,5 +1,5 @@
 diff --git a/libavfilter/af_volume.c b/libavfilter/af_volume.c
-index 4809ae7..e105da8 100644
+index 8d49c65..0921bc1 100644
 --- a/libavfilter/af_volume.c
 +++ b/libavfilter/af_volume.c
 @@ -54,6 +54,7 @@ static const char *const var_names[] = {
@@ -83,7 +83,7 @@ index 4809ae7..e105da8 100644
          vol->var_values[VAR_STARTPTS] = TS2D(buf->pts);
          vol->var_values[VAR_STARTT  ] = TS2T(buf->pts, inlink->time_base);
 diff --git a/libavfilter/af_volume.h b/libavfilter/af_volume.h
-index 53a328e..d60ea50 100644
+index aff7526..c2fff70 100644
 --- a/libavfilter/af_volume.h
 +++ b/libavfilter/af_volume.h
 @@ -54,6 +54,7 @@ enum VolumeVarName {

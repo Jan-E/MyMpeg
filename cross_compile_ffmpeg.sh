@@ -683,7 +683,10 @@ build_libogg() {
 }
 
 build_libvorbis() {
-  generic_download_and_install http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.4.tar.gz libvorbis-1.3.4
+  libvorbis_prev_version="1.3.4"
+  libvorbis_version="1.3.5"
+  rm -rf vorbis-$libvorbis_prev_version
+  generic_download_and_install http://downloads.xiph.org/releases/vorbis/libvorbis-$libvorbis_version.tar.gz libvorbis-$libvorbis_version
 }
 
 build_libspeex() {
