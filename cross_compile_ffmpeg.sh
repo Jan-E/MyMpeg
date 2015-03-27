@@ -609,8 +609,8 @@ build_libopus() {
 }
 
 build_libdvdread() {
-  libdvdread_prev_version="5.0.0"
-  libdvdread_version="5.0.2"
+  libdvdread_prev_version="5.0.2"
+  libdvdread_version="5.0.3"
   rm -rf libdvdread-$libdvdread_prev_version
   download_and_unpack_file http://download.videolan.org/pub/videolan/libdvdread/$libdvdread_version/libdvdread-$libdvdread_version.tar.bz2 libdvdread-$libdvdread_version
   cd libdvdread-$libdvdread_version
