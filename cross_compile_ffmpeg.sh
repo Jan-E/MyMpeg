@@ -536,8 +536,11 @@ build_libwebp() {
 }
 
 build_libvpx() {
-  download_and_unpack_file http://ffmpeg.zeranoe.com/builds/source/external_libraries/libvpx-1.3.0.tar.xz libvpx-1.3.0
-  cd libvpx-1.3.0
+  vpx_prev_version=1.3.0
+  vpx_version=1.4.0
+  rm -rf libwebp-$vpx_prev_version
+  download_and_unpack_file http://ffmpeg.zeranoe.com/builds/source/external_libraries/libvpx-$vpx_version.tar.xz libvpx-$vpx_version
+  cd libvpx-$vpx_version
 #  do_git_checkout https://git.chromium.org/git/webm/libvpx.git "libvpx_git"
 #  cd libvpx_git
   export CROSS="$cross_prefix"
