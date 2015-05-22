@@ -1,5 +1,5 @@
 diff --git a/libavcodec/aacenc.c b/libavcodec/aacenc.c
-index 998a875..d124435 100644
+index 897c3a1..f565085 100644
 --- a/libavcodec/aacenc.c
 +++ b/libavcodec/aacenc.c
 @@ -872,8 +872,7 @@ AVCodec ff_aac_encoder = {
