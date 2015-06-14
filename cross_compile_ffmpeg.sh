@@ -879,8 +879,8 @@ build_libaacplus() {
 }
 
 build_openssl() {
-  openssl_prev_version="1.0.1l"
-  openssl_version="1.0.1m"
+  openssl_prev_version="1.0.1m"
+  openssl_version="1.0.1o"
   rm -rf openssl-$openssl_prev_version
   download_and_unpack_file http://www.openssl.org/source/openssl-$openssl_version.tar.gz openssl-$openssl_version
   cd openssl-$openssl_version
