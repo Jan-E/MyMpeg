@@ -879,8 +879,8 @@ build_libaacplus() {
 }
 
 build_openssl() {
-  openssl_prev_version="1.0.1m"
-  openssl_version="1.0.1o"
+  openssl_prev_version="1.0.1o"
+  openssl_version="1.0.1p"
   rm -rf openssl-$openssl_prev_version
   download_and_unpack_file http://www.openssl.org/source/openssl-$openssl_version.tar.gz openssl-$openssl_version
   cd openssl-$openssl_version
@@ -925,8 +925,8 @@ build_iconv() {
 }
 
 build_freetype() {
-  freetype_prev_version=2.5.4
-  freetype_version=2.5.5
+  freetype_prev_version=2.5.5
+  freetype_version=2.6
   rm -rf freetype-$freetype_prev_version
   download_and_unpack_file http://download.savannah.gnu.org/releases/freetype/freetype-$freetype_version.tar.gz freetype-$freetype_version
   cd freetype-$freetype_version

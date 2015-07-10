@@ -1,8 +1,8 @@
 diff --git a/libavcodec/aacenc.c b/libavcodec/aacenc.c
-index 897c3a1..f565085 100644
+index f05f51b..e34f66f 100644
 --- a/libavcodec/aacenc.c
 +++ b/libavcodec/aacenc.c
-@@ -872,8 +872,7 @@ AVCodec ff_aac_encoder = {
+@@ -911,8 +911,7 @@ AVCodec ff_aac_encoder = {
      .encode2        = aac_encode_frame,
      .close          = aac_encode_end,
      .supported_samplerates = mpeg4audio_sample_rates,

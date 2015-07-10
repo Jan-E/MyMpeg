@@ -1,8 +1,8 @@
 diff --git a/libavcodec/avuienc.c b/libavcodec/avuienc.c
-index b91f782..bcec4f9 100644
+index b32f433..a290a76 100644
 --- a/libavcodec/avuienc.c
 +++ b/libavcodec/avuienc.c
-@@ -112,6 +112,5 @@ AVCodec ff_avui_encoder = {
+@@ -114,6 +114,5 @@ AVCodec ff_avui_encoder = {
      .init         = avui_encode_init,
      .encode2      = avui_encode_frame,
      .close        = avui_encode_close,
