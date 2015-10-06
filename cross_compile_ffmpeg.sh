@@ -925,8 +925,8 @@ build_iconv() {
 }
 
 build_freetype() {
-  freetype_prev_version=2.5.5
-  freetype_version=2.6
+  freetype_prev_version=2.6
+  freetype_version=2.6.1
   rm -rf freetype-$freetype_prev_version
   download_and_unpack_file http://download.savannah.gnu.org/releases/freetype/freetype-$freetype_version.tar.gz freetype-$freetype_version
   cd freetype-$freetype_version
