@@ -1,5 +1,5 @@
 diff --git a/libavcodec/mpegvideo_enc.c b/libavcodec/mpegvideo_enc.c
-index 8e565c1..d23f33e 100644
+index 1e8d240..5aeeee2 100644
 --- a/libavcodec/mpegvideo_enc.c
 +++ b/libavcodec/mpegvideo_enc.c
 @@ -1139,7 +1139,14 @@ static int load_input_picture(MpegEncContext *s, const AVFrame *pic_arg)
