@@ -611,8 +611,11 @@ build_libgsm() {
 }
 
 build_libopus() {
-  download_and_unpack_file http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz opus-1.1
-  cd opus-1.1
+  libopus_prev_version="1.1"
+  libopus_version="1.1.1"
+  rm -rf libopus-$libopus_prev_version
+  download_and_unpack_file http://downloads.xiph.org/releases/opus/opus-$libopus_version.tar.gz opus-$libopus_version
+  cd opus-$libopus_version
     apply_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/opus11.patch # allow it to work with shared builds
     generic_configure_make_install 
   cd ..
@@ -767,8 +770,8 @@ build_orc() {
 }
 
 build_libxml2() {
-  libxml2_prev_version="2.9.1"
-  libxml2_version="2.9.2"
+  libxml2_prev_version="2.9.2"
+  libxml2_version="2.9.3"
   rm -rf libxml2-$libxml2_prev_version
   download_and_unpack_file ftp://xmlsoft.org/libxml2/libxml2-$libxml2_version.tar.gz libxml2-$libxml2_version
   cd libxml2-$libxml2_version
@@ -802,21 +805,45 @@ build_libschroedinger() {
   cd ..
 }
 
+build_libtasn1() {
+  tasn1_version="4.7"
+  download_and_unpack_file ftp://ftp.gnu.org/gnu/libtasn1/libtasn1-$tasn1_version.tar.gz libtasn1-$tasn1_version
+  cd libtasn1-$tasn1_version
+    generic_configure
+    do_make_install
+  cd ..
+}
+
+build_libidn() {
+  idn_version="1.32"
+  download_and_unpack_file ftp://ftp.gnu.org/gnu/libidn/libidn-$idn_version.tar.gz libidn-$idn_version
+  cd libidn-$idn_version
+    generic_configure
+    do_make_install
+  cd ..
+}
+
 build_gnutls() {
-  gnutls_version="3.2.21"
-  prev_gnutls_version="3.2.20"
+  gnutls_version="3.4.7"
+  prev_gnutls_version="3.2.21"
   rm -rf gnutls-$prev_gnutls_version
-  download_and_unpack_file ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/gnutls-$gnutls_version.tar.xz gnutls-$gnutls_version
+  prev_gnutls_version="3.3.19"
+  rm -rf gnutls-$prev_gnutls_version
+  download_and_unpack_file ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-$gnutls_version.tar.xz gnutls-$gnutls_version
   cd gnutls-$gnutls_version
-    generic_configure "--disable-cxx --disable-doc" # don't need the c++ version, in an effort to cut down on size... LODO test difference...
+    sed -i.bak 's/mkstemp(tmpfile)/ -1 /g' src/danetool.c # fix x86_64 absent? but danetool is just an exe AFAICT so this hack should be ok...
+    generic_configure "--with-included-libtasn1 --without-idn --without-p11-kit --disable-cxx --disable-doc --enable-local-libopts --disable-guile" # don't need the c++ version, in an effort to cut down on size... LODO test difference...
     do_make_install
   cd ..
   sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -lgmp -lcrypt32 -lws2_32 -liconv/' "$PKG_CONFIG_PATH/gnutls.pc"
 }
 
 build_libnettle() {
-  download_and_unpack_file http://www.lysator.liu.se/~nisse/archive/nettle-2.7.1.tar.gz nettle-2.7.1
-  cd nettle-2.7.1
+  nettle_version="3.1"
+  prev_nettle_version="2.7.1"
+  rm -rf nettle-$prev_nettle_version
+  download_and_unpack_file http://www.lysator.liu.se/~nisse/archive/nettle-$nettle_version.tar.gz nettle-$nettle_version
+  cd nettle-$nettle_version
     generic_configure "--disable-openssl"
     do_make_install
   cd ..
@@ -879,8 +906,8 @@ build_libaacplus() {
 }
 
 build_openssl() {
-  openssl_prev_version="1.0.1o"
-  openssl_version="1.0.1p"
+  openssl_prev_version="1.0.1p"
+  openssl_version="1.0.2e"
   rm -rf openssl-$openssl_prev_version
   download_and_unpack_file http://www.openssl.org/source/openssl-$openssl_version.tar.gz openssl-$openssl_version
   cd openssl-$openssl_version
@@ -1198,13 +1225,6 @@ build_ffmpeg() {
   fi
   cd ${output_dir}
 
-  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_aacenc.patch
-  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_avuienc.patch
-  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_crystalhd.patch
-  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_dcaenc.patch
-  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_s302menc.patch
-  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/experiment_vorbisenc.patch
-  
   apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/ass_fontsize.patch
   apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/subtitles_non_fatal.patch
   apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/asfenc.patch
@@ -1262,8 +1282,8 @@ build_ffmpeg() {
 }
 
 build_ffmpeg_release() {
-  local version="2.8.2"
-  local prev_version="2.8.1"
+  local version="2.8.3"
+  local prev_version="2.8.2"
   local type=$1
   local shared=$2
   local download_url="http://ffmpeg.org/releases/ffmpeg-$version.tar.gz"
@@ -1364,6 +1384,8 @@ build_dependencies() {
   build_gmp # for libnettle
   build_libnettle # needs gmp
   build_iconv # mplayer I think needs it for freetype [just it though], vlc also wants it.  looks like ffmpeg can use it too...not sure what for :)
+  build_libtasn1
+  build_libidn
   build_gnutls # needs libnettle, can use iconv it appears
 
   build_freetype
