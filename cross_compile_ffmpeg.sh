@@ -1233,8 +1233,8 @@ build_ffmpeg() {
   local type=$1
   local shared=$2
   local git_url="https://github.com/FFmpeg/FFmpeg.git"
-  local download_url="http://ffmpeg.org/releases/ffmpeg-snapshot-git.tar.bz2"
   local output_dir="ffmpeg_git"
+  local download_url="http://ffmpeg.org/releases/ffmpeg-snapshot-git.tar.bz2" && output_dir="ffmpeg"
 
   local extra_configure_opts="--enable-gpl --enable-version3 --enable-avisynth --enable-bzlib --enable-decklink --enable-dxva2 --enable-fontconfig --enable-frei0r --enable-gnutls --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libdcadec --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmfx --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-librtmp --enable-libschroedinger --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libutvideo --enable-libvidstab --enable-libvo-aacenc --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-libzvbi --enable-lzma --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DPTW32_STATIC_LIB --extra-cflags=-DLIBTWOLAME_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng"
   if [[ $type = "libav" ]]; then
