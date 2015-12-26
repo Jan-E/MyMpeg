@@ -1063,10 +1063,6 @@ build_freetype() {
   cd ..
 }
 
-build_vo_aacenc() {
-  generic_download_and_install http://sourceforge.net/projects/opencore-amr/files/vo-aacenc/vo-aacenc-0.1.3.tar.gz/download vo-aacenc-0.1.3
-}
-
 build_sdl() {
   # apparently ffmpeg expects prefix-sdl-config not sdl-config that they give us, so rename...
   export CFLAGS=-DDECLSPEC=  # avoid SDL trac tickets 939 and 282, not worried about optimizing yet
@@ -1313,7 +1309,7 @@ build_ffmpeg() {
   local output_dir="ffmpeg_git"
   local download_url="http://ffmpeg.org/releases/ffmpeg-snapshot-git.tar.bz2"
 
-  local extra_configure_opts="--enable-gpl --enable-version3 --enable-avisynth --enable-bzlib --enable-decklink --enable-dxva2 --enable-fontconfig --enable-frei0r --enable-gnutls --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libdcadec --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmfx --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenh264 --enable-libopenjpeg --enable-libopus --enable-librtmp --enable-libschroedinger --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libutvideo --enable-libvidstab --enable-libvo-aacenc --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-libzvbi --enable-lzma --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DPTW32_STATIC_LIB --extra-cflags=-DLIBTWOLAME_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng"
+  local extra_configure_opts="--enable-gpl --enable-version3 --enable-avisynth --enable-bzlib --enable-decklink --enable-dxva2 --enable-fontconfig --enable-frei0r --enable-gnutls --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libdcadec --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmfx --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenh264 --enable-libopenjpeg --enable-libopus --enable-librtmp --enable-libschroedinger --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libutvideo --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-libzvbi --enable-lzma --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DPTW32_STATIC_LIB --extra-cflags=-DLIBTWOLAME_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng"
   if [[ $type = "libav" ]]; then
     # libav [ffmpeg fork]  has a few missing options?
     git_url="https://github.com/libav/libav.git"
@@ -1408,7 +1404,7 @@ build_ffmpeg_release() {
   local prev_output_dir="ffmpeg-$prev_version"
 
   # FFmpeg 
-  local extra_configure_opts="--enable-gpl --enable-version3 --enable-avisynth --enable-bzlib --enable-decklink --enable-dxva2 --enable-fontconfig --enable-frei0r --enable-gnutls --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libdcadec --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmfx --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenh264 --enable-libopenjpeg --enable-libopus --enable-librtmp --enable-libschroedinger --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libutvideo --enable-libvidstab --enable-libvo-aacenc --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-libzvbi --enable-lzma --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DPTW32_STATIC_LIB --extra-cflags=-DLIBTWOLAME_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng"
+  local extra_configure_opts="--enable-gpl --enable-version3 --enable-avisynth --enable-bzlib --enable-decklink --enable-dxva2 --enable-fontconfig --enable-frei0r --enable-gnutls --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libdcadec --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmfx --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenh264 --enable-libopenjpeg --enable-libopus --enable-librtmp --enable-libschroedinger --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libutvideo --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-libzvbi --enable-lzma --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DPTW32_STATIC_LIB --extra-cflags=-DLIBTWOLAME_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng"
   extra_configure_opts="$extra_configure_opts"
   # can't mix and match --enable-static --enable-shared unfortunately, or the final executable seems to just use shared if the're both present
 
@@ -1496,7 +1492,7 @@ build_dependencies() {
   build_iconv # mplayer I think needs it for freetype [just it though], vlc also wants it.  looks like ffmpeg can use it too...not sure what for :)
   build_libtasn1
   build_libidn
-  build_gnutls # needs libnettle and libtasn1 (? --with-included-libtasn1), can use iconv it appears
+  build_gnutls # needs libnettle, no libtasn1 (--with-included-libtasn1 => CCLD libminitasn1.la), can use iconv it appears
 
   build_freetype
   build_libexpat
@@ -1533,7 +1529,6 @@ build_dependencies() {
   build_libmodplug
   build_zvbi
   build_libvpx
-  build_vo_aacenc
   build_libdecklink
   build_libilbc
   build_fontconfig # needs expat, might need freetype, can use iconv, but I believe doesn't currently
