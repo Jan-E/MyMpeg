@@ -307,6 +307,22 @@ do_cmake() {
   fi
 }
 
+do_cmake_and_install() {
+  extra_args="$1" 
+  local touch_name=$(get_small_touchfile_name already_ran_cmake "$extra_args")
+
+  if [ ! -f $touch_name ]; then
+    rm -f already_* # reset so that make will run again if option just changed
+	rm -f CMakeCache.txt
+    local cur_dir2=$(pwd)
+    echo doing cmake in $cur_dir2 with PATH=$PATH  with extra_args=$extra_args like this:
+    echo cmake $(pwd) -G'Unix Makefiles' -DENABLE_STATIC_RUNTIME=1 -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_RANLIB=${cross_prefix}ranlib -DCMAKE_C_COMPILER=${cross_prefix}gcc -DCMAKE_CXX_COMPILER=${cross_prefix}g++ -DCMAKE_RC_COMPILER=${cross_prefix}windres -DCMAKE_INSTALL_PREFIX=$mingw_w64_x86_64_prefix $extra_args
+    cmake $(pwd) -G'Unix Makefiles' -DENABLE_STATIC_RUNTIME=1 -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_RANLIB=${cross_prefix}ranlib -DCMAKE_C_COMPILER=${cross_prefix}gcc -DCMAKE_CXX_COMPILER=${cross_prefix}g++ -DCMAKE_RC_COMPILER=${cross_prefix}windres -DCMAKE_INSTALL_PREFIX=$mingw_w64_x86_64_prefix $extra_args || exit 1
+    touch $touch_name || exit 1
+  fi
+  do_make_and_make_install
+}
+
 apply_patch() {
  local url=$1
  local patch_name=$(basename $url)
@@ -960,6 +976,31 @@ build_openssl() {
   cd ..
 }
 
+build_libssh() {
+  rm -rf libssh-* # temp for testing build
+  libssh_version="0.7.2"
+  download_and_unpack_file http://sources.openelec.tv/mirror/libssh/libssh-$libssh_version.tar.xz libssh-$libssh_version
+  cd libssh-$libssh_version
+    local touch_name=$(get_small_touchfile_name already_ran_cmake "$extra_args")
+
+    if [ ! -f $touch_name ]; then
+      rm -f already_* # reset so that make will run again if option just changed
+	  rm -f CMakeCache.txt
+	  rm -rf CMakeFiles
+      local cur_dir2=$(pwd)
+	  # https://github.com/alexander-jones/NCV/blob/master/README.md
+      mkdir build
+      cd build
+        echo cmake -G\"Unix Makefiles\" .. -DOPENSSL_LIBRARIES=$mingw_w64_x86_64_prefix/../lib -DENABLE_STATIC_RUNTIME=1 -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_RANLIB=${cross_prefix}ranlib -DCMAKE_C_COMPILER=${cross_prefix}gcc -DCMAKE_CXX_COMPILER=${cross_prefix}g++ -DCMAKE_RC_COMPILER=${cross_prefix}windres -DCMAKE_INSTALL_PREFIX=$mingw_w64_x86_64_prefix $extra_args
+        cmake -G"Unix Makefiles" .. -DOPENSSL_LIBRARIES=$mingw_w64_x86_64_prefix/../lib -DENABLE_STATIC_RUNTIME=1 -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_RANLIB=${cross_prefix}ranlib -DCMAKE_C_COMPILER=${cross_prefix}gcc -DCMAKE_CXX_COMPILER=${cross_prefix}g++ -DCMAKE_RC_COMPILER=${cross_prefix}windres -DCMAKE_INSTALL_PREFIX=$mingw_w64_x86_64_prefix $extra_args || exit 1
+	  cd ..
+      touch $touch_name || exit 1
+    fi
+    do_make_install
+
+  cd ..
+}
+
 build_libssh2() {
   libssh2_version="1.6.0"
   download_and_unpack_file https://github.com/libssh2/libssh2/releases/download/libssh2-$libssh2_version/libssh2-$libssh2_version.tar.gz libssh2-$libssh2_version
@@ -967,6 +1008,20 @@ build_libssh2() {
     generic_configure "--disable-examples-build"
     do_make_install
   cd ..
+
+# configure: summary of build options:
+# version:          1.6.0
+# Host type:        i686-w64-mingw32
+# Install prefix:   /home/jan/sandbox/mingw-w64-i686/i686-w64-mingw32
+# Compiler:         i686-w64-mingw32-gcc
+# Compiler flags:    -DLIBSSH2_WIN32
+# Library types:    Shared=no, Static=yes
+# Crypto library:   OpenSSL (AES-CTR: no)
+# Clear memory:     unsupported
+# Debug build:      no
+# Build examples:   no
+# Path to sshd:      (only for self-tests)
+# zlib compression: yes
 }
 
 build_fdk_aac() {
@@ -1497,6 +1552,7 @@ build_dependencies() {
     # build_libaacplus # if you use it, conflicts with other AAC encoders <sigh>, so disabled :)
   fi
   build_openssl
+  build_libssh
   build_libssh2 # needs gcrypt or openssl 
   build_librtmp # needs gnutls [or openssl...]
   build_libmfx
