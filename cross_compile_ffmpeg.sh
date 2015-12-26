@@ -433,6 +433,19 @@ build_libx265() {
   cd ../..
 }
 
+build_libopenh264() {
+  do_git_checkout "https://github.com/cisco/openh264.git" openh264 24916a652ee5d3 # need this to match ffmpeg's apparently or openh264v1.4 [this is last commit before 1.5 AFAICT]
+  cd openh264
+    if [ $bits_target = 32 ]; then
+      local arch=i686
+    else
+      local arch=x86_64
+    fi
+    do_make "$make_prefix_options OS=mingw_nt ARCH=$arch"
+    do_make_install "" "$make_prefix_options OS=mingw_nt install-static"
+  cd ..
+}
+
 #x264_profile_guided=y
 
 build_x264() {
@@ -1447,6 +1460,7 @@ build_dependencies() {
   build_libxavs
   build_libsoxr
   build_x264
+  build_libopenh264 # needs nasm - sudo apt-get install nasm
   build_libx265
   build_lame
   build_twolame
