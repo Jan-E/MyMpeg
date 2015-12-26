@@ -211,9 +211,7 @@ do_git_checkout() {
     echo "Downloading (via git clone) $to_dir"
     rm -rf $to_dir # just in case it was interrupted previously...
     # prevent partial checkouts by renaming it only after success
-    git clone $repo_url $to_dir.tmp || exit 1
-    mv $to_dir.tmp $to_dir
-    echo "done downloading $to_dir"
+    git clone $repo_url $to_dir.tmp && mv $to_dir.tmp $to_dir && echo "done downloading $to_dir"
     update_to_desired_git_branch_or_revision $to_dir $desired_branch
   else
     cd $to_dir
