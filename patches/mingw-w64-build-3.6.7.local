@@ -121,7 +121,7 @@ Compile Options:
   --binutils-ver=VERSION      compile with binutils VERSION ($binutils_release_ver, git)
                               [$binutils_release_ver]
   --gcc-ver=VERSION           compile with GCC VERSION ($gcc_release_ver, $gcc_old_release_ver, svn)
-                              [$gcc_old_release_ver]
+                              [$gcc_release_ver]
   --pthreads-w32-ver=VERSION  compile with Pthreads-w32 VERSION ($pthreads_w32_release_ver, cvs)
                               [cvs]
   --gcc-langs=LANG1,LANG2     compile GCC with support for LANG (ada, c, c++,
@@ -443,7 +443,7 @@ if [[ -z "$binutils_ver" ]]; then
   binutils_ver="$binutils_release_ver"
 fi
 if [[ -z "$gcc_ver" ]]; then
-  gcc_ver="$gcc_old_release_ver"
+  gcc_ver="$gcc_release_ver"
 fi
 if [[ -z "$disable_nls" ]]; then
   disable_nls=('--disable-nls')
