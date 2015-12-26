@@ -1552,7 +1552,7 @@ build_dependencies() {
     # build_libaacplus # if you use it, conflicts with other AAC encoders <sigh>, so disabled :)
   fi
   build_openssl
-  build_libssh
+#  build_libssh
   build_libssh2 # needs gcrypt or openssl 
   build_librtmp # needs gnutls [or openssl...]
   build_libmfx
