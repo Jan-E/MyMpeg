@@ -25,7 +25,7 @@
 # add OpenCL - https://ffmpeg.zeranoe.com/blog/?p=419
 # --enable-opencl          enable OpenCL code
 # --enable-opengl          enable OpenGL rendering [no]
-# add LibMFX - https://ffmpeg.zeranoe.com/blog/?p=407
+# --enable-libssh          enable SFTP protocol via libssh [no]
 
 yes_no_sel () {
   unset user_input
@@ -1287,7 +1287,7 @@ build_ffmpeg() {
 
   # minimal static build plus x264, x265 & faac
   if [[ $shared = "ministat" ]]; then
-    config_options="$build_options --enable-static --disable-shared --enable-pthreads --enable-avisynth --enable-libgme --enable-libmodplug --enable-libx264 --enable-libx265 --enable-nonfree --enable-libfaac --disable-doc"
+    config_options="$build_options --enable-static --disable-shared --enable-pthreads --enable-gpl --enable-avisynth --enable-libgme --enable-libmodplug --enable-libx264 --enable-libx265 --enable-nonfree --enable-libfaac --disable-doc"
   fi
 
   # minimal build for php_av.dll
