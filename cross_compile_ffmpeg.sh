@@ -1233,6 +1233,7 @@ build_ffmpeg() {
   local type=$1
   local shared=$2
   local git_url="https://github.com/FFmpeg/FFmpeg.git"
+  local download_url="http://ffmpeg.org/releases/ffmpeg-snapshot-git.tar.bz2"
   local output_dir="ffmpeg_git"
 
   local extra_configure_opts="--enable-gpl --enable-version3 --enable-avisynth --enable-bzlib --enable-decklink --enable-dxva2 --enable-fontconfig --enable-frei0r --enable-gnutls --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libdcadec --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmfx --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-librtmp --enable-libschroedinger --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libutvideo --enable-libvidstab --enable-libvo-aacenc --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-libzvbi --enable-lzma --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DPTW32_STATIC_LIB --extra-cflags=-DLIBTWOLAME_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng"
@@ -1248,7 +1249,9 @@ build_ffmpeg() {
     output_dir=${output_dir}_shared
 	rm -rf ${output_dir}
     # d6af706 = latest avcodec-55.dll
-    do_git_checkout $git_url ${output_dir} # d6af706
+    # do_git_checkout $git_url ${output_dir} # d6af706
+    download_and_unpack_file $download_url ${output_dir}
+
     final_install_dir=`pwd`/${output_dir}.installed
     rm -rf $final_install_dir
     extra_configure_opts="--enable-shared --disable-static $extra_configure_opts"
@@ -1256,7 +1259,8 @@ build_ffmpeg() {
     extra_configure_opts="$extra_configure_opts --prefix=$final_install_dir"
   else
 	rm -rf ${output_dir}
-    do_git_checkout $git_url $output_dir
+    # do_git_checkout $git_url $output_dir
+    download_and_unpack_file $download_url ${output_dir}
     extra_configure_opts="--enable-static --disable-shared $extra_configure_opts"
   fi
   cd ${output_dir}
@@ -1338,7 +1342,7 @@ build_ffmpeg_release() {
     extra_configure_opts="--enable-shared --disable-static $extra_configure_opts"
     cd ${output_dir}
   else
-    download_and_unpack_file $download_url $output_dir
+    download_and_unpack_file $download_url ${output_dir}
     cd ${output_dir}
   fi
 
