@@ -441,8 +441,8 @@ build_libopenh264() {
     else
       local arch=x86_64
     fi
-    do_make "$make_prefix_options OS=mingw_nt ARCH=$arch" || exit 1
-    do_make_install "$make_prefix_options OS=mingw_nt install-static" || exit 1
+    do_make "$make_prefix_options OS=mingw_nt ARCH=$arch"
+    do_make_install "$make_prefix_options OS=mingw_nt install-static"
   cd ..
 }
 
@@ -962,9 +962,9 @@ build_openssl() {
 
 build_libssh2() {
   libssh2_version="1.6.0"
-  download_and_unpack_file  https://github.com/libssh2/libssh2/releases/download/libssh2-$libssh2_version/libssh2-$libssh2_version.tar.gz libssh2-$libssh2_version
+  download_and_unpack_file https://github.com/libssh2/libssh2/releases/download/libssh2-$libssh2_version/libssh2-$libssh2_version.tar.gz libssh2-$libssh2_version
   cd libssh2-$libssh2_version
-    do_configure "--prefix=$mingw_w64_x86_64_prefix --disable-shared --disable-examples-build"
+    generic_configure "--disable-examples-build"
     do_make_install
   cd ..
 }
@@ -1497,7 +1497,7 @@ build_dependencies() {
     # build_libaacplus # if you use it, conflicts with other AAC encoders <sigh>, so disabled :)
   fi
   build_openssl
-#  build_libssh2 # needs gcrypt or openssl 
+  build_libssh2 # needs gcrypt or openssl 
   build_librtmp # needs gnutls [or openssl...]
   build_libmfx
 }
