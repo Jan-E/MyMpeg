@@ -964,11 +964,7 @@ build_libssh2() {
   libssh2_version="1.6.0"
   download_and_unpack_file  https://github.com/libssh2/libssh2/releases/download/libssh2-$libssh2_version/libssh2-$libssh2_version.tar.gz libssh2-$libssh2_version
   cd libssh2-$libssh2_version
-    if [ "$bits_target" = "32" ]; then
-      do_configure "--prefix=$mingw_w64_x86_64_prefix --disable-shared --disable-examples-build"
-    else
-      do_configure "--prefix=$mingw_w64_x86_64_prefix --disable-shared --disable-examples-build"
-    fi
+    do_configure "--prefix=$mingw_w64_x86_64_prefix --disable-shared --disable-examples-build"
     do_make_install
   cd ..
 }
@@ -1445,7 +1441,7 @@ build_dependencies() {
   build_iconv # mplayer I think needs it for freetype [just it though], vlc also wants it.  looks like ffmpeg can use it too...not sure what for :)
   build_libtasn1
   build_libidn
-  build_gnutls # needs libnettle and libtasn1, can use iconv it appears
+  build_gnutls # needs libnettle and libtasn1 (? --with-included-libtasn1), can use iconv it appears
 
   build_freetype
   build_libexpat
@@ -1501,7 +1497,7 @@ build_dependencies() {
     # build_libaacplus # if you use it, conflicts with other AAC encoders <sigh>, so disabled :)
   fi
   build_openssl
-  build_libssh2 # needs gcrypt or openssl 
+#  build_libssh2 # needs gcrypt or openssl 
   build_librtmp # needs gnutls [or openssl...]
   build_libmfx
 }
