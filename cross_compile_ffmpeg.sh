@@ -19,6 +19,14 @@
 #
 # The GNU General Public License can be found in the LICENSE file.
 
+# TODO
+# --enable-libzimg enable z.lib, needed for zscale filter - https://github.com/sekrit-twc/zimg - https://ffmpeg.zeranoe.com/forum/viewtopic.php?t=2270&start=10
+# add xz utils - http://tukaani.org/xz/
+# add OpenCL - https://ffmpeg.zeranoe.com/blog/?p=419
+# --enable-opencl          enable OpenCL code
+# --enable-opengl          enable OpenGL rendering [no]
+# add LibMFX - https://ffmpeg.zeranoe.com/blog/?p=407
+
 yes_no_sel () {
   unset user_input
   local question="$1"
@@ -490,8 +498,11 @@ build_qt() {
 }
 
 build_libsoxr() {
-  download_and_unpack_file http://sourceforge.net/projects/soxr/files/soxr-0.1.1-Source.tar.xz soxr-0.1.1-Source
-  cd soxr-0.1.1-Source
+  soxr_version="0.1.2"
+  soxr_prev_version="0.1.1"
+  rm -rf soxr-$soxr_prev_version
+  download_and_unpack_file http://sourceforge.net/projects/soxr/files/soxr-$soxr_version-Source.tar.xz soxr-$soxr_version-Source
+  cd soxr-$soxr_version-Source
     do_cmake "-DHAVE_WORDS_BIGENDIAN_EXITCODE=0  -DBUILD_SHARED_LIBS:bool=off -DBUILD_TESTS:BOOL=OFF"
     do_make_install
   cd ..
@@ -529,33 +540,36 @@ build_libopenjpeg() {
 }
 
 build_libwebp() {
-  webp_prev_version=0.4.2
-  webp_version=0.4.3
+  webp_version=0.4.4
+  webp_prev_version=0.4.3
   rm -rf libwebp-$webp_prev_version
   generic_download_and_install http://downloads.webmproject.org/releases/webp/libwebp-$webp_version.tar.gz libwebp-$webp_version
 }
 
 build_libvpx() {
-  vpx_prev_version=1.3.0
-  vpx_version=1.4.0
-  rm -rf libwebp-$vpx_prev_version
+  vpx_version=1.5.0
+  vpx_prev_version=1.4.0
+  rm -rf libvpx-$vpx_prev_version
   download_and_unpack_file http://ffmpeg.zeranoe.com/builds/source/external_libraries/libvpx-$vpx_version.tar.xz libvpx-$vpx_version
   cd libvpx-$vpx_version
-#  do_git_checkout https://git.chromium.org/git/webm/libvpx.git "libvpx_git"
-#  cd libvpx_git
-  export CROSS="$cross_prefix"
-  if [[ "$bits_target" = "32" ]]; then
-    do_configure "--extra-cflags=-DPTW32_STATIC_LIB --target=x86-win32-gcc --prefix=$mingw_w64_x86_64_prefix --enable-static --disable-shared"
-  else
-    do_configure "--extra-cflags=-DPTW32_STATIC_LIB --target=x86_64-win64-gcc --prefix=$mingw_w64_x86_64_prefix --enable-static --disable-shared "
-  fi
-  do_make_install
-  unset CROSS
+#   do_git_checkout https://git.chromium.org/git/webm/libvpx.git "libvpx_git"
+#   cd libvpx_git
+    export CROSS="$cross_prefix"
+    if [[ "$bits_target" = "32" ]]; then
+      do_configure "--extra-cflags=-DPTW32_STATIC_LIB --target=x86-win32-gcc --prefix=$mingw_w64_x86_64_prefix --enable-static --disable-shared"
+    else
+      do_configure "--extra-cflags=-DPTW32_STATIC_LIB --target=x86_64-win64-gcc --prefix=$mingw_w64_x86_64_prefix --enable-static --disable-shared "
+    fi
+    do_make_install
+    unset CROSS
   cd ..
 }
 
 build_wavpack() {
-  generic_download_and_install http://wavpack.com/wavpack-4.70.0.tar.bz2 wavpack-4.70.0
+  wavpack_version=4.75.2
+  wavpack_prev_version=4.70.0
+  rm -rf wavpack-$wavpack_prev_version
+  generic_download_and_install http://wavpack.com/wavpack-$wavpack_version.tar.bz2 wavpack-$wavpack_version
 }
 
 build_libdcadec() {
@@ -577,7 +591,7 @@ build_libilbc() {
   do_git_checkout https://github.com/dekkers/libilbc.git libilbc_git
   cd libilbc_git
   if [[ ! -f "configure" ]]; then
-    autoreconf -fiv
+    autoreconf -fiv || exit 1 # failure here, OS X means "you need libtoolize" perhaps? http://betterlogic.com/roger/2014/12/ilbc-cross-compile-os-x-mac-woe/
   fi
   generic_configure_make_install
   cd ..
@@ -600,13 +614,16 @@ build_libflite() {
 }
 
 build_libgsm() {
-  download_and_unpack_file http://www.quut.com/gsm/gsm-1.0.13.tar.gz gsm-1.0-pl13
-  cd gsm-1.0-pl13
-  apply_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/libgsm.patch
-  do_make "CC=${cross_prefix}gcc AR=${cross_prefix}ar RANLIB=${cross_prefix}ranlib INSTALL_ROOT=${mingw_w64_x86_64_prefix}"
-  cp lib/libgsm.a $mingw_w64_x86_64_prefix/lib || exit 1
-  mkdir -p $mingw_w64_x86_64_prefix/include/gsm
-  cp inc/gsm.h $mingw_w64_x86_64_prefix/include/gsm || exit 1
+  libgsm_version="1.0.13-4"
+  libgsm_prev_version="1.0-pl13"
+  rm -rf libgsm-$libgsm_prev_version
+  download_and_unpack_file http://ffmpeg.zeranoe.com/builds/source/external_libraries/libgsm-$libgsm_version.tar.xz libgsm-$libgsm_version
+  cd libgsm-$libgsm_version
+#   apply_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/libgsm.patch
+    do_make "CC=${cross_prefix}gcc AR=${cross_prefix}ar RANLIB=${cross_prefix}ranlib INSTALL_ROOT=${mingw_w64_x86_64_prefix}"
+    cp lib/libgsm.a $mingw_w64_x86_64_prefix/lib || exit 1
+    mkdir -p $mingw_w64_x86_64_prefix/include/gsm
+    cp inc/gsm.h $mingw_w64_x86_64_prefix/include/gsm || exit 1
   cd ..
 }
 
@@ -717,44 +734,42 @@ build_libspeex() {
 
 build_libtheora() {
   cpu_count=1 # can't handle it
-  generic_download_and_install http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2 libtheora-1.1.1
+  download_and_unpack_file http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.gz libtheora-1.1.1
+  cd libtheora-1.1.1
+    sed -i 's/double rint/double rint_disabled/' examples/encoder_example.c # double define issue [?]
+    generic_configure_make_install 
+  cd ..
   cpu_count=$original_cpu_count
 }
 
 build_libfribidi() {
-  fribidi_prev_version="0.19.5"
-  fribidi_version="0.19.6"
+  fribidi_prev_version="0.19.6"
+  fribidi_version="0.19.7"
   rm -rf fribidi-$fribidi_prev_version
-  download_and_unpack_file http://download.videolan.org/contrib/fribidi-$fribidi_version.tar.bz2 fribidi-$fribidi_version
+# download_and_unpack_file http://download.videolan.org/contrib/fribidi-$fribidi_version.tar.bz2 fribidi-$fribidi_version # 12-2015 mac 0.19.6
+  download_and_unpack_file http://fribidi.org/download/fribidi-$fribidi_version.tar.bz2 fribidi-$fribidi_version
   cd fribidi-$fribidi_version
     # make it export symbols right...
     # apply_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/fribidi.diff
     generic_configure
     do_make_install
   cd ..
-
-  #do_git_checkout http://anongit.freedesktop.org/git/fribidi/fribidi.git fribidi_git
-  #cd fribidi_git
-  #  ./bootstrap # couldn't figure out how to make this work...
-  #  generic_configure
-  #  do_make_install
-  #cd ..
 }
 
 build_libass() {
-  libass_prev_version="0.12.0"
-  libass_version="0.12.1"
+  libass_version="0.13.1"
+  libass_prev_version="0.12.1"
   rm -rf libass-$libass_prev_version
   generic_download_and_install https://github.com/libass/libass/releases/download/$libass_version/libass-$libass_version.tar.xz libass-$libass_version
   sed -i 's/-lass -lm/-lass -lfribidi -lm/' "$PKG_CONFIG_PATH/libass.pc"
 }
 
 build_gmp() {
-  gmp_prev_version_dir="5.1.3"
-  gmp_version="6.0.0a"
-  gmp_version_dir="6.0.0"
+  gmp_prev_version_dir="6.0.0"
+  gmp_version="6.1.0"
+  gmp_version_dir="6.1.0"
   rm -rf gmp-$gmp_prev_version_dir
-  download_and_unpack_file ftp://ftp.gnu.org/gnu/gmp/gmp-$gmp_version.tar.bz2 gmp-$gmp_version_dir
+  download_and_unpack_file ftp://ftp.gnu.org/gnu/gmp/gmp-$gmp_version.tar.xz gmp-$gmp_version_dir
   cd gmp-$gmp_version_dir
     export CC_FOR_BUILD=/usr/bin/gcc
     export CPP_FOR_BUILD=usr/bin/cpp
@@ -824,18 +839,16 @@ build_libidn() {
 }
 
 build_gnutls() {
-  gnutls_version="3.4.7"
+  gnutls_version="3.3.19"
   prev_gnutls_version="3.2.21"
   rm -rf gnutls-$prev_gnutls_version
-  prev_gnutls_version="3.3.19"
-  rm -rf gnutls-$prev_gnutls_version
-  download_and_unpack_file ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-$gnutls_version.tar.xz gnutls-$gnutls_version
+  download_and_unpack_file ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-$gnutls_version.tar.xz gnutls-$gnutls_version
   cd gnutls-$gnutls_version
-    sed -i.bak 's/mkstemp(tmpfile)/ -1 /g' src/danetool.c # fix x86_64 absent? but danetool is just an exe AFAICT so this hack should be ok...
-    generic_configure "--with-included-libtasn1 --without-idn --without-p11-kit --disable-cxx --disable-doc --enable-local-libopts --disable-guile" # don't need the c++ version, in an effort to cut down on size... LODO test difference...
-    do_make_install
+    sed -i 's/mkstemp(tmpfile)/ -1 /g' src/danetool.c # fix x86_64 absent? but danetool is just an exe AFAICT so this hack should be ok...
+    generic_configure "--disable-cxx --disable-doc --enable-local-libopts --disable-guile" # don't need the c++ version, in an effort to cut down on size... XXXX test size difference... libopts to allow building with local autogen installed, guile is so that if it finds guile installed (cygwin did/does) it won't try and link/build to it and fail...
+    do_make_and_make_install
   cd ..
-  sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -lgmp -lcrypt32 -lws2_32 -liconv/' "$PKG_CONFIG_PATH/gnutls.pc"
+  sed -i 's/-lgnutls/-lgnutls -lnettle -lhogweed -lgmp -lcrypt32 -lws2_32 -liconv/' "$PKG_CONFIG_PATH/gnutls.pc"
 }
 
 build_libnettle() {
@@ -866,7 +879,10 @@ build_zlib() {
 }
 
 build_libxvid() {
-  download_and_unpack_file http://downloads.xvid.org/downloads/xvidcore-1.3.3.tar.gz xvidcore
+  xvidcore_version="1.3.4"
+  prev_xvidcore_version="1.3.3"
+  rm -rf xvidcore-$prev_xvidcore_version
+  download_and_unpack_file http://downloads.xvid.org/downloads/xvidcore-$xvidcore_version.tar.gz xvidcore
   cd xvidcore/build/generic
   if [ "$bits_target" = "64" ]; then
     local config_opts="--build=x86_64-unknown-linux-gnu --disable-assembly" # kludgey work arounds for 64 bit
@@ -886,9 +902,12 @@ build_libxvid() {
   fi
 }
 
-build_fontconfig() { # 2.11.0 failed
-  download_and_unpack_file http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.1.tar.gz fontconfig-2.11.1
-  cd fontconfig-2.11.1
+build_fontconfig() {
+  fontconfig_version="2.11.94"
+  fontconfig_prev_version="2.11.1"
+  rm -rf fontconfig-$fontconfig_prev_version
+  download_and_unpack_file http://www.freedesktop.org/software/fontconfig/release/fontconfig-$fontconfig_version.tar.gz fontconfig-$fontconfig_version
+  cd fontconfig-$fontconfig_version
     generic_configure --disable-docs
     do_make_install
   cd .. 
@@ -952,8 +971,8 @@ build_iconv() {
 }
 
 build_freetype() {
-  freetype_prev_version=2.6
-  freetype_version=2.6.1
+  freetype_prev_version=2.6.1
+  freetype_version=2.6.2
   rm -rf freetype-$freetype_prev_version
   download_and_unpack_file http://download.savannah.gnu.org/releases/freetype/freetype-$freetype_version.tar.gz freetype-$freetype_version
   cd freetype-$freetype_version
@@ -1192,14 +1211,23 @@ apply_ffmpeg_release_patch() {
  fi
 }
 
+build_libdecklink() {
+   if [[ ! -f $mingw_w64_x86_64_prefix/include/DeckLinkAPIVersion.h ]]; then
+     # smaller files don't worry about partials for now, plus we only care about the last file anyway here...
+     curl -4 https://raw.githubusercontent.com/rdp/ffmpeg-windows-build-helpers/master/patches/DeckLinkAPI.h > $mingw_w64_x86_64_prefix/include/DeckLinkAPI.h  || exit 1
+     curl -4 https://raw.githubusercontent.com/rdp/ffmpeg-windows-build-helpers/master/patches/DeckLinkAPI_i.c > $mingw_w64_x86_64_prefix/include/DeckLinkAPI_i.c.tmp  || exit 1
+     mv $mingw_w64_x86_64_prefix/include/DeckLinkAPI_i.c.tmp $mingw_w64_x86_64_prefix/include/DeckLinkAPI_i.c
+     curl -4 https://raw.githubusercontent.com/rdp/ffmpeg-windows-build-helpers/master/patches/DeckLinkAPIVersion.h > $mingw_w64_x86_64_prefix/include/DeckLinkAPIVersion.h  || exit 1
+  fi
+}
+
 build_ffmpeg() {
   local type=$1
   local shared=$2
   local git_url="https://github.com/FFmpeg/FFmpeg.git"
   local output_dir="ffmpeg_git"
 
-  local extra_configure_opts="--enable-libsoxr --enable-fontconfig --enable-libass --enable-libutvideo --enable-libbluray --enable-iconv --enable-libtwolame --extra-cflags=-DLIBTWOLAME_STATIC --enable-libzvbi --enable-libcaca --enable-libmodplug --enable-libbs2b --enable-libgme --enable-dxva2 --enable-libdcadec --extra-libs=-lstdc++ --extra-libs=-lpng --enable-libvidstab"
-
+  local extra_configure_opts="--enable-gpl --enable-version3 --enable-avisynth --enable-bzlib --enable-decklink --enable-dxva2 --enable-fontconfig --enable-frei0r --enable-gnutls --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libdcadec --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-librtmp --enable-libschroedinger --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libutvideo --enable-libvidstab --enable-libvo-aacenc --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-libzvbi --enable-lzma --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DPTW32_STATIC_LIB --extra-cflags=-DLIBTWOLAME_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng"
   if [[ $type = "libav" ]]; then
     # libav [ffmpeg fork]  has a few missing options?
     git_url="https://github.com/libav/libav.git"
@@ -1239,8 +1267,8 @@ build_ffmpeg() {
    local arch=x86_64
   fi
 
-  build_options="--arch=$arch --target-os=mingw32 --cross-prefix=$cross_prefix --pkg-config=pkg-config --enable-gpl"
-  config_options="$build_options --enable-libx264 --enable-libx265 --enable-avisynth --enable-libxvid --enable-libmp3lame --enable-version3 --enable-zlib --enable-librtmp --enable-libvorbis --enable-libtheora --enable-libspeex --enable-libopenjpeg --enable-gnutls --enable-libgsm --enable-libfreetype --disable-w32threads --enable-frei0r --enable-filter=frei0r --enable-libvo-aacenc --enable-bzlib --enable-libxavs --extra-cflags=-DPTW32_STATIC_LIB --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libilbc --disable-doc --prefix=$mingw_w64_x86_64_prefix $extra_configure_opts" # other possibilities: --enable-w32threads --enable-libflite
+  build_options="--arch=$arch --target-os=mingw32 --cross-prefix=$cross_prefix --pkg-config=pkg-config"
+  config_options="$build_options --disable-w32threads --disable-doc --prefix=$mingw_w64_x86_64_prefix $extra_configure_opts" # other possibilities: --enable-w32threads --enable-libflite
   if [[ "$non_free" = "y" ]]; then
     config_options="$config_options --enable-nonfree --enable-libfdk-aac --enable-libfaac" # -- faac deemed too poor quality and becomes the default -- add it in and uncomment the build_faac line to include it --enable-openssl --enable-libaacplus
   else
@@ -1282,8 +1310,8 @@ build_ffmpeg() {
 }
 
 build_ffmpeg_release() {
-  local version="2.8.3"
-  local prev_version="2.8.2"
+  local version="2.8.4"
+  local prev_version="2.8.3"
   local type=$1
   local shared=$2
   local download_url="http://ffmpeg.org/releases/ffmpeg-$version.tar.gz"
@@ -1291,7 +1319,7 @@ build_ffmpeg_release() {
   local prev_output_dir="ffmpeg-$prev_version"
 
   # FFmpeg 
-  local extra_configure_opts="--enable-libsoxr --enable-fontconfig --enable-libass --enable-libutvideo --enable-libbluray --enable-iconv --enable-libtwolame --extra-cflags=-DLIBTWOLAME_STATIC --enable-libzvbi --enable-libcaca --enable-libmodplug --enable-libbs2b --enable-libgme --enable-dxva2 --extra-libs=-lstdc++ --extra-libs=-lpng --enable-libvidstab"
+  local extra_configure_opts="--enable-gpl --enable-version3 --enable-avisynth --enable-bzlib --enable-decklink --enable-dxva2 --enable-fontconfig --enable-frei0r --enable-gnutls --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libdcadec --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-librtmp --enable-libschroedinger --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libutvideo --enable-libvidstab --enable-libvo-aacenc --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-libzvbi --enable-lzma --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DPTW32_STATIC_LIB --extra-cflags=-DLIBTWOLAME_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng"
   extra_configure_opts="$extra_configure_opts"
   # can't mix and match --enable-static --enable-shared unfortunately, or the final executable seems to just use shared if the're both present
 
@@ -1320,7 +1348,7 @@ build_ffmpeg_release() {
    local arch=x86_64
   fi
 
-  config_options="--arch=$arch --target-os=mingw32 --cross-prefix=$cross_prefix --pkg-config=pkg-config --enable-gpl --enable-libx264 --enable-libx265 --enable-avisynth --enable-libxvid --enable-libmp3lame --enable-version3 --enable-zlib --enable-librtmp --enable-libvorbis --enable-libtheora --enable-libspeex --enable-libopenjpeg --enable-gnutls --enable-libgsm --enable-libfreetype --enable-libopus --disable-w32threads --enable-frei0r --enable-filter=frei0r --enable-libvo-aacenc --enable-bzlib --enable-libxavs --extra-cflags=-DPTW32_STATIC_LIB --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libilbc --disable-doc --prefix=$mingw_w64_x86_64_prefix $extra_configure_opts" # other possibilities: --enable-w32threads --enable-libflite
+  config_options="--arch=$arch --target-os=mingw32 --cross-prefix=$cross_prefix --pkg-config=pkg-config --disable-w32threads --disable-doc --prefix=$mingw_w64_x86_64_prefix $extra_configure_opts" # other possibilities: --enable-w32threads --enable-libflite
   if [[ "$non_free" = "y" ]]; then
     config_options="$config_options --enable-nonfree --enable-libfdk-aac --enable-libfaac" # -- faac deemed too poor quality and becomes the default -- add it in and uncomment the build_faac line to include it --enable-openssl --enable-libaacplus
   else
@@ -1416,6 +1444,7 @@ build_dependencies() {
   build_zvbi
   build_libvpx
   build_vo_aacenc
+  build_libdecklink
   build_libilbc
   build_fontconfig # needs expat, might need freetype, can use iconv, but I believe doesn't currently
   build_libfribidi
@@ -1457,8 +1486,8 @@ build_apps() {
 #   build_ffmpeg_release ffmpeg shared
   fi
   if [[ $build_ffmpeg_static = "y" ]]; then
-    build_ffmpeg ffmpeg
     build_ffmpeg_release ffmpeg
+    build_ffmpeg ffmpeg
   fi
   if [[ $build_libav = "y" ]]; then
     build_ffmpeg libav
