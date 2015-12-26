@@ -960,6 +960,19 @@ build_openssl() {
   cd ..
 }
 
+build_libssh2() {
+  libssh2_version="1.6.0"
+  download_and_unpack_file  https://github.com/libssh2/libssh2/releases/download/libssh2-$libssh2_version/libssh2-$libssh2_version.tar.gz libssh2-$libssh2_version
+  cd libssh2-$libssh2_version
+    if [ "$bits_target" = "32" ]; then
+      do_configure "--prefix=$mingw_w64_x86_64_prefix --disable-shared --disable-examples-build"
+    else
+      do_configure "--prefix=$mingw_w64_x86_64_prefix --disable-shared --disable-examples-build"
+    fi
+    do_make_install
+  cd ..
+}
+
 build_fdk_aac() {
   #generic_download_and_install http://sourceforge.net/projects/opencore-amr/files/fdk-aac/fdk-aac-0.1.3.tar.gz/download fdk-aac-0.1.3
   #do_git_checkout https://github.com/mstorsjo/fdk-aac.git fdk-aac_git
@@ -1247,7 +1260,7 @@ build_ffmpeg() {
   local shared=$2
   local git_url="https://github.com/FFmpeg/FFmpeg.git"
   local output_dir="ffmpeg_git"
-  local download_url="http://ffmpeg.org/releases/ffmpeg-snapshot-git.tar.bz2" && output_dir="ffmpeg"
+  local download_url="http://ffmpeg.org/releases/ffmpeg-snapshot-git.tar.bz2"
 
   local extra_configure_opts="--enable-gpl --enable-version3 --enable-avisynth --enable-bzlib --enable-decklink --enable-dxva2 --enable-fontconfig --enable-frei0r --enable-gnutls --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libdcadec --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmfx --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenh264 --enable-libopenjpeg --enable-libopus --enable-librtmp --enable-libschroedinger --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libutvideo --enable-libvidstab --enable-libvo-aacenc --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-libzvbi --enable-lzma --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DPTW32_STATIC_LIB --extra-cflags=-DLIBTWOLAME_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng"
   if [[ $type = "libav" ]]; then
@@ -1262,8 +1275,8 @@ build_ffmpeg() {
     output_dir=${output_dir}_shared
 	rm -rf ${output_dir}
     # d6af706 = latest avcodec-55.dll
-    # do_git_checkout $git_url ${output_dir} # d6af706
-    download_and_unpack_file $download_url ${output_dir}
+    do_git_checkout $git_url ${output_dir} # d6af706
+    # download_and_unpack_file $download_url ${output_dir}
 
     final_install_dir=`pwd`/${output_dir}.installed
     rm -rf $final_install_dir
@@ -1273,7 +1286,7 @@ build_ffmpeg() {
   else
 	rm -rf ${output_dir}
     # do_git_checkout $git_url $output_dir
-    download_and_unpack_file $download_url ${output_dir}
+    output_dir="ffmpeg" && download_and_unpack_file $download_url ${output_dir}
     extra_configure_opts="--enable-static --disable-shared $extra_configure_opts"
   fi
   cd ${output_dir}
@@ -1487,7 +1500,8 @@ build_dependencies() {
     build_faac # not included for now, too poor quality :)
     # build_libaacplus # if you use it, conflicts with other AAC encoders <sigh>, so disabled :)
   fi
-  build_openssl # hopefully do not need it anymore, since we have gnutls everywhere...
+  build_openssl
+  build_libssh2 # needs gcrypt or openssl 
   build_librtmp # needs gnutls [or openssl...]
   build_libmfx
 }
