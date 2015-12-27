@@ -930,13 +930,15 @@ build_libxvid() {
 }
 
 build_fontconfig() {
-  fontconfig_version="2.11.1"
-  fontconfig_prev_version="2.11.94"
+  fontconfig_version="2.11.94"
+  fontconfig_prev_version="2.11.1"
   rm -rf fontconfig-$fontconfig_prev_version
   download_and_unpack_file http://www.freedesktop.org/software/fontconfig/release/fontconfig-$fontconfig_version.tar.gz fontconfig-$fontconfig_version
   cd fontconfig-$fontconfig_version
+    export CFLAGS=-DFLEXIBLE_ARRAY_MEMBER
     generic_configure --disable-docs
     do_make_install
+	unset CFLAGS
   cd .. 
   sed -i 's/-L${libdir} -lfontconfig[^l]*$/-L${libdir} -lfontconfig -lfreetype -lexpat -lpng/' "$PKG_CONFIG_PATH/fontconfig.pc"
 }
