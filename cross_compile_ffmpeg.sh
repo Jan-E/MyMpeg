@@ -978,8 +978,16 @@ build_openssl() {
   cd ..
 }
 
+build_libgcrypt() {
+  download_and_unpack_file https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.6.4.tar.bz2 libgcrypt-1.6.4
+  cd libgcrypt-1.6.4
+    do_configure
+    do_make_install
+  cd ..
+}
+
 build_libssh() {
-  rm -rf libssh-* # temp for testing build
+  #rm -rf libssh-* # temp for testing build
   libssh_version="0.7.2"
   download_and_unpack_file http://sources.openelec.tv/mirror/libssh/libssh-$libssh_version.tar.xz libssh-$libssh_version
   cd libssh-$libssh_version
@@ -990,11 +998,11 @@ build_libssh() {
 	  rm -f CMakeCache.txt
 	  rm -rf CMakeFiles
       local cur_dir2=$(pwd)
-	  # https://github.com/alexander-jones/NCV/blob/master/README.md
+      sed -i 's/add_subdirectory(doc.*)//g' CMakeLists.txt
       mkdir build
       cd build
-        echo cmake -G\"Unix Makefiles\" .. -DOPENSSL_LIBRARIES=$mingw_w64_x86_64_prefix/../lib -DENABLE_STATIC_RUNTIME=1 -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_RANLIB=${cross_prefix}ranlib -DCMAKE_C_COMPILER=${cross_prefix}gcc -DCMAKE_CXX_COMPILER=${cross_prefix}g++ -DCMAKE_RC_COMPILER=${cross_prefix}windres -DCMAKE_INSTALL_PREFIX=$mingw_w64_x86_64_prefix $extra_args
-        cmake -G"Unix Makefiles" .. -DOPENSSL_LIBRARIES=$mingw_w64_x86_64_prefix/../lib -DENABLE_STATIC_RUNTIME=1 -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_RANLIB=${cross_prefix}ranlib -DCMAKE_C_COMPILER=${cross_prefix}gcc -DCMAKE_CXX_COMPILER=${cross_prefix}g++ -DCMAKE_RC_COMPILER=${cross_prefix}windres -DCMAKE_INSTALL_PREFIX=$mingw_w64_x86_64_prefix $extra_args || exit 1
+        echo cmake .. -DCMAKE_RANLIB=${cross_prefix}ranlib -DCMAKE_C_COMPILER=${cross_prefix}gcc -DCMAKE_CXX_COMPILER=${cross_prefix}g++ -DCMAKE_RC_COMPILER=${cross_prefix}windres -DCMAKE_INSTALL_PREFIX=$mingw_w64_x86_64_prefix $extra_args
+        cmake ..  -DCMAKE_RANLIB=${cross_prefix}ranlib -DCMAKE_C_COMPILER=${cross_prefix}gcc -DCMAKE_CXX_COMPILER=${cross_prefix}g++ -DCMAKE_RC_COMPILER=${cross_prefix}windres -DCMAKE_INSTALL_PREFIX=$mingw_w64_x86_64_prefix $extra_args || ls -la & exit 1
 	  cd ..
       touch $touch_name || exit 1
     fi
@@ -1493,6 +1501,9 @@ build_dependencies() {
 #  build_win32_pthreads # vpx etc. depend on this--provided by the compiler build script now, so shouldn't have to build our own
   build_libdl # ffmpeg's frei0r implentation needs this
   build_zlib # rtmp depends on it [as well as ffmpeg's optional but handy --enable-zlib]
+  build_openssl
+  build_libgcrypt
+  build_libssh # needs openssl
   build_bzlib2 # in case someone wants it [ffmpeg uses it]
   build_libpng # for openjpeg, needs zlib
   build_gmp # for libnettle
@@ -1554,8 +1565,6 @@ build_dependencies() {
     build_faac # not included for now, too poor quality :)
     # build_libaacplus # if you use it, conflicts with other AAC encoders <sigh>, so disabled :)
   fi
-  build_openssl
-#  build_libssh
   build_libssh2 # needs gcrypt or openssl 
   build_librtmp # needs gnutls [or openssl...]
   build_libmfx
