@@ -979,18 +979,20 @@ build_openssl() {
 }
 
 build_libgpgerror() {
+  generic_download_and_install https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.21.tar.bz2 libgpg-error-1.21
   download_and_unpack_file https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.21.tar.bz2 libgpg-error-1.21
   cd libgpg-error-1.21
-    do_configure
-    do_make_install
+    # undefined reference to `__WSAFDIsSet'
+    export LDFLAGS='-lws2_32'
+    generic_configure_make_install
+    unset LDFLAGS
   cd ..  
 }
 
 build_libgcrypt() {
   download_and_unpack_file https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.6.4.tar.bz2 libgcrypt-1.6.4
   cd libgcrypt-1.6.4
-    do_configure
-    do_make_install
+    generic_configure_make_install
   cd ..
 }
 
@@ -1571,8 +1573,8 @@ build_dependencies() {
     # build_libaacplus # if you use it, conflicts with other AAC encoders <sigh>, so disabled :)
   fi
   build_openssl
-  build_libgpgerror
-  build_libgcrypt
+#  build_libgpgerror
+#  build_libgcrypt
 #  build_libssh # needs openssl or gcrypt
   build_libssh2 # needs gcrypt or openssl 
   build_librtmp # needs gnutls [or openssl...]
