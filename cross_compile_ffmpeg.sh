@@ -1509,10 +1509,6 @@ build_dependencies() {
 #  build_win32_pthreads # vpx etc. depend on this--provided by the compiler build script now, so shouldn't have to build our own
   build_libdl # ffmpeg's frei0r implentation needs this
   build_zlib # rtmp depends on it [as well as ffmpeg's optional but handy --enable-zlib]
-  build_openssl
-  build_libgpgerror
-  build_libgcrypt
-  build_libssh # needs openssl
   build_bzlib2 # in case someone wants it [ffmpeg uses it]
   build_libpng # for openjpeg, needs zlib
   build_gmp # for libnettle
@@ -1574,6 +1570,10 @@ build_dependencies() {
     build_faac # not included for now, too poor quality :)
     # build_libaacplus # if you use it, conflicts with other AAC encoders <sigh>, so disabled :)
   fi
+  build_openssl
+  build_libgpgerror
+  build_libgcrypt
+#  build_libssh # needs openssl or gcrypt
   build_libssh2 # needs gcrypt or openssl 
   build_librtmp # needs gnutls [or openssl...]
   build_libmfx
