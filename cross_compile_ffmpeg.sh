@@ -978,6 +978,14 @@ build_openssl() {
   cd ..
 }
 
+build_libgpgerror() {
+  download_and_unpack_file https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.21.tar.bz2 libgpg-error-1.21
+  cd libgpg-error-1.21
+    do_configure
+    do_make_install
+  cd ..  
+}
+
 build_libgcrypt() {
   download_and_unpack_file https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.6.4.tar.bz2 libgcrypt-1.6.4
   cd libgcrypt-1.6.4
@@ -1502,6 +1510,7 @@ build_dependencies() {
   build_libdl # ffmpeg's frei0r implentation needs this
   build_zlib # rtmp depends on it [as well as ffmpeg's optional but handy --enable-zlib]
   build_openssl
+  build_libgpgerror
   build_libgcrypt
   build_libssh # needs openssl
   build_bzlib2 # in case someone wants it [ffmpeg uses it]
