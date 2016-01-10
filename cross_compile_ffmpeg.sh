@@ -546,8 +546,8 @@ build_libxavs() {
 }
 
 build_libpng() {
-  libpng_prev_version=1.5.21
-  libpng_version=1.5.24
+  libpng_prev_version=1.5.24
+  libpng_version=1.5.26
   rm -rf libpng-$libpng_prev_version
   generic_download_and_install http://download.sourceforge.net/libpng/libpng-$libpng_version.tar.xz libpng-$libpng_version
 }
@@ -866,8 +866,8 @@ build_libidn() {
 }
 
 build_gnutls() {
-  gnutls_version="3.3.19"
-  prev_gnutls_version="3.2.21"
+  gnutls_version="3.3.20"
+  prev_gnutls_version="3.3.19"
   rm -rf gnutls-$prev_gnutls_version
   download_and_unpack_file ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-$gnutls_version.tar.xz gnutls-$gnutls_version
   cd gnutls-$gnutls_version
@@ -983,9 +983,12 @@ build_libgpgerror() {
   download_and_unpack_file https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.21.tar.bz2 libgpg-error-1.21
   cd libgpg-error-1.21
     # undefined reference to `__WSAFDIsSet'
-    export LDFLAGS='-lws2_32'
-    generic_configure_make_install
-    unset LDFLAGS
+    export LIBS=' -lws2_32'
+	export GPG_ERROR_CONFIG_LIBS=' -lgpg-error -lws2_32'
+    generic_configure "-DHAVE_W32_SYSTEM=1"
+	make_install
+	unset GPG_ERROR_CONFIG_LIBS
+    unset LIBS
   cd ..  
 }
 
@@ -997,26 +1000,59 @@ build_libgcrypt() {
 }
 
 build_libssh() {
+
+# This works in Mingw under Windows:
+#
+#	cmake -G"MSYS Makefiles" .. \
+#		-DWITH_STATIC_LIB=1 -DWITH_SERVER=0 -DWITH_PCAP=0 -DWITH_EXAMPLES=0 \
+#		-DOPENSSL_ROOT_DIR=/mingw -DOPENSSL_INCLUDE_DIR=/mingw/include \
+#		-DCMAKE_INSTALL_PREFIX=/mingw
+#	
+#	-- Installing: D:/MinGW/CMake/libssh/libssh-config.cmake
+#	-- Installing: D:/MinGW/CMake/libssh/libssh-config-version.cmake
+#	-- Installing: D:/MinGW/include/libssh/callbacks.h
+#	-- Installing: D:/MinGW/include/libssh/libssh.h
+#	-- Installing: D:/MinGW/include/libssh/ssh2.h
+#	-- Installing: D:/MinGW/include/libssh/legacy.h
+#	-- Installing: D:/MinGW/include/libssh/libsshpp.hpp
+#	-- Installing: D:/MinGW/include/libssh/sftp.h
+#	-- Installing: D:/MinGW/lib/libssh.dll.a
+#	-- Installing: D:/MinGW/bin/libssh.dll
+#	-- Installing: D:/MinGW/lib/libssh.a
+#	-- Installing: D:/MinGW/lib/libssh_threads.dll.a
+#	-- Installing: D:/MinGW/bin/libssh_threads.dll
+#	-- Installing: D:/MinGW/lib/libssh_threads.a
+#	
+#	$ cmake -G"MSYS Makefiles" .. \
+#		-DWITH_STATIC_LIB=1 -DWITH_SHARED_LIB=0 -DWITH_SERVER=0 -DWITH_PCAP=0 -DWITH_EXAMPLES=0 \
+#		-DOPENSSL_ROOT_DIR=/mingw/x64 -DOPENSSL_INCLUDE_DIR=/mingw/x64/include \
+#		-DOPENSSL_LIBRARIES="/mingw/x64/lib/libcrypto.a;/mingw/x64/lib/libssl.a" \
+#		-DCMAKE_INSTALL_PREFIX=/mingw/x64 -DZLIB_ROOT=/mingw/x64
+#
+
   #rm -rf libssh-* # temp for testing build
   libssh_version="0.7.2"
   download_and_unpack_file http://sources.openelec.tv/mirror/libssh/libssh-$libssh_version.tar.xz libssh-$libssh_version
   cd libssh-$libssh_version
     local touch_name=$(get_small_touchfile_name already_ran_cmake "$extra_args")
+    rm -f $touch_name # reset so that make will run again
 
     if [ ! -f $touch_name ]; then
-      rm -f already_* # reset so that make will run again if option just changed
-	  rm -f CMakeCache.txt
-	  rm -rf CMakeFiles
+#      rm -f already_* # reset so that make will run again
+#      rm -f CMakeCache.txt
+#      rm -rf CMakeFiles
       local cur_dir2=$(pwd)
       sed -i 's/add_subdirectory(doc.*)//g' CMakeLists.txt
       mkdir build
       cd build
-        echo cmake .. -DCMAKE_RANLIB=${cross_prefix}ranlib -DCMAKE_C_COMPILER=${cross_prefix}gcc -DCMAKE_CXX_COMPILER=${cross_prefix}g++ -DCMAKE_RC_COMPILER=${cross_prefix}windres -DCMAKE_INSTALL_PREFIX=$mingw_w64_x86_64_prefix $extra_args
-        cmake ..  -DCMAKE_RANLIB=${cross_prefix}ranlib -DCMAKE_C_COMPILER=${cross_prefix}gcc -DCMAKE_CXX_COMPILER=${cross_prefix}g++ -DCMAKE_RC_COMPILER=${cross_prefix}windres -DCMAKE_INSTALL_PREFIX=$mingw_w64_x86_64_prefix $extra_args || ls -la & exit 1
-	  cd ..
+        echo cmake .. -DWITH_STATIC_LIB=1 -DWITH_SERVER=0 -DWITH_PCAP=0 -DWITH_EXAMPLES=0 -DCMAKE_RANLIB=${cross_prefix}ranlib -DCMAKE_C_COMPILER=${cross_prefix}gcc -DCMAKE_CXX_COMPILER=${cross_prefix}g++ -DCMAKE_RC_COMPILER=${cross_prefix}windres -DCMAKE_INSTALL_PREFIX=$mingw_w64_x86_64_prefix $extra_args
+        cmake      .. -DWITH_STATIC_LIB=1 -DWITH_SERVER=0 -DWITH_PCAP=0 -DWITH_EXAMPLES=0 -DOPENSSL_ROOT_DIR=$mingw_w64_x86_64_prefix -DOPENSSL_INCLUDE_DIR=$mingw_w64_x86_64_prefix/../include -DCMAKE_RANLIB=${cross_prefix}ranlib -DCMAKE_C_COMPILER=${cross_prefix}gcc -DCMAKE_CXX_COMPILER=${cross_prefix}g++ -DCMAKE_RC_COMPILER=${cross_prefix}windres -DCMAKE_INSTALL_PREFIX=$mingw_w64_x86_64_prefix $extra_args || ( ls -la & exit 1 )
+        sleep 5
+        make clean
+        do_make_install
+      cd ..
       touch $touch_name || exit 1
     fi
-    do_make_install
 
   cd ..
 }
