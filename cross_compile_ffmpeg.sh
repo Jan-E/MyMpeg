@@ -954,8 +954,8 @@ build_libaacplus() {
 }
 
 build_openssl() {
-  openssl_prev_version="1.0.1p"
-  openssl_version="1.0.2e"
+  openssl_prev_version="1.0.2e"
+  openssl_version="1.0.2f"
   rm -rf openssl-$openssl_prev_version
   download_and_unpack_file http://www.openssl.org/source/openssl-$openssl_version.tar.gz openssl-$openssl_version
   cd openssl-$openssl_version
@@ -1457,8 +1457,8 @@ build_ffmpeg() {
 }
 
 build_ffmpeg_release() {
-  local version="2.8.5"
-  local prev_version="2.8.4"
+  local version="2.8.6"
+  local prev_version="2.8.5"
   local type=$1
   local shared=$2
   local download_url="http://ffmpeg.org/releases/ffmpeg-$version.tar.gz"

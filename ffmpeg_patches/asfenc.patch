@@ -1,8 +1,8 @@
 diff --git a/libavformat/asfenc.c b/libavformat/asfenc.c
-index 87993b6..294539a 100644
+index 14f92e2..1a98080 100644
 --- a/libavformat/asfenc.c
 +++ b/libavformat/asfenc.c
-@@ -773,9 +773,9 @@ static void flush_packet(AVFormatContext *s)
+@@ -854,9 +854,9 @@ static void flush_packet(AVFormatContext *s)
  {
      ASFContext *asf = s->priv_data;
      int packet_hdr_size, packet_filled_size;
