@@ -1108,8 +1108,8 @@ build_iconv() {
 }
 
 build_freetype() {
-  freetype_prev_version=2.6.1
-  freetype_version=2.6.2
+  freetype_prev_version=2.6.2
+  freetype_version=2.6.3
   rm -rf freetype-$freetype_prev_version
   download_and_unpack_file http://download.savannah.gnu.org/releases/freetype/freetype-$freetype_version.tar.gz freetype-$freetype_version
   cd freetype-$freetype_version
@@ -1457,8 +1457,8 @@ build_ffmpeg() {
 }
 
 build_ffmpeg_release() {
-  local version="2.8.6"
-  local prev_version="2.8.5"
+  local version="3.0"
+  local prev_version="2.8.6"
   local type=$1
   local shared=$2
   local download_url="http://ffmpeg.org/releases/ffmpeg-$version.tar.gz"
