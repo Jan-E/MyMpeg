@@ -567,8 +567,8 @@ build_libopenjpeg() {
 }
 
 build_libwebp() {
-  webp_version=0.4.4
-  webp_prev_version=0.4.3
+  webp_version=0.5.0
+  webp_prev_version=0.4.4
   rm -rf libwebp-$webp_prev_version
   generic_download_and_install http://downloads.webmproject.org/releases/webp/libwebp-$webp_version.tar.gz libwebp-$webp_version
 }
@@ -655,8 +655,8 @@ build_libgsm() {
 }
 
 build_libopus() {
-  libopus_prev_version="1.1"
-  libopus_version="1.1.1"
+  libopus_prev_version="1.1.1"
+  libopus_version="1.1.2"
   rm -rf libopus-$libopus_prev_version
   download_and_unpack_file http://downloads.xiph.org/releases/opus/opus-$libopus_version.tar.gz opus-$libopus_version
   cd opus-$libopus_version
@@ -866,8 +866,8 @@ build_libidn() {
 }
 
 build_gnutls() {
-  gnutls_version="3.3.20"
-  prev_gnutls_version="3.3.19"
+  gnutls_version="3.3.21"
+  prev_gnutls_version="3.3.20"
   rm -rf gnutls-$prev_gnutls_version
   download_and_unpack_file ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-$gnutls_version.tar.xz gnutls-$gnutls_version
   cd gnutls-$gnutls_version
