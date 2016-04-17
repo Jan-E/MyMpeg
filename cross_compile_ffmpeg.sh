@@ -866,8 +866,8 @@ build_libidn() {
 }
 
 build_gnutls() {
-  gnutls_version="3.3.21"
-  prev_gnutls_version="3.3.20"
+  gnutls_version="3.3.22"
+  prev_gnutls_version="3.3.21"
   rm -rf gnutls-$prev_gnutls_version
   download_and_unpack_file ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-$gnutls_version.tar.xz gnutls-$gnutls_version
   cd gnutls-$gnutls_version
@@ -954,8 +954,8 @@ build_libaacplus() {
 }
 
 build_openssl() {
-  openssl_prev_version="1.0.2e"
-  openssl_version="1.0.2f"
+  openssl_prev_version="1.0.2f"
+  openssl_version="1.0.2g"
   rm -rf openssl-$openssl_prev_version
   download_and_unpack_file http://www.openssl.org/source/openssl-$openssl_version.tar.gz openssl-$openssl_version
   cd openssl-$openssl_version
@@ -1457,8 +1457,8 @@ build_ffmpeg() {
 }
 
 build_ffmpeg_release() {
-  local version="3.0"
-  local prev_version="2.8.6"
+  local version="3.0.1"
+  local prev_version="3.0"
   local type=$1
   local shared=$2
   local download_url="http://ffmpeg.org/releases/ffmpeg-$version.tar.gz"

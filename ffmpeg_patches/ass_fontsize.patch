@@ -1,5 +1,5 @@
 diff --git a/libavcodec/ass.h b/libavcodec/ass.h
-index 621a7ba..df0ea4a 100644
+index 314b43b..e558e85 100644
 --- a/libavcodec/ass.h
 +++ b/libavcodec/ass.h
 @@ -33,7 +33,7 @@
