@@ -379,14 +379,14 @@ build_libx265() {
       if [[ $git_get_latest = "y" ]]; then
         echo "doing hg pull -u x265"
         old_hg_version=`hg --debug id -i`
-        hg pull -u || exit 1
-        hg update || exit 1 # guess you need this too if no new changes are brought down [what the...]
+        hg pull -u
+        hg update
       else
         echo "not doing hg pull x265"
         old_hg_version=`hg --debug id -i`
       fi
     else
-      hg clone https://bitbucket.org/multicoreware/x265 || exit 1
+      hg clone https://bitbucket.org/multicoreware/x265
       cd x265
       old_hg_version=none-yet
     fi
@@ -408,14 +408,14 @@ build_libx265() {
       if [[ $git_get_latest = "y" ]]; then
         echo "doing hg pull -u x265"
         old_hg_version=`hg --debug id -i`
-        hg pull -u || exit 1
-        hg update || exit 1 # guess you need this too if no new changes are brought down [what the...]
+        hg pull -u
+        hg update
       else
         echo "not doing hg pull x265"
         old_hg_version=`hg --debug id -i`
       fi
     else
-      hg clone https://bitbucket.org/multicoreware/x265 -r stable || exit 1
+      hg clone https://bitbucket.org/multicoreware/x265 -r stable
       cd x265
       old_hg_version=none-yet
     fi
@@ -474,9 +474,9 @@ build_x264() {
     # TODO more march=native here?
     # TODO profile guided here option, with wine?
     do_configure "$configure_flags"
-    wget http://samples.mplayerhq.hu/yuv4mpeg2/example.y4m.bz2 || exit 1
+    wget http://samples.mplayerhq.hu/yuv4mpeg2/example.y4m.bz2
     rm example.y4m # in case it exists already...
-    bunzip2 example.y4m.bz2 || exit 1
+    bunzip2 example.y4m.bz2
     # XXX does this kill git updates? maybe a more general fix, since vid.stab does also?
     sed -i "s_\\, ./x264_, wine ./x264_" Makefile # in case they have wine auto-run disabled http://askubuntu.com/questions/344088/how-to-ensure-wine-does-not-auto-run-exe-files
     do_make_install "fprofiled VIDS=example.y4m" # guess it has its own make fprofiled, so we don't need to manually add -fprofile-generate here...
@@ -494,11 +494,11 @@ build_librtmp() {
   do_git_checkout git://git.ffmpeg.org/rtmpdump rtmpdump_git a1900c3
   cd rtmpdump_git/librtmp
   do_make_install "CRYPTO=GNUTLS OPT=-O2 CROSS_COMPILE=$cross_prefix SHARED=no prefix=$mingw_w64_x86_64_prefix"
-  #make install CRYPTO=GNUTLS OPT='-O2 -g' "CROSS_COMPILE=$cross_prefix" SHARED=no "prefix=$mingw_w64_x86_64_prefix" || exit 1
+  #make install CRYPTO=GNUTLS OPT='-O2 -g' "CROSS_COMPILE=$cross_prefix" SHARED=no "prefix=$mingw_w64_x86_64_prefix"
   sed -i 's/-lrtmp -lz/-lrtmp -lwinmm -lz/' "$PKG_CONFIG_PATH/librtmp.pc"
   cd ..
    # TODO do_make here instead...
-   make SYS=mingw CRYPTO=GNUTLS OPT=-O2 CROSS_COMPILE=$cross_prefix SHARED=no LIB_GNUTLS="`pkg-config --libs gnutls` -lz" || exit 1
+   make SYS=mingw CRYPTO=GNUTLS OPT=-O2 CROSS_COMPILE=$cross_prefix SHARED=no LIB_GNUTLS="`pkg-config --libs gnutls` -lz"
   cd ..
 }
 
@@ -956,8 +956,8 @@ build_libaacplus() {
 }
 
 build_openssl() {
-  openssl_version="1.0.2g"
-  openssl_prev_version="1.0.2f"
+  openssl_version="1.0.2h"
+  openssl_prev_version="1.0.2g"
   rm -rf openssl-$openssl_prev_version
   download_and_unpack_file http://www.openssl.org/source/openssl-$openssl_version.tar.gz openssl-$openssl_version
   cd openssl-$openssl_version
@@ -1459,8 +1459,8 @@ build_ffmpeg() {
 }
 
 build_ffmpeg_release() {
-  local version="3.0.1"
-  local prev_version="3.0"
+  local version="3.0.2"
+  local prev_version="3.0.1"
   local type=$1
   local shared=$2
   local download_url="http://ffmpeg.org/releases/ffmpeg-$version.tar.gz"
