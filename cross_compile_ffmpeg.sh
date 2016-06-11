@@ -1215,6 +1215,8 @@ build_frei0r() {
   # http://ffmpeg.zeranoe.com/forum/viewtopic.php?f=5&t=312&sid=9f4b95387d88cb2a62b5ec1e98f43edc&start=10#p3467
   do_git_checkout http://code.dyne.org/frei0r frei0r_git
   cd frei0r_git
+    git stash
+    echo AM_INIT_AUTOMAKE\([subdir-objects]\) >> configure.ac
     ./autogen.sh
     do_cmake
     do_make_install
