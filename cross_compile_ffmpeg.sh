@@ -548,8 +548,8 @@ build_libxavs() {
 }
 
 build_libpng() {
-  libpng_prev_version=1.5.24
-  libpng_version=1.5.26
+  libpng_prev_version=1.5.26
+  libpng_version=1.5.27
   rm -rf libpng-$libpng_prev_version
   generic_download_and_install http://download.sourceforge.net/libpng/libpng-$libpng_version.tar.xz libpng-$libpng_version
 }
@@ -1383,7 +1383,7 @@ build_ffmpeg() {
   local output_dir="ffmpeg_git"
   local download_url="http://ffmpeg.org/releases/ffmpeg-snapshot-git.tar.bz2"
 
-  local extra_configure_opts="--enable-gpl --enable-version3 --enable-avisynth --enable-bzlib --enable-decklink --enable-dxva2 --enable-fontconfig --enable-frei0r --enable-gnutls --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmfx --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-librtmp --enable-libschroedinger --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --disable-libutvideo --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-lzma --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DPTW32_STATIC_LIB --extra-cflags=-DLIBTWOLAME_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng"
+  local extra_configure_opts="--enable-gpl --enable-version3 --enable-avisynth --enable-bzlib --enable-decklink --enable-dxva2 --enable-fontconfig --enable-frei0r --enable-gnutls --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmfx --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-librtmp --enable-libschroedinger --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-lzma --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DPTW32_STATIC_LIB --extra-cflags=-DLIBTWOLAME_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng"
   if [[ $type = "libav" ]]; then
     # libav [ffmpeg fork]  has a few missing options?
     git_url="https://github.com/libav/libav.git"
@@ -1469,8 +1469,8 @@ build_ffmpeg() {
 }
 
 build_ffmpeg_release() {
-  local version="3.0.2"
-  local prev_version="3.0.1"
+  local version="3.1.1"
+  local prev_version="3.0.2"
   local type=$1
   local shared=$2
   local download_url="http://ffmpeg.org/releases/ffmpeg-$version.tar.gz"
@@ -1478,7 +1478,7 @@ build_ffmpeg_release() {
   local prev_output_dir="ffmpeg-$prev_version"
 
   # FFmpeg 
-  local extra_configure_opts="--enable-gpl --enable-version3 --enable-avisynth --enable-bzlib --enable-decklink --enable-dxva2 --enable-fontconfig --enable-frei0r --enable-gnutls --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libdcadec --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmfx --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-librtmp --enable-libschroedinger --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --disable-libutvideo --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-libzvbi --enable-lzma --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DPTW32_STATIC_LIB --extra-cflags=-DLIBTWOLAME_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng"
+  local extra_configure_opts="--enable-gpl --enable-version3 --enable-avisynth --enable-bzlib --enable-decklink --enable-dxva2 --enable-fontconfig --enable-frei0r --enable-gnutls --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmfx --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-librtmp --enable-libschroedinger --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-libzvbi --enable-lzma --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DPTW32_STATIC_LIB --extra-cflags=-DLIBTWOLAME_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng"
   extra_configure_opts="$extra_configure_opts"
   # can't mix and match --enable-static --enable-shared unfortunately, or the final executable seems to just use shared if the're both present
 
