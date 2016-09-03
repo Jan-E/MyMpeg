@@ -867,7 +867,9 @@ build_libtasn1() {
 }
 
 build_libidn() {
-  idn_version="1.32"
+  idn_version="1.33"
+  prev_idn_version="1.32"
+  rm -rf libidn-$prev_gnutls_version
   download_and_unpack_file ftp://ftp.gnu.org/gnu/libidn/libidn-$idn_version.tar.gz libidn-$idn_version
   cd libidn-$idn_version
     generic_configure
