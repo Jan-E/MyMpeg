@@ -1247,7 +1247,7 @@ build_bs2b() {
 }
 
 build_gme() {
-  download_and_unpack_file http://game-music-emu.googlecode.com/files/game-music-emu-0.6.0.tar.bz2 game-music-emu-0.6.0
+  download_and_unpack_file https://bitbucket.org/mpyne/game-music-emu/downloads/game-music-emu-0.6.0.tar.bz2 game-music-emu-0.6.0
   cd game-music-emu-0.6.0
     do_cmake
   cd ..
