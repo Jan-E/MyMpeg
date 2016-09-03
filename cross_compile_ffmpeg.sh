@@ -595,8 +595,8 @@ build_libvpx() {
 }
 
 build_wavpack() {
-  wavpack_version=4.75.2
-  wavpack_prev_version=4.70.0
+  wavpack_version=4.80.0
+  wavpack_prev_version=4.75.2
   rm -rf wavpack-$wavpack_prev_version
   generic_download_and_install http://wavpack.com/wavpack-$wavpack_version.tar.bz2 wavpack-$wavpack_version
 }
