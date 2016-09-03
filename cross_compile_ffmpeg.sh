@@ -576,8 +576,8 @@ build_libwebp() {
 }
 
 build_libvpx() {
-  vpx_version=1.6.0
-  vpx_prev_version=1.5.0
+  vpx_version=1.5.0
+  vpx_prev_version=1.4.0
   rm -rf libvpx-$vpx_prev_version
   download_and_unpack_file http://ffmpeg.zeranoe.com/builds/source/external_libraries/libvpx-$vpx_version.tar.xz libvpx-$vpx_version
   cd libvpx-$vpx_version
