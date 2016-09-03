@@ -665,12 +665,12 @@ build_libgsm() {
 }
 
 build_libopus() {
-  libopus_prev_version="1.1.1"
-  libopus_version="1.1.2"
+  libopus_prev_version="1.1.2"
+  libopus_version="1.1.3"
   rm -rf libopus-$libopus_prev_version
   download_and_unpack_file http://downloads.xiph.org/releases/opus/opus-$libopus_version.tar.gz opus-$libopus_version
   cd opus-$libopus_version
-    apply_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/opus11.patch # allow it to work with shared builds
+    #apply_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/opus11.patch # allow it to work with shared builds
     generic_configure_make_install 
   cd ..
 }
@@ -733,8 +733,8 @@ build_win32_pthreads() {
 }
 
 build_libdl() {
-  #download_and_unpack_file http://dlfcn-win32.googlecode.com/files/dlfcn-win32-r19.tar.bz2 dlfcn-win32-r19
-  do_svn_checkout http://dlfcn-win32.googlecode.com/svn/trunk/ dlfcn-win32
+  do_git_checkout https://github.com/dlfcn-win32/dlfcn-win32 dlfcn-win32-r19
+  #do_svn_checkout http://dlfcn-win32.googlecode.com/svn/trunk/ dlfcn-win32
   cd dlfcn-win32
     ./configure --disable-shared --enable-static --cross-prefix=$cross_prefix --prefix=$mingw_w64_x86_64_prefix
     do_make_install
@@ -1469,8 +1469,8 @@ build_ffmpeg() {
 }
 
 build_ffmpeg_release() {
-  local version="3.1.1"
-  local prev_version="3.0.2"
+  local version="3.1.2"
+  local prev_version="3.1.1"
   local type=$1
   local shared=$2
   local download_url="http://ffmpeg.org/releases/ffmpeg-$version.tar.gz"
