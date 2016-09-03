@@ -876,8 +876,8 @@ build_libidn() {
 }
 
 build_gnutls() {
-  gnutls_version="3.3.22"
-  prev_gnutls_version="3.3.21"
+  gnutls_version="3.3.24"
+  prev_gnutls_version="3.3.22"
   rm -rf gnutls-$prev_gnutls_version
   download_and_unpack_file ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-$gnutls_version.tar.xz gnutls-$gnutls_version
   cd gnutls-$gnutls_version
