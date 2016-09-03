@@ -889,8 +889,8 @@ build_gnutls() {
 }
 
 build_libnettle() {
-  nettle_version="3.1"
-  prev_nettle_version="2.7.1"
+  nettle_version="3.2"
+  prev_nettle_version="3.1"
   rm -rf nettle-$prev_nettle_version
   download_and_unpack_file http://www.lysator.liu.se/~nisse/archive/nettle-$nettle_version.tar.gz nettle-$nettle_version
   cd nettle-$nettle_version
