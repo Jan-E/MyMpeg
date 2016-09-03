@@ -733,8 +733,8 @@ build_win32_pthreads() {
 }
 
 build_libdl() {
-  do_git_checkout https://github.com/dlfcn-win32/dlfcn-win32 dlfcn-win32-r19
   #do_svn_checkout http://dlfcn-win32.googlecode.com/svn/trunk/ dlfcn-win32
+  do_git_checkout https://github.com/dlfcn-win32/dlfcn-win32 dlfcn-win32
   cd dlfcn-win32
     ./configure --disable-shared --enable-static --cross-prefix=$cross_prefix --prefix=$mingw_w64_x86_64_prefix
     do_make_install
