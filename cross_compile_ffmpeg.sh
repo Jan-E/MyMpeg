@@ -966,8 +966,8 @@ build_libaacplus() {
 }
 
 build_openssl() {
-  openssl_version="1.0.2h"
-  openssl_prev_version="1.0.2g"
+  openssl_version="1.0.2j"
+  openssl_prev_version="1.0.2h"
   rm -rf openssl-$openssl_prev_version
   download_and_unpack_file http://www.openssl.org/source/openssl-$openssl_version.tar.gz openssl-$openssl_version
   cd openssl-$openssl_version
@@ -1120,8 +1120,8 @@ build_iconv() {
 }
 
 build_freetype() {
-  freetype_prev_version=2.6.4
-  freetype_version=2.6.5
+  freetype_prev_version=2.6.5
+  freetype_version=2.7
   rm -rf freetype-$freetype_prev_version
   download_and_unpack_file http://download.savannah.gnu.org/releases/freetype/freetype-$freetype_version.tar.gz freetype-$freetype_version
   cd freetype-$freetype_version
@@ -1471,11 +1471,11 @@ build_ffmpeg() {
 }
 
 build_ffmpeg_release() {
-  local version="3.1.2"
-  local prev_version="3.1.1"
+  local version="3.1.3"
+  local prev_version="3.1.2"
   local type=$1
   local shared=$2
-  local download_url="http://ffmpeg.org/releases/ffmpeg-$version.tar.gz"
+  local download_url="http://ffmpeg.org/releases/ffmpeg-$version.tar.xz"
   local output_dir="ffmpeg-$version"
   local prev_output_dir="ffmpeg-$prev_version"
 
