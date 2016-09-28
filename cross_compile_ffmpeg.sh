@@ -372,51 +372,60 @@ generic_configure_make_install() {
 }
 
 build_libx265() {
+  # the only one that uses mercurial, so there's some extra initial junk in this method... XXX needs some cleanup :|
+  local checkout_dir=x265
+  if [[ $high_bitdepth == "y" ]]; then
+    checkout_dir=x265_high_bitdepth_10
+  fi
+
   if [[ $prefer_stable = "n" ]]; then
     local old_hg_version
-    if [[ -d x265 ]]; then
-      cd x265
+    if [[ -d $checkout_dir ]]; then
+      cd $checkout_dir
       if [[ $git_get_latest = "y" ]]; then
         echo "doing hg pull -u x265"
         old_hg_version=`hg --debug id -i`
-        hg pull -u
-        hg update
+        hg pull -u || exit 1
+        hg update || exit 1 # guess you need this too if no new changes are brought down [what the...]
       else
         echo "not doing hg pull x265"
         old_hg_version=`hg --debug id -i`
       fi
     else
-      hg clone https://bitbucket.org/multicoreware/x265
-      cd x265
+      echo "doing hg clone x265"
+      hg clone https://bitbucket.org/multicoreware/x265 $checkout_dir || exit 1
+      cd $checkout_dir
       old_hg_version=none-yet
     fi
     cd source
 
-    # hg checkout 9b0c9b # no longer needed, but once was...
+    # hg checkout 9b0c9b # no longer needed, but once was...left here so I know how :)
 
     local new_hg_version=`hg --debug id -i`  
     if [[ "$old_hg_version" != "$new_hg_version" ]]; then
       echo "got upstream hg changes, forcing rebuild...x265"
-      rm already*
+      rm -f already*
     else
       echo "still at hg $new_hg_version x265"
     fi
   else
+    # prefer_stable == "y" TODO clean this up...
     local old_hg_version
-    if [[ -d x265 ]]; then
-      cd x265
+    if [[ -d $checkout_dir ]]; then
+      cd $checkout_dir
       if [[ $git_get_latest = "y" ]]; then
         echo "doing hg pull -u x265"
         old_hg_version=`hg --debug id -i`
-        hg pull -u
-        hg update
+        hg pull -u || exit 1
+        hg update || exit 1 # guess you need this too if no new changes are brought down [what the...]
       else
         echo "not doing hg pull x265"
         old_hg_version=`hg --debug id -i`
       fi
     else
-      hg clone https://bitbucket.org/multicoreware/x265 -r stable
-      cd x265
+      echo "doing hg clone x265"
+      hg clone https://bitbucket.org/multicoreware/x265 -r stable $checkout_dir || exit 1
+      cd $checkout_dir
       old_hg_version=none-yet
     fi
     cd source
@@ -426,7 +435,7 @@ build_libx265() {
     local new_hg_version=`hg --debug id -i`  
     if [[ "$old_hg_version" != "$new_hg_version" ]]; then
       echo "got upstream hg changes, forcing rebuild...x265"
-      rm already*
+      rm -f already*
     else
       echo "still at hg $new_hg_version x265"
     fi
@@ -435,16 +444,19 @@ build_libx265() {
   local cmake_params="-DENABLE_SHARED=OFF"
   if [[ $high_bitdepth == "y" ]]; then
     cmake_params="$cmake_params -DHIGH_BIT_DEPTH=ON" # Enable 10 bits (main10) and 12 bits (???) per pixels profiles.
-    if grep "DHIGH_BIT_DEPTH=0" CMakeFiles/cli.dir/flags.make; then
-      rm already_ran_cmake_* #Last build was not high bitdepth. Forcing rebuild.
-    fi
-  else
-    if grep "DHIGH_BIT_DEPTH=1" CMakeFiles/cli.dir/flags.make; then
-      rm already_ran_cmake_* #Last build was high bitdepth. Forcing rebuild.
+    if [ "$bits_target" = "32" ]; then
+      cmake_params="$cmake_params -DENABLE_ASSEMBLY=OFF" # apparently required or build fails
     fi
   fi
-  
-  do_cmake "$cmake_params" 
+
+  #if [ "$bits_target" = "32" ]; then
+    cmake_params="$cmake_params -DWINXP_SUPPORT:BOOL=TRUE" # enable windows xp support apparently
+  #fi
+
+  do_cmake "$cmake_params"
+  do_make
+  echo force reinstall in case bit depth changed at all :|
+  rm already_ran_make_install* 
   do_make_install
   cd ../..
 }
