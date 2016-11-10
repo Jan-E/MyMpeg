@@ -746,7 +746,7 @@ build_win32_pthreads() {
 
 build_libdl() {
   #do_svn_checkout http://dlfcn-win32.googlecode.com/svn/trunk/ dlfcn-win32
-  do_git_checkout https://github.com/dlfcn-win32/dlfcn-win32 dlfcn-win32
+  do_git_checkout https://github.com/dlfcn-win32/dlfcn-win32.git dlfcn-win32
   cd dlfcn-win32
     ./configure --disable-shared --enable-static --cross-prefix=$cross_prefix --prefix=$mingw_w64_x86_64_prefix
     do_make_install
@@ -890,8 +890,8 @@ build_libidn() {
 }
 
 build_gnutls() {
-  gnutls_version="3.3.24"
-  prev_gnutls_version="3.3.22"
+  gnutls_version="3.3.25"
+  prev_gnutls_version="3.3.24"
   rm -rf gnutls-$prev_gnutls_version
   download_and_unpack_file ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-$gnutls_version.tar.xz gnutls-$gnutls_version
   cd gnutls-$gnutls_version
@@ -1443,14 +1443,14 @@ build_ffmpeg() {
   build_options="--arch=$arch --target-os=mingw32 --cross-prefix=$cross_prefix --pkg-config=pkg-config"
   config_options="$build_options --disable-w32threads --disable-doc --prefix=$mingw_w64_x86_64_prefix $extra_configure_opts" # other possibilities: --enable-w32threads --enable-libflite
   if [[ "$non_free" = "y" ]]; then
-    config_options="$config_options --enable-nonfree --enable-libfdk-aac --enable-libfaac" # -- faac deemed too poor quality and becomes the default -- add it in and uncomment the build_faac line to include it --enable-openssl --enable-libaacplus
+    config_options="$config_options --enable-nonfree --enable-libfdk-aac" # --enable-libfaac -- faac deemed too poor quality and becomes the default -- add it in and uncomment the build_faac line to include it --enable-openssl --enable-libaacplus
   else
     config_options="$config_options"
   fi
 
   # minimal static build plus x264, x265 & faac
   if [[ $shared = "ministat" ]]; then
-    config_options="$build_options --enable-static --disable-shared --enable-pthreads --enable-gpl --enable-avisynth --enable-libgme --enable-libmodplug --enable-libx264 --enable-libx265 --enable-nonfree --enable-libfaac --disable-doc"
+    config_options="$build_options --enable-static --disable-shared --enable-pthreads --enable-gpl --enable-avisynth --enable-libgme --enable-libmodplug --enable-libx264 --enable-libx265 --enable-nonfree --disable-doc" #  -enable-libfaac
   fi
 
   # minimal build for php_av.dll
@@ -1483,8 +1483,8 @@ build_ffmpeg() {
 }
 
 build_ffmpeg_release() {
-  local version="3.1.3"
-  local prev_version="3.1.2"
+  local version="3.1.5"
+  local prev_version="3.1.3"
   local type=$1
   local shared=$2
   local download_url="http://ffmpeg.org/releases/ffmpeg-$version.tar.xz"
@@ -1523,7 +1523,7 @@ build_ffmpeg_release() {
 
   config_options="--arch=$arch --target-os=mingw32 --cross-prefix=$cross_prefix --pkg-config=pkg-config --disable-w32threads --disable-doc --prefix=$mingw_w64_x86_64_prefix $extra_configure_opts" # other possibilities: --enable-w32threads --enable-libflite
   if [[ "$non_free" = "y" ]]; then
-    config_options="$config_options --enable-nonfree --enable-libfdk-aac --enable-libfaac" # -- faac deemed too poor quality and becomes the default -- add it in and uncomment the build_faac line to include it --enable-openssl --enable-libaacplus
+    config_options="$config_options --enable-nonfree --enable-libfdk-aac" # --enable-libfaac -- faac deemed too poor quality and becomes the default -- add it in and uncomment the build_faac line to include it --enable-openssl --enable-libaacplus
   else
     config_options="$config_options"
   fi
