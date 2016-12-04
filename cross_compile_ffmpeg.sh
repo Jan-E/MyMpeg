@@ -1483,8 +1483,8 @@ build_ffmpeg() {
 }
 
 build_ffmpeg_release() {
-  local version="3.2"
-  local prev_version="3.1.5"
+  local version="3.2.1"
+  local prev_version="3.2"
   local type=$1
   local shared=$2
   local download_url="http://ffmpeg.org/releases/ffmpeg-$version.tar.xz"
