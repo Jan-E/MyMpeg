@@ -1450,12 +1450,12 @@ build_ffmpeg() {
 
   # minimal static build plus x264, x265 & faac
   if [[ $shared = "ministat" ]]; then
-    config_options="$build_options --enable-static --disable-shared --enable-pthreads --enable-gpl --enable-avisynth --enable-libgme --enable-libmodplug --enable-libx264 --enable-libx265 --enable-nonfree --disable-doc" #  -enable-libfaac
+    config_options="$build_options --enable-static --disable-shared --disable-w32threads --enable-gpl --enable-avisynth --enable-libgme --enable-libmodplug --enable-libx264 --enable-libx265 --enable-nonfree --disable-doc" #  -enable-libfaac
   fi
 
   # minimal build for php_av.dll
   if [[ $shared = "minimal" ]]; then
-    config_options="$build_options --enable-shared --disable-static --enable-pthreads --enable-avisynth --enable-libgme --enable-libmodplug --disable-doc"
+    config_options="$build_options --enable-shared --disable-static --disable-w32threads --enable-avisynth --enable-libgme --enable-libmodplug --disable-doc"
     # avoid installing this to system
 	cd ..
     final_install_dir=`pwd`/${output_dir}.installed
