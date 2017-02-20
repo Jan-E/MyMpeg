@@ -1508,6 +1508,7 @@ build_ffmpeg_release() {
   fi
 
   apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/ass_fontsize.patch
+  apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/subtitles_non_fatal_old.patch
   apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/subtitles_non_fatal.patch
   apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/asfenc.patch
   apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/movenc.patch
