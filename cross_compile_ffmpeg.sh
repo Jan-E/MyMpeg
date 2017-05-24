@@ -385,8 +385,8 @@ build_libx265() {
       if [[ $git_get_latest = "y" ]]; then
         echo "doing hg pull -u x265"
         old_hg_version=`hg --debug id -i`
-        hg pull -u || exit 1
-        hg update || exit 1 # guess you need this too if no new changes are brought down [what the...]
+        hg pull -u
+        hg update # guess you need this too if no new changes are brought down [what the...]
       else
         echo "not doing hg pull x265"
         old_hg_version=`hg --debug id -i`
@@ -416,8 +416,8 @@ build_libx265() {
       if [[ $git_get_latest = "y" ]]; then
         echo "doing hg pull -u x265"
         old_hg_version=`hg --debug id -i`
-        hg pull -u || exit 1
-        hg update || exit 1 # guess you need this too if no new changes are brought down [what the...]
+        hg pull -u
+        hg update # guess you need this too if no new changes are brought down [what the...]
       else
         echo "not doing hg pull x265"
         old_hg_version=`hg --debug id -i`
