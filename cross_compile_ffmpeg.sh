@@ -1488,7 +1488,7 @@ build_ffmpeg() {
 }
 
 build_ffmpeg_release() {
-  local version="3.3.1" # change subtitles_non_fatal_old.patch at update
+  local version="3.3.1"
   local prev_version="3.2.4"
   local type=$1
   local shared=$2
@@ -1513,7 +1513,7 @@ build_ffmpeg_release() {
   fi
 
   apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/ass_fontsize.patch
-  apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/subtitles_non_fatal_old.patch
+  apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/subtitles_non_fatal.patch
   apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/asfenc.patch
   apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/movenc.patch
   apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/mpegvideo_enc.patch
