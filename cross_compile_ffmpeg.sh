@@ -320,7 +320,7 @@ do_cmake_and_install() {
     cmake $(pwd) -G'Unix Makefiles' -DENABLE_STATIC_RUNTIME=1 -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_RANLIB=${cross_prefix}ranlib -DCMAKE_C_COMPILER=${cross_prefix}gcc -DCMAKE_CXX_COMPILER=${cross_prefix}g++ -DCMAKE_RC_COMPILER=${cross_prefix}windres -DCMAKE_INSTALL_PREFIX=$mingw_w64_x86_64_prefix $extra_args || exit 1
     touch $touch_name || exit 1
   fi
-  do_make_and_make_install
+  do_make_install
 }
 
 apply_patch() {
@@ -560,24 +560,30 @@ build_libxavs() {
 }
 
 build_libpng() {
-  libpng_prev_version=1.5.26
-  libpng_version=1.5.27
+  libpng_prev_version=1.5.27
+  libpng_version=1.5.30
   rm -rf libpng-$libpng_prev_version
   generic_download_and_install http://download.sourceforge.net/libpng/libpng-$libpng_version.tar.xz libpng-$libpng_version
 }
 
 build_libopenjpeg() {
-  # does openjpeg 2.0 work with ffmpeg? possibly not yet...
-  openjpeg_prev_version=1.5.1
-  openjpeg_version=1.5.2
+  openjpeg_prev_version=2.1.2
+  # https://github.com/rdp/ffmpeg-windows-build-helpers/issues/218#issuecomment-292743142
+  openjpeg_version=2.3.0
   rm -rf openjpeg-$openjpeg_prev_version
-  download_and_unpack_file http://downloads.sourceforge.net/openjpeg.mirror/openjpeg-$openjpeg_version.tar.gz openjpeg-$openjpeg_version
+  # download_and_unpack_file http://downloads.sourceforge.net/openjpeg.mirror/openjpeg-$openjpeg_version.tar.gz openjpeg-$openjpeg_version
+  download_and_unpack_file https://github.com/uclouvain/openjpeg/archive/v$openjpeg_version.tar.gz openjpeg-$openjpeg_version
   cd openjpeg-$openjpeg_version
-    export CFLAGS="$CFLAGS -DOPJ_STATIC" # see https://github.com/rdp/ffmpeg-windows-build-helpers/issues/37
-    generic_configure 
-    do_make_install
+    export CFLAGS="$CFLAGS -DOPJ_STATIC"
+    if [[ ! -f CMakeLists.txt.bak ]]; then # Library only.
+      sed -i.bak "/#.*OPENJPEGTargets/,/#.*/d" CMakeLists.txt
+    fi
+    do_cmake_and_install "-DBUILD_SHARED_LIBS:BOOL=off -DBUILD_THIRDPARTY:BOOL=on -DBUILD_PKGCONFIG_FILES:BOOL=on"
     export CFLAGS=$original_cflags # reset it
   cd ..
+  cp -p $mingw_w64_x86_64_prefix/lib/libopenjp2.a $mingw_w64_x86_64_prefix/lib/libopenjpeg.a
+  sed -i 's/-lopenjp2 -lm/-lopenjp2/' "$PKG_CONFIG_PATH/libopenjp2.pc"
+  sed -i 's/-lopenjp2/-lopenjp2 -lm/' "$PKG_CONFIG_PATH/libopenjp2.pc"
 }
 
 build_libwebp() {
@@ -589,7 +595,7 @@ build_libwebp() {
 
 build_libvpx() {
   vpx_version=1.5.0
-  vpx_prev_version=1.4.0
+  vpx_prev_version=1.6.0
   rm -rf libvpx-$vpx_prev_version
   download_and_unpack_file http://ffmpeg.zeranoe.com/builds/source/external_libraries/libvpx-$vpx_version.tar.xz libvpx-$vpx_version
   cd libvpx-$vpx_version
@@ -679,7 +685,7 @@ build_libgsm() {
 build_libopus() {
   libopus_prev_version="1.1.2"
   libopus_version="1.1.3"
-  rm -rf libopus-$libopus_prev_version
+  rm -rf opus-$libopus_prev_version
   download_and_unpack_file http://downloads.xiph.org/releases/opus/opus-$libopus_version.tar.gz opus-$libopus_version
   cd opus-$libopus_version
     #apply_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/opus11.patch # allow it to work with shared builds
@@ -758,16 +764,28 @@ build_libjpeg_turbo() {
 }
 
 build_libogg() {
-  generic_download_and_install http://downloads.xiph.org/releases/ogg/libogg-1.3.2.tar.gz libogg-1.3.2
+  do_git_checkout https://github.com/xiph/ogg.git ogg_git
+  cd ogg_git
+    if [[ ! -f Makefile.am.bak ]]; then # Library only.
+      sed -i.bak "s/ doc//;/m4data/,+2d" Makefile.am
+    fi
+    do_cmake_and_install
+  cd ..
 }
 
 build_libvorbis() {
-  libvorbis_prev_version="1.3.4"
-  libvorbis_version="1.3.5"
-  rm -rf vorbis-$libvorbis_prev_version
-  generic_download_and_install http://downloads.xiph.org/releases/vorbis/libvorbis-$libvorbis_version.tar.gz libvorbis-$libvorbis_version
+  do_git_checkout https://github.com/xiph/vorbis.git vorbis_git
+  cd vorbis_git
+    if [[ ! -f Makefile.am.bak ]]; then # Library only.
+      sed -i.bak "s/ test.*//;/m4data/,+2d" Makefile.am
+    fi
+    do_cmake
+    do_make_install
+    sed -i 's/-lvorbis/-lvorbis -lm -logg/' "$PKG_CONFIG_PATH/vorbis.pc"
+    sed -i 's/-lvorbisenc/-lvorbisenc -lvorbis -lm -logg/' "$PKG_CONFIG_PATH/vorbisenc.pc"
+    sed -i 's/-lvorbisdec/-lvorbisdec -lvorbis -lm -logg/' "$PKG_CONFIG_PATH/vorbisdec.pc"
+  cd ..
 }
-
 build_libspeex() {
   speex_prev_version="1.2rc1"
   speex_version="1.2rc2"
@@ -845,17 +863,18 @@ build_libxml2() {
 }
 
 build_libbluray() {
-  libbluray_prev_version="0.6.2"
+  libbluray_prev_version="1.0.1"
   libbluray_version="0.7.0"
   rm -rf libbluray-$libbluray_prev_version
   download_and_unpack_file ftp://ftp.videolan.org/pub/videolan/libbluray/$libbluray_version/libbluray-$libbluray_version.tar.bz2 libbluray-$libbluray_version
   cd libbluray-$libbluray_version
-    export LIBS=-lpng
+    export LIBS=-lpng -lz -lbz2
     generic_configure "--without-libxml2"
     do_make_install
     unset LIBS
-    # add -lpng everywhere where -lfreetype is present
-    sed -i 's/Libs: -L${libdir} -lbluray/Libs: -L${libdir} -lbluray -lfreetype -lexpat -lpng/' "$PKG_CONFIG_PATH/libbluray.pc"
+    # add -lpng -lz -lbz2 everywhere where -lfreetype is present
+    sed -i 's/Libs: -L${libdir} -lbluray -lfreetype -lexpat -lpng -lz -lbz2/Libs: -L${libdir} -lbluray/' "$PKG_CONFIG_PATH/libbluray.pc"
+    sed -i 's/Libs: -L${libdir} -lbluray/Libs: -L${libdir} -lbluray -lfreetype -lexpat -lpng -lz -lbz2/' "$PKG_CONFIG_PATH/libbluray.pc"
   cd ..
 }
 
@@ -881,7 +900,7 @@ build_libtasn1() {
 build_libidn() {
   idn_version="1.33"
   prev_idn_version="1.32"
-  rm -rf libidn-$prev_gnutls_version
+  rm -rf libidn-$prev_idn_version
   download_and_unpack_file ftp://ftp.gnu.org/gnu/libidn/libidn-$idn_version.tar.gz libidn-$idn_version
   cd libidn-$idn_version
     generic_configure
@@ -890,16 +909,20 @@ build_libidn() {
 }
 
 build_gnutls() {
-  gnutls_version="3.3.25"
-  prev_gnutls_version="3.3.24"
+  gnutls_version="3.3.28"
+  prev_gnutls_version="3.3.25"
   rm -rf gnutls-$prev_gnutls_version
   download_and_unpack_file ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-$gnutls_version.tar.xz gnutls-$gnutls_version
   cd gnutls-$gnutls_version
     sed -i 's/mkstemp(tmpfile)/ -1 /g' src/danetool.c # fix x86_64 absent? but danetool is just an exe AFAICT so this hack should be ok...
+	if [[ ! -f lib/gnutls.pc.in.bak ]]; then # Somehow FFmpeg's 'configure' needs '-lcrypt32'. Otherwise you'll get "undefined reference to `_imp__Cert...'" and "ERROR: gnutls not found using pkg-config".
+      sed -i.bak "/privat/s/.*/& -lcrypt32 -lz/" lib/gnutls.pc.in
+    fi
     generic_configure "--with-included-libtasn1 --disable-cxx --disable-doc --enable-local-libopts --disable-guile" # don't need the c++ version, in an effort to cut down on size... XXXX test size difference... libopts to allow building with local autogen installed, guile is so that if it finds guile installed (cygwin did/does) it won't try and link/build to it and fail...
     do_make_install
   cd ..
-  sed -i 's/-lgnutls/-lgnutls -lnettle -lhogweed -lgmp -lcrypt32 -lws2_32 -liconv/' "$PKG_CONFIG_PATH/gnutls.pc"
+  sed -i 's/-lgnutls -lnettle -lhogweed -lgmp -lcrypt32 -lz -lws2_32 -liconv/-lgnutls/' "$PKG_CONFIG_PATH/gnutls.pc"
+  sed -i 's/-lgnutls/-lgnutls -lnettle -lhogweed -lgmp -lcrypt32 -lz -lws2_32 -liconv/' "$PKG_CONFIG_PATH/gnutls.pc"
 }
 
 build_libnettle() {
@@ -922,8 +945,11 @@ build_bzlib2() {
 }
 
 build_zlib() {
-  download_and_unpack_file http://zlib.net/zlib-1.2.8.tar.gz zlib-1.2.8
-  cd zlib-1.2.8
+  download_and_unpack_file http://zlib.net/zlib-1.2.11.tar.gz zlib-1.2.11
+  cd zlib-1.2.11
+    if [[ ! -f Makefile.in.bak ]]; then # Library only.
+      sed -i.bak "/man3dir/d" Makefile.in
+    fi
     do_configure "--static --prefix=$mingw_w64_x86_64_prefix"
     do_make_install "CC=$(echo $cross_prefix)gcc AR=$(echo $cross_prefix)ar RANLIB=$(echo $cross_prefix)ranlib"
   cd ..
@@ -964,7 +990,7 @@ build_fontconfig() {
     do_make_install
 	unset CFLAGS
   cd .. 
-  sed -i 's/-L${libdir} -lfontconfig[^l]*$/-L${libdir} -lfontconfig -lfreetype -lexpat -lpng/' "$PKG_CONFIG_PATH/fontconfig.pc"
+  sed -i 's/-L${libdir} -lfontconfig[^l]*$/-L${libdir} -lfontconfig -lfreetype -lexpat -lpng -lz -lbz2/' "$PKG_CONFIG_PATH/fontconfig.pc"
 }
 
 build_libaacplus() {
@@ -978,8 +1004,8 @@ build_libaacplus() {
 }
 
 build_openssl() {
-  openssl_version="1.0.2j"
-  openssl_prev_version="1.0.2h"
+  openssl_version="1.0.2n"
+  openssl_prev_version="1.0.2j"
   rm -rf openssl-$openssl_prev_version
   download_and_unpack_file http://www.openssl.org/source/openssl-$openssl_version.tar.gz openssl-$openssl_version
   cd openssl-$openssl_version
@@ -1145,7 +1171,8 @@ build_freetype() {
 # unset LIBPNG_LDFLAGS
 # unset LIBPNG_CFLAGS
 # unset LIBS
-  sed -i 's/Libs: -L${libdir} -lfreetype.*/Libs: -L${libdir} -lfreetype -lexpat -lpng/' "$PKG_CONFIG_PATH/freetype2.pc"
+  sed -i 's/Libs: -L${libdir} -lfreetype -lexpat -lpng -lz -lbz2/Libs: -L${libdir} -lfreetype/' "$PKG_CONFIG_PATH/freetype2.pc"
+  sed -i 's/Libs: -L${libdir} -lfreetype.*/Libs: -L${libdir} -lfreetype -lexpat -lpng -lz -lbz2/' "$PKG_CONFIG_PATH/freetype2.pc"
   cd ..
 }
 
@@ -1218,11 +1245,13 @@ build_libcaca() {
 # download_and_unpack_file http://ffmpeg.zeranoe.com/builds/source/external_libraries/libcaca-0.99.beta18.tar.xz libcaca-0.99.beta18
   download_and_unpack_file http://caca.zoy.org/files/libcaca/libcaca-$libcaca_version.tar.gz libcaca-$libcaca_version
   cd libcaca-$libcaca_version
-  cd caca
-    sed -i "s/__declspec(dllexport)//g" *.h # get rid of the declspec lines otherwise the build will fail for undefined symbols
-    sed -i "s/__declspec(dllimport)//g" *.h 
-  cd ..
+    cd caca
+      sed -i "s/__declspec(dllexport)//g" *.h # get rid of the declspec lines otherwise the build will fail for undefined symbols
+      sed -i "s/__declspec(dllimport)//g" *.h 
+    cd ..
   generic_configure_make_install "--libdir=$mingw_w64_x86_64_prefix/lib --disable-cxx --disable-csharp --disable-java --disable-python --disable-ruby --disable-imlib2 --disable-doc"
+  sed -i 's/-lcaca -lz/-lcaca/' "$PKG_CONFIG_PATH/caca.pc"
+  sed -i 's/-lcaca/-lcaca -lz/' "$PKG_CONFIG_PATH/caca.pc"
   cd ..
 }
 
@@ -1260,7 +1289,10 @@ build_libsndfile() {
 build_bs2b() {
   download_and_unpack_file http://sourceforge.net/projects/bs2b/files/libbs2b/3.1.0/libbs2b-3.1.0.tar.bz2/download libbs2b-3.1.0
   cd libbs2b-3.1.0
-    sed -i "s/bin_PROGRAMS =/# bin_PROGRAMS =/" src/Makefile.in  
+    if [[ ! -f src/Makefile.in.bak ]]; then
+      sed -i.bak "/^bin_PROGRAMS/s/=.*/=/" src/Makefile.in # Library only.
+    fi
+    sed -i.bak "s/AC_FUNC_MALLOC//" configure.ac # #270
     generic_configure_make_install
   cd ..
 }
@@ -1402,7 +1434,7 @@ build_ffmpeg() {
   local output_dir="ffmpeg_git"
   local download_url="http://ffmpeg.org/releases/ffmpeg-snapshot-git.tar.bz2"
 
-  local extra_configure_opts="--enable-gpl --enable-version3 --enable-avisynth --enable-bzlib --enable-decklink --enable-dxva2 --enable-fontconfig --enable-frei0r --enable-gnutls --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmfx --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-librtmp --enable-libschroedinger --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DPTW32_STATIC_LIB --extra-cflags=-DLIBTWOLAME_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng"
+  local extra_configure_opts="--enable-gpl --enable-version3 --enable-avisynth --enable-bzlib --enable-decklink --enable-dxva2 --enable-fontconfig --enable-frei0r --enable-gnutls --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmfx --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-librtmp --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DPTW32_STATIC_LIB --extra-cflags=-DLIBTWOLAME_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng"
   if [[ $type = "libav" ]]; then
     # libav [ffmpeg fork]  has a few missing options?
     git_url="https://github.com/libav/libav.git"
@@ -1488,8 +1520,8 @@ build_ffmpeg() {
 }
 
 build_ffmpeg_release() {
-  local version="3.3.1"
-  local prev_version="3.2.4"
+  local version="3.4.1"
+  local prev_version="3.3.3"
   local type=$1
   local shared=$2
   local download_url="http://ffmpeg.org/releases/ffmpeg-$version.tar.xz"
@@ -1497,7 +1529,7 @@ build_ffmpeg_release() {
   local prev_output_dir="ffmpeg-$prev_version"
 
   # FFmpeg 
-  local extra_configure_opts="--enable-gpl --enable-version3 --enable-avisynth --enable-bzlib --enable-decklink --enable-dxva2 --enable-fontconfig --enable-frei0r --enable-gnutls --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmfx --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-librtmp --enable-libschroedinger --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-libzvbi --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DPTW32_STATIC_LIB --extra-cflags=-DLIBTWOLAME_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng"
+  local extra_configure_opts="--enable-gpl --enable-version3 --enable-avisynth --enable-bzlib --enable-decklink --enable-dxva2 --enable-fontconfig --enable-frei0r --enable-gnutls --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmfx --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-librtmp --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-libzvbi --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DPTW32_STATIC_LIB --extra-cflags=-DLIBTWOLAME_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng"
   extra_configure_opts="$extra_configure_opts"
   # can't mix and match --enable-static --enable-shared unfortunately, or the final executable seems to just use shared if the're both present
 
@@ -1658,7 +1690,7 @@ build_apps() {
   fi
   if [[ $build_ffmpeg_shared = "m" ]]; then
     build_ffmpeg ffmpeg minimal
-#   build_ffmpeg_release ffmpeg minimal
+    build_ffmpeg_release ffmpeg minimal
   fi
   if [[ $build_ffmpeg_static = "m" ]]; then
     build_ffmpeg ffmpeg ministat
