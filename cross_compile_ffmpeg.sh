@@ -1424,7 +1424,7 @@ build_ffmpeg() {
 
   # minimal static build plus x264, x265 & faac
   if [[ $shared = "ministat" ]]; then
-    config_options="$build_options --enable-static --disable-shared --disable-w32threads --enable-gpl --enable-avisynth --enable-libgme --enable-libmodplug --enable-libx264 --enable-nonfree --disable-doc" #  -enable-libfaac
+    config_options="$build_options --enable-static --disable-shared --disable-w32threads --enable-gpl --enable-avisynth --enable-libgme --enable-libmodplug --enable-libx264 --enable-nonfree --enable-libfdk-aac --disable-doc" #  -enable-libfaac
   fi
 
   # minimal build for php_av.dll
@@ -1445,9 +1445,9 @@ build_ffmpeg() {
   fi
   
   if [[ "$bits_target" = "32" ]]; then
-    config_options="$config_options --enable-libx265"
+    config_options="$config_options"
   else
-    config_options="$config_options --enable-libx265"
+    config_options="$config_options"
   fi
 
   sed -i -e 's/require_pkg_config libmodplug libmodplug\/modplug\.h ModPlug_Load/require libmodplug libmodplug\/modplug\.h ModPlug_Load -lmodplug/' configure
