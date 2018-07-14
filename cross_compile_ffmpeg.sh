@@ -1589,7 +1589,7 @@ build_dependencies() {
   build_libsoxr
   build_x264
   build_libopenh264 # needs nasm - sudo apt-get install nasm
-  build_libx265 	# needs newer nasm - build from source
+#  build_libx265 	# needs newer nasm - build from source
   build_lame
   build_twolame
   build_vidstab
