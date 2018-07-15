@@ -758,8 +758,8 @@ build_libfribidi() {
 }
 
 build_libass() {
-  libass_version="0.13.1"
-  libass_prev_version="0.12.1"
+  libass_version="0.14.0"
+  libass_prev_version="0.13.1"
   rm -rf libass-$libass_prev_version
   generic_download_and_install https://github.com/libass/libass/releases/download/$libass_version/libass-$libass_version.tar.xz libass-$libass_version
   sed -i 's/-lass -lm/-lass -lfribidi -lm/' "$PKG_CONFIG_PATH/libass.pc"
