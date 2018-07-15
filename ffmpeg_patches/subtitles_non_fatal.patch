@@ -1,8 +1,8 @@
-diff --git a/libavcodec/utils.c b/libavcodec/utils.c
-index 3c8a9cc..5dc8ccf 100644
---- a/libavcodec/utils.c
-+++ b/libavcodec/utils.c
-@@ -2726,9 +2726,6 @@ int avcodec_decode_subtitle2(AVCodecContext *avctx, AVSubtitle *sub,
+diff --git a/libavcodec/decode.c b/libavcodec/decode.c
+index fb1824b..d2b92ee 100644
+--- a/libavcodec/decode.c
++++ b/libavcodec/decode.c
+@@ -1086,9 +1086,6 @@ FF_ENABLE_DEPRECATION_WARNINGS
                      av_log(avctx, AV_LOG_ERROR,
                             "Invalid UTF-8 in decoded subtitles text; "
                             "maybe missing -sub_charenc option\n");
