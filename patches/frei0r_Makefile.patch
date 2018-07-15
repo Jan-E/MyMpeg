@@ -1,7 +1,7 @@
 diff --git a/Makefile.am b/Makefile.am
 index 169497a..927e2d8 100644
---- a/Makefile.am
-+++ b/Makefile.am
+--- Makefile.am
++++ Makefile.am
 @@ -16,4 +16,4 @@ pkgconfigdir = $(libdir)/pkgconfig
  pkgconfig_DATA = frei0r.pc
  
