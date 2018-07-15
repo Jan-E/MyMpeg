@@ -1201,6 +1201,7 @@ build_frei0r() {
   do_git_checkout http://code.dyne.org/frei0r frei0r_git
   cd frei0r_git
     git stash
+    apply_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/frei0r_Makefile.patch
     echo AM_INIT_AUTOMAKE\([subdir-objects]\) >> configure.ac
     ./autogen.sh
     do_cmake
