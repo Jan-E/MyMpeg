@@ -1431,9 +1431,9 @@ build_ffmpeg() {
   if [[ $shared = "minimal" ]]; then
     config_options="$build_options --enable-shared --disable-static --disable-w32threads --enable-gpl --enable-avisynth --enable-libgme --enable-libmodplug --disable-doc"
     # avoid installing this to system
-	cd ..
+    cd ..
     final_install_dir=`pwd`/${output_dir}.installed
-	cd ${output_dir}
+    cd ${output_dir}
     config_options="$config_options --prefix=$final_install_dir"
   fi
 
@@ -1474,18 +1474,19 @@ build_ffmpeg_release() {
   # FFmpeg 
   local extra_configure_opts="--enable-gpl --enable-version3 --enable-avisynth --enable-bzlib --enable-decklink --enable-dxva2 --enable-fontconfig --enable-frei0r --enable-gnutls --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmfx --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-librtmp --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-libzvbi --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DPTW32_STATIC_LIB --extra-cflags=-DLIBTWOLAME_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng"
   extra_configure_opts="$extra_configure_opts"
-  # can't mix and match --enable-static --enable-shared unfortunately, or the final executable seems to just use shared if the're both present
 
+  rm -rf ${prev_output_dir}.installed
   rm -rf ${prev_output_dir}_shared
   rm -rf $prev_output_dir
-  if [[ $shared = "shared" ]]; then
+  if [[ $shared = "ministat" ]] || [[ $shared = "minimal" ]]; then
     download_and_unpack_file $download_url ${output_dir}
-    extra_configure_opts="--enable-shared --disable-static $extra_configure_opts"
+    extra_configure_opts=""
     cd ${output_dir}
   else
     download_and_unpack_file $download_url ${output_dir}
     cd ${output_dir}
   fi
+  rm already_configured
 
   apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/ass_fontsize.patch
   apply_ffmpeg_release_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/subtitles_non_fatal.patch
@@ -1501,7 +1502,25 @@ build_ffmpeg_release() {
    local arch=x86_64
   fi
 
-  config_options="--arch=$arch --target-os=mingw32 --cross-prefix=$cross_prefix --pkg-config=pkg-config --disable-w32threads --disable-doc --prefix=$mingw_w64_x86_64_prefix $extra_configure_opts" # other possibilities: --enable-w32threads --enable-libflite
+  config_options="--arch=$arch --target-os=mingw32 --cross-prefix=$cross_prefix --pkg-config=pkg-config --disable-w32threads --disable-doc $extra_configure_opts" # other possibilities: --enable-w32threads --enable-libflite
+
+  # minimal static build plus x264, x265 & fdk-aac
+  if [[ $shared = "ministat" ]]; then
+    config_options="$config_options --enable-static --disable-shared --enable-gpl --enable-avisynth --enable-libgme --enable-libmodplug --enable-libx264 --enable-libx265 --extra-libs=-lstdc++ --enable-nonfree --enable-libfdk-aac" # -enable-libfaac
+  fi
+
+  # minimal build for php_av.dll
+  if [[ $shared = "shared" ]] || [[ $shared = "minimal" ]]; then
+    config_options="$config_options --enable-shared --disable-static --enable-gpl --enable-avisynth --enable-libgme --enable-libmodplug"
+    # avoid installing this to system
+    cd ..
+    final_install_dir=`pwd`/${output_dir}.installed
+    cd ${output_dir}
+  else
+    final_install_dir=$mingw_w64_x86_64_prefix
+  fi
+  config_options="$config_options --prefix=$final_install_dir"
+
   if [[ "$non_free" = "y" ]]; then
     config_options="$config_options --enable-nonfree --enable-libfdk-aac" # --enable-libfaac -- faac deemed too poor quality and becomes the default -- add it in and uncomment the build_faac line to include it --enable-openssl --enable-libaacplus
   else
@@ -1521,10 +1540,8 @@ build_ffmpeg_release() {
   rm already_ran_make*
   echo "doing ffmpeg make $(pwd)"
   do_make
-  if [[ $shared != "shared" ]]; then
-    do_make_install # install ffmpeg to get libavcodec libraries to be used as dependencies for other things, like vlc [XXX make this a config option?]
-  fi
-  echo "Done! You will find $bits_target bit $shared binaries in $(pwd)/{ffmpeg,ffprobe,ffplay}*.exe"
+  do_make_install # install ffmpeg to get libavcodec libraries to be used as dependencies for other things, like vlc [XXX make this a config option?]
+  echo "Done! You will find $bits_target bit $shared binaries in $final_install_dir/{ffmpeg,ffprobe,ffplay}*.exe"
   ls -la *.exe
   cd ..
 }
@@ -1636,11 +1653,11 @@ build_apps() {
     build_ffmpeg ffmpeg minimal
   fi
   if [[ $build_ffmpeg_static = "m" ]]; then
-#   build_ffmpeg_release ffmpeg ministat
+    build_ffmpeg_release ffmpeg ministat
     build_ffmpeg ffmpeg ministat
   fi
   if [[ $build_ffmpeg_shared = "y" ]]; then
-#   build_ffmpeg_release ffmpeg shared
+    build_ffmpeg_release ffmpeg shared
     build_ffmpeg ffmpeg shared
   fi
   if [[ $build_ffmpeg_static = "y" ]]; then
