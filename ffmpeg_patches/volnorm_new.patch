@@ -103,3 +103,18 @@ index af46e34..81b920a 100644
  } VolumeContext;
  
  void ff_volume_init_x86(VolumeContext *vol);
+diff --git a/libavfilter/f_ebur128.c b/libavfilter/f_ebur128.c
+index 1e8b90f..1e11598 100644
+--- a/libavfilter/f_ebur128.c
++++ b/libavfilter/f_ebur128.c
+@@ -462,10 +462,7 @@ static av_cold int init(AVFilterContext *ctx)
+ 
+     if (ebur128->loglevel != AV_LOG_INFO &&
+         ebur128->loglevel != AV_LOG_VERBOSE) {
+-        if (ebur128->do_video || ebur128->metadata)
+             ebur128->loglevel = AV_LOG_VERBOSE;
+-        else
+-            ebur128->loglevel = AV_LOG_INFO;
+     }
+ 
+     if (!CONFIG_SWRESAMPLE && (ebur128->peak_mode & PEAK_MODE_TRUE_PEAKS)) {
