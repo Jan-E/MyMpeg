@@ -1424,7 +1424,7 @@ build_ffmpeg() {
 
   # minimal static build plus x264, x265 & faac
   if [[ $shared = "ministat" ]]; then
-    config_options="$build_options --enable-static --disable-shared --disable-w32threads --enable-gpl --enable-avisynth --enable-libgme --enable-libmodplug --enable-libx264 --enable-nonfree --enable-libfdk-aac --disable-doc" #  -enable-libfaac
+    config_options="$build_options --enable-static --disable-shared --disable-w32threads --enable-gpl --enable-avisynth --enable-libgme --enable-libmodplug --enable-libx264 --enable-libx265 --extra-libs=-lstdc++ --enable-nonfree --enable-libfdk-aac --disable-doc" #  -enable-libfaac
   fi
 
   # minimal build for php_av.dll
