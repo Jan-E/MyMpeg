@@ -354,13 +354,13 @@ download_file() {
   url="$1"
   output_name=$(basename $url)
   output_dir="$2"
-  if [ ! -f "$output_dir/downloaded.successfully" ]; then
+  if [ ! -f "$output_dir/$output_name.done" ]; then
     echo "downloading $url"
     mkdir "$output_dir"
     cd "$output_dir"
       wget "$url" || curl "$url" -O -L || exit 1
     cd ..
-    touch "$output_dir/downloaded.successfully" || exit 1
+    touch "$output_dir/$output_name.done" || exit 1
   fi
 }
 
@@ -1270,10 +1270,38 @@ build_libmfx() {
 }
 
 build_dxva2() {
-  # make sure to download the latest available
   if [[ ! -s dxva2/dxva2api.h ]]; then
     download_file https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/dxva2/dxva2api.h dxva2
     cat dxva2/dxva2api.h > $mingw_w64_x86_64_prefix/include/dxva2api.h
+  fi
+}
+
+download_file_install_d3d11() {
+    download_file https://raw.githubusercontent.com/Jan-E/mympeg/master/patches/d3d11/$1 d3d11
+    cat d3d11/$1 > $mingw_w64_x86_64_prefix/include/$1
+}
+
+build_d3d11() {
+  # make sure to download the latest available
+  # current Windows Kits\10\Include\10.0.17134.0
+  if [[ ! -s d3d11/d3d11.h ]]; then
+    download_file_install_d3d11 d3d11.idl
+    download_file_install_d3d11 d3d11on12.h
+    download_file_install_d3d11 d3d11on12.idl
+    download_file_install_d3d11 d3d11sdklayers.h
+    download_file_install_d3d11 d3d11sdklayers.idl
+    download_file_install_d3d11 d3d11shader.h
+    download_file_install_d3d11 d3d11shadertracing.h
+    download_file_install_d3d11 d3d11_1.h
+    download_file_install_d3d11 d3d11_1.idl
+    download_file_install_d3d11 d3d11_2.h
+    download_file_install_d3d11 d3d11_2.idl
+    download_file_install_d3d11 d3d11_3.h
+    download_file_install_d3d11 d3d11_3.idl
+    download_file_install_d3d11 d3d11_4.h
+    download_file_install_d3d11 d3d11_4.idl
+    download_file_install_d3d11 d3dcsx.h
+    download_file_install_d3d11 d3d11.h
   fi
 }
 
@@ -1403,7 +1431,7 @@ build_ffmpeg() {
   local output_dir="ffmpeg_git"
   local download_url="http://ffmpeg.org/releases/ffmpeg-snapshot-git.tar.bz2"
 
-  local extra_configure_opts="--enable-gpl --enable-version3 --enable-bzlib --enable-decklink --enable-libmfx --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-fontconfig --enable-frei0r --enable-gnutls --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-librtmp --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libmfx --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-avisynth --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DPTW32_STATIC_LIB --extra-cflags=-DLIBTWOLAME_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng"
+  local extra_configure_opts="--enable-gpl --enable-version3 --enable-bzlib --enable-decklink --enable-libmfx --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va --enable-fontconfig --enable-frei0r --enable-gnutls --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-librtmp --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libmfx --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va --enable-avisynth --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DPTW32_STATIC_LIB --extra-cflags=-DLIBTWOLAME_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng"
   if [[ $type = "libav" ]]; then
     # libav [ffmpeg fork]  has a few missing options?
     git_url="https://github.com/libav/libav.git"
@@ -1456,7 +1484,7 @@ build_ffmpeg() {
 
   # minimal static build plus x264, x265 & faac
   if [[ $shared = "ministat" ]]; then
-    config_options="$build_options --enable-static --disable-shared --disable-w32threads --enable-gpl --enable-libgme --enable-libmodplug --enable-libmfx --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-avisynth --enable-libx264 --enable-libx265 --extra-libs=-lstdc++ --enable-nonfree --enable-libfdk-aac --disable-doc" #  -enable-libfaac
+    config_options="$build_options --enable-static --disable-shared --disable-w32threads --enable-gpl --enable-libgme --enable-libmodplug --enable-libmfx --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va --enable-avisynth --enable-libx264 --enable-libx265 --extra-libs=-lstdc++ --enable-nonfree --enable-libfdk-aac --disable-doc" #  -enable-libfaac
   fi
 
   # minimal build for php_av.dll
@@ -1648,6 +1676,7 @@ build_dependencies() {
   build_libvpx
   build_libdecklink
   build_dxva2
+#  build_d3d11
   build_ffnvcodec
   build_libilbc
   build_fontconfig # needs expat, might need freetype, can use iconv, but I believe doesn't currently
