@@ -1,0 +1,144 @@
+== actual todos ==
+
+zipped lgpl (shared+static) and release plz
+
+build "all" doesn't actually built low and high bitdepth x26x
+
+fix vlc... :| then patch for DVD :)
+poor audio sdl ffplay something?
+try more march, does it really even matter?
+  compare with gcc 4.9.3 ?? grr
+  try with latest gcc :|
+
+nvidia build various deps :)
+
+nvresize distro once
+
+add cygwin "cygwin bash" prompt [and combine...]
+
+add LGPL to the normal distro, why not? (shared and static)
+
+release fei0r filters once
+
+distro mp4box/anything else vaguely useful :|
+
+== maybe/never do, more on the never... ==
+release 7z options too? :)
+
+release "real" static libs: http://stackoverflow.com/questions/11701635/use-ffmpeg-in-visual-studio
+
+XP mingwex?
+test out mplayer with its record-size whatever...
+fix gsm shared is broken...that was painful...
+
+opencl support [copy in headers?] https://www.khronos.org/registry/cl/ it needs something to link against too...ai ai
+  I doubt you can use the kronos stuff but maybe...
+  apparently "hard" http://oscarbg.blogspot.com/2009/12/opencl-with-mingw.html but possible, but https://streamcomputing.eu/blog/2015-03-16/how-to-install-opencl-on-windows/ says just to download the drivers still :|
+  or maybe just use the most basic version and is ok? https://raw.githubusercontent.com/KhronosGroup/OpenCL-Headers/opencl12/opencl.h
+
+figure out real static linkable builds [tell zeranoe to put them on his site?]
+  linkable against them with mingw, msvc...
+
+libav.pc is missing myriad things [patches to ffmpeg-core?]
+  then use it in x264 LOL wait isn't that circular...ok maybe this is low prio
+
+add more executables like the jb-alvarado one [?] meh
+
+not use the "default lib" directory I guess, if that enables us to build versions for linux instead, easily, and as well...except shouldn't they use their own dep system? I guess it might still be convenient...awaiting more demand...
+
+auto detect new release versions of dependencies [that are active LOL]
+
+mplayer use svn trunk?
+
+final install of ffmpeg static to some folder etc. [?] yeah why not...
+  and .exe distro LOL
+
+real distro/installer/put it online
+  release "debug" builds, full static linkable builds [?]
+
+ask the x264 guys what is a good fprofiled option out there...
+
+were there any other places with suspect non -march stuff?
+
+linux VM download with all of it
+
+https://github.com/qyot27/mpv/blob/extra-new/DOCS/crosscompile-mingw-tedious.txt lists some more dependencies, some of which even work with FFmpeg.  Some might work with Mplayer.  Might as well add them, right?
+
+don't ffmpeg enable runtime cpu detect for march cases? [meh, just for a smaller binary? or does it make it faster?]
+
+clean sandbox build all with libfdk [i.e. can it still build everything everything?] 
+
+march without runtime cpu with hard core 1GB y4m fprofiled x264 and amd/intel cpu specified...LOLyeah...ask sherpya if he gets any speedups.
+
+use libcaca git instead, tell them it still isn't enough...
+  https://ffmpeg.zeranoe.com/forum/viewtopic.php?t=1391 also tell them non windows xp? also tell mingw-w64 what?
+
+test all things dvd to make sure they play anything...
+
+
+-d should auto select "both 32 and 64 bit" [XXX make it into command line param too?]
+
+command line option "don't update any git repos"
+
+complain on anybody that I have to sed their .pc files [yikes!]
+
+  check for any other configs zeranoe uses?
+
+fix all that are hard coded revision checkouts...meh
+
+SDL check if has same configure bug with 2.0, if so then file it...
+
+Qt check if same weirdness with 5.1, if so then file it...
+
+it should notice when configure was originally from some other git commit...anyway today, if you go to ffmpeg, checkout a different branch, it doesn't reconfigure...
+
+x264 pkg-config should specify -libpthread? (repro by compiling ffmpeg with windows threads, you'll see...)
+  tell them? others that require tweaks also?
+
+out only real speedup hopes: configure ffmpeg --cpu, libx264 profile guided <sigh>
+  make march work with ffmpeg/x264
+   compare speeds, plus 64 vs 32 bit for everything
+  then with profiled LOL
+
+tell those that fail with multi-threaded make
+
+distribute "my own set of [I guess optimized?] binaries" that are processor optimized (if it even matters speed-wise LOL).
+  though mine do have pthreads...but hopefully I can test and report and get the zeranoe ones built that way...share the workload :)
+  move all downloads to some place I control...maybe even "all" downloads LOL
+    old downloads to sourceforge [?]
+
+a distro that's a VM they can just open up and hit "go" in :)
+
+make it compilable on windows native...
+  release a downloadable "click here to run it" to build full libfdk-aac on windows LOL
+
+release "some 10 bit, some not" ?
+  command line?
+
+release some compiler optimized? does it make a difference? real installer?
+  ancient debug builds, etc...hmm...sourceforge for legacy? yeah
+
+add openmp, for libsoxr? (any other dependency?)
+
+test fribidi git master (does 0.19.5 fail? it should?) with wine installed
+
+tell orc+schro "you didn't well cross compile!"
+
+calculate size of each piece, put it on a wiki somewhere...
+  startup slowdown, too?
+
+support external toolchains
+  then support "checking if they already have zlib installed into it"
+
+--enable-none --enable-x264 --enable-all-gpl --enable-all-non-free
+
+profile guided builds?
+  major libs
+  everything
+
+other "-march" like options? fastmath? f full program?
+  x264 fomit frame pointer for 32 bit?
+
+qt seemed to infer too much about the cpu [possibly?]
+
+somewhere mentioned the old "-fwhole-project" setting again somewhere LOL hmm...for optimizing x264 possibly?
