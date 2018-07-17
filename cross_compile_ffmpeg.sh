@@ -1662,6 +1662,21 @@ build_libMXF() {
   cd ..
 }
 
+apply_ffmpeg_patch() {
+ local url=$1
+ local patch_name=$(basename $url)
+ local patch_done_name="$patch_name.my_patch"
+ if [[ ! -e $patch_done_name ]]; then
+   wget $url || exit 1
+   echo "applying patch $patch_name"
+   patch -p1 < "$patch_name" && touch $patch_done_name && git diff > "/mnt/winshare/mympeg/ffmpeg_patches/$patch_name" \
+     || git stash
+   git commit -a -m applied
+ else
+   echo "patch $patch_name already applied"
+ fi
+}
+
 build_ffmpeg() {
   local extra_postpend_configure_options=$2
   local output_dir=$3
@@ -1693,6 +1708,14 @@ build_ffmpeg() {
 
   do_git_checkout https://github.com/FFmpeg/FFmpeg.git $output_dir $ffmpeg_git_checkout_version
   cd $output_dir
+    apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/ass_fontsize.patch
+    apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/subtitles_non_fatal.patch
+    apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/asfenc.patch
+    apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/movenc.patch
+    apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/mpegvideo_enc.patch
+    apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/swscale.patch
+    apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_new.patch
+
     apply_patch file://$patch_dir/frei0r_load-shared-libraries-dynamically.diff
 
     if [ "$bits_target" = "32" ]; then
