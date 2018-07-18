@@ -1929,6 +1929,100 @@ build_ffmpeg_dependencies() {
   build_libx264 # at bottom as it might build a ffmpeg which needs all the above deps...
 }
 
+build_my_ffmpeg() {
+  local type="ffmpeg"
+  local shared=$build_ffmpeg_shared
+  local git_url="https://github.com/FFmpeg/FFmpeg.git"
+  local output_dir="ffmpeg_git"
+  local download_url="http://ffmpeg.org/releases/ffmpeg-snapshot-git.tar.bz2"
+
+  local extra_configure_opts="--enable-gpl --enable-version3 --enable-bzlib --enable-decklink --enable-libmfx --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-fontconfig --enable-frei0r --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libmfx --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-avisynth --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DPTW32_STATIC_LIB --extra-cflags=-DLIBTWOLAME_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng"
+
+  # can't mix and match --enable-static --enable-shared unfortunately, or the final executable seems to just use shared if the're both present
+  if [[ $shared = "shared" ]] || [[ $shared = "minimal" ]]; then
+    output_dir=${output_dir}_shared
+    rm -rf ${output_dir}
+    # d6af706 = latest avcodec-55.dll
+    do_git_checkout $git_url ${output_dir} # d6af706
+    # download_and_unpack_file $download_url ${output_dir}
+
+    final_install_dir=`pwd`/${output_dir}.installed
+    rm -rf $final_install_dir
+    extra_configure_opts="--enable-shared --disable-static $extra_configure_opts"
+    # avoid installing this to system
+    extra_configure_opts="$extra_configure_opts --prefix=$final_install_dir"
+  else
+    rm -rf ${output_dir}
+    # do_git_checkout $git_url $output_dir
+    output_dir="ffmpeg" && download_and_unpack_file $download_url ${output_dir}
+    extra_configure_opts="--enable-static --disable-shared $extra_configure_opts"
+  fi
+  cd ${output_dir}
+
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/ass_fontsize.patch
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/subtitles_non_fatal.patch
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/asfenc.patch
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/movenc.patch
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/mpegvideo_enc.patch
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/swscale.patch
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_new.patch
+  
+  if [ "$bits_target" = "32" ]; then
+    local arch=x86
+  else
+    local arch=x86_64
+  fi
+
+  build_options="--arch=$arch --target-os=mingw32 --cross-prefix=$cross_prefix --pkg-config=pkg-config --pkg-config-flags=--static"
+  config_options="$build_options --disable-w32threads --disable-doc --prefix=$mingw_w64_x86_64_prefix $extra_configure_opts" # other possibilities: --enable-w32threads --enable-libflite
+  if [[ "$non_free" = "y" ]]; then
+    config_options="$config_options --enable-nonfree --enable-libfdk-aac" # --enable-libfaac -- faac deemed too poor quality and becomes the default -- add it in and uncomment the build_faac line to include it --enable-openssl --enable-libaacplus
+  else
+    config_options="$config_options"
+  fi
+
+  # minimal static build plus x264, x265 & faac
+  if [[ $shared = "ministat" ]]; then
+    config_options="$build_options --enable-static --disable-shared --disable-w32threads --enable-gpl --enable-libgme --enable-libmodplug --enable-libmfx --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-avisynth --enable-libx264 --enable-libx265 --extra-libs=-lstdc++ --enable-nonfree --enable-libfdk-aac --disable-doc" #  -enable-libfaac
+  fi
+
+  # minimal build for php_av.dll
+  if [[ $shared = "minimal" ]]; then
+    config_options="$build_options --enable-shared --disable-static --disable-w32threads --enable-gpl --enable-avisynth --enable-libgme --enable-libmodplug --disable-doc"
+    # avoid installing this to system
+    cd ..
+    final_install_dir=`pwd`/${output_dir}.installed
+    cd ${output_dir}
+    config_options="$config_options --prefix=$final_install_dir"
+  fi
+
+  if [[ "$native_build" = "y" ]]; then
+    config_options="$config_options --disable-runtime-cpudetect"
+    # TODO --cpu=host ... ?
+  else
+    config_options="$config_options --enable-runtime-cpudetect"
+  fi
+  
+  if [[ "$bits_target" = "32" ]]; then
+    config_options="$config_options"
+  else
+    config_options="$config_options"
+  fi
+
+  sed -i -e 's/require_pkg_config libmodplug libmodplug\/modplug\.h ModPlug_Load/require libmodplug libmodplug\/modplug\.h ModPlug_Load -lmodplug/' configure
+  do_configure "$config_options"
+  rm -f */*.a */*.dll *.exe # just in case some dependency library has changed, force it to re-link even if the ffmpeg source hasn't changed...
+  rm already_ran_make*
+  echo "doing ffmpeg make $(pwd)"
+  do_make
+  if [[ $shared = "shared" ]] || [[ $shared = "minimal" ]]; then
+    do_make_install # install ffmpeg to get libavcodec libraries to be used as dependencies for other things, like vlc [XXX make this a config option?]
+  fi
+  echo "Done! You will find $bits_target bit $shared binaries in $(pwd)/{ffmpeg,ffprobe,ffplay}*.exe"
+  ls -la *.exe
+  cd ..
+}
+
 build_apps() {
   if [[ $build_dvbtee = "y" ]]; then
     build_dvbtee_app
@@ -2126,8 +2220,7 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win32" ]]; then
   make_prefix_options="CC=${cross_prefix}gcc AR=${cross_prefix}ar PREFIX=$mingw_w64_x86_64_prefix RANLIB=${cross_prefix}ranlib LD=${cross_prefix}ld STRIP=${cross_prefix}strip CXX=${cross_prefix}g++"
   mkdir -p win32
   cd win32
-    build_ffmpeg_dependencies
-    build_apps
+    build_my_ffmpeg    
   cd ..
 fi
 
@@ -2144,8 +2237,7 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win64" ]]; then
   make_prefix_options="CC=${cross_prefix}gcc AR=${cross_prefix}ar PREFIX=$mingw_w64_x86_64_prefix RANLIB=${cross_prefix}ranlib LD=${cross_prefix}ld STRIP=${cross_prefix}strip CXX=${cross_prefix}g++"
   mkdir -p win64
   cd win64
-    build_ffmpeg_dependencies
-    build_apps
+    build_my_ffmpeg
   cd ..
 fi
 
