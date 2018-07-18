@@ -159,7 +159,7 @@ The resultant binary may not be distributable, but can be useful for in-house us
 }
 
 pick_compiler_flavors() {
-  while [[ "$compiler_flavors" != [1-5] ]]; do
+  while [[ "$compiler_flavors" != [1-4] ]]; do
     if [[ -n "${unknown_opts[@]}" ]]; then
       echo -n 'Unknown option(s)'
       for unknown_opt in "${unknown_opts[@]}"; do
@@ -172,18 +172,16 @@ What version of MinGW-w64 would you like to build or update?
   1. Both Win32 and Win64
   2. Win32 (32-bit only)
   3. Win64 (64-bit only)
-  4. Local native
-  5. Exit
+  4. Exit
 EOF
-    echo -n 'Input your choice [1-5]: '
+    echo -n 'Input your choice [1-4]: '
     read compiler_flavors
   done
   case "$compiler_flavors" in
   1 ) compiler_flavors=multi ;;
   2 ) compiler_flavors=win32 ;;
   3 ) compiler_flavors=win64 ;;
-  4 ) compiler_flavors=native ;;
-  5 ) echo "exiting"; exit 0 ;;
+  4 ) echo "exiting"; exit 0 ;;
   * ) clear;  echo 'Your choice was not valid, please try again.'; echo ;;
   esac
 }
@@ -205,15 +203,11 @@ install_cross_compiler() {
      echo "selecting multi build (both win32 and win64)...since both cross compilers are present assuming you want both..."
      compiler_flavors=multi
    fi
-   return # early exit they've selected at least some kind by this point...
+   return # early exit just assume they want both, don't even prompt :)
   fi
 
   if [[ -z $compiler_flavors ]]; then
     pick_compiler_flavors
-  fi
-  if [[ $compiler_flavors == "native" ]]; then
-    echo "native build, not building any cross compilers..."
-    return
   fi
 
   mkdir -p cross_compilers
@@ -249,7 +243,7 @@ install_cross_compiler() {
       fi
     fi
 
-    # rm -f build.log # leave resultant build log...sometimes useful...
+    # rm -f build.log # left over stuff... # sometimes useful...
     reset_cflags
   cd ..
   echo "Done building (or already built) MinGW-w64 cross-compiler(s) successfully..."
@@ -1373,7 +1367,7 @@ build_libx264() {
   #if [[ $prefer_stable = "n" ]]; then
   #  do_git_checkout "http://git.videolan.org/git/x264.git" $checkout_dir "origin/master" # During 'configure': "Found no assembler. Minimum version is nasm-2.13" so disable for now...
   #else
-    do_git_checkout "http://git.videolan.org/git/x264.git" $checkout_dir  "origin/stable" # or "origin/stable" nasm again
+    do_git_checkout "http://git.videolan.org/git/x264.git" $checkout_dir  8c2974255b01728 # or "origin/stable" nasm again
   #fi
   cd $checkout_dir
     if [[ ! -f configure.bak ]]; then # Change CFLAGS.
@@ -1385,7 +1379,7 @@ build_libx264() {
       configure_flags+=" --disable-lavf" # lavf stands for libavformat, there is no --enable-lavf option, either auto or disable...
     fi
     if [[ $high_bitdepth == "y" ]]; then
-      configure_flags+=" --bit-depth=10" # all?
+      configure_flags+=" --bit-depth=10" # Enable 10 bits (main10) per pixels profile. possibly affects other profiles as well (?)
     fi
     for i in $CFLAGS; do
       configure_flags+=" --extra-cflags=$i" # needs it this way seemingly :|
@@ -1724,19 +1718,17 @@ build_ffmpeg() {
       local arch=x86_64
     fi
 
-    init_options="--pkg-config=pkg-config --pkg-config-flags=--static --extra-version=ffmpeg-windows-build-helpers --enable-version3 --disable-debug --disable-w32threads"
-    if [[ $compiler_flavors != "native" ]]; then
-      init_options += " --arch=$arch --target-os=mingw32 --cross-prefix=$cross_prefix"
-    fi
+    init_options="--arch=$arch --target-os=mingw32 --cross-prefix=$cross_prefix --pkg-config=pkg-config --pkg-config-flags=--static --extra-version=ffmpeg-windows-build-helpers --enable-gray --enable-version3 --disable-debug --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-w32threads"
     if [[ `uname` =~ "5.1" ]]; then
       init_options+=" --disable-schannel"
       # Fix WinXP incompatibility by disabling Microsoft's Secure Channel, because Windows XP doesn't support TLS 1.1 and 1.2, but with GnuTLS or OpenSSL it does. The main reason I started this journey!
     fi
-    config_options="$init_options --enable-gray --enable-libtesseract --enable-fontconfig --enable-gmp --enable-gnutls --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libflite --enable-libfreetype --enable-libfribidi --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libmysofa --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenh264 --enable-libopenjpeg --enable-libopus --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libzimg --enable-libzvbi  --enable-nvenc --enable-nvdec --enable-libaom"
+    config_options="$init_options  --enable-libtesseract --enable-fontconfig --enable-gmp --enable-gnutls --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libflite --enable-libfreetype --enable-libfribidi --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libmysofa --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenh264 --enable-libopenjpeg --enable-libopus --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libzimg --enable-libzvbi  --enable-nvenc --enable-nvdec --enable-libaom"
     # With the changes being made to 'configure' above and with '--pkg-config-flags=--static' there's no need anymore for '--extra-cflags=' and '--extra-libs='.
     if [[ ! -f configure.bak ]]; then # Changes being made to 'configure' are done with 'sed', because 'configure' gets updated a lot.
-      # Alternative to 'do_configure "... --extra-cflags=-DLIBTWOLAME_STATIC --extra-cflags=-DMODPLUG_STATIC --extra-cflags=-DCACA_STATIC"'.
       sed -i "/enabled libtwolame/s/&&$/-DLIBTWOLAME_STATIC \&\& add_cppflags -DLIBTWOLAME_STATIC \&\&/;/enabled libmodplug/s/.*/& -DMODPLUG_STATIC \&\& add_cppflags -DMODPLUG_STATIC/;/enabled libcaca/s/.*/& -DCACA_STATIC \&\& add_cppflags -DCACA_STATIC/" configure # Add '-Dxxx_STATIC' to LibTwoLAME, LibModplug and Libcaca. FFmpeg should change this upstream, just like they did with libopenjpeg.
+      # Alternative to 'do_configure "... --extra-cflags=-DLIBTWOLAME_STATIC --extra-cflags=-DMODPLUG_STATIC --extra-cflags=-DCACA_STATIC"'.
+      sed -i.bak "s/ install-data//" Makefile # Binary only (don't install 'DATA_FILES' and 'EXAMPLES_FILES').
     fi
     config_options+=" --extra-cflags=-DLIBTWOLAME_STATIC --extra-cflags=-DMODPLUG_STATIC --extra-cflags=-DCACA_STATIC" # if we ever do a git pull then it nukes the changes from above, so just use these for now :|
     if [[ $enable_gpl == 'y' ]]; then
@@ -1762,7 +1754,7 @@ build_ffmpeg() {
     config_options+=" $postpend_configure_opts"
 
     if [[ "$non_free" = "y" ]]; then
-      config_options+=" --enable-nonfree --enable-decklink --enable-libfdk-aac"
+      config_options+=" --enable-nonfree --enable-libfdk-aac"
       # other possible options: --enable-openssl [unneeded since we use gnutls]
     fi
     #apply_patch file://$patch_dir/nvresize2.patch "-p1" # uncomment if you want to test nvresize filter [et al] http://ffmpeg.org/pipermail/ffmpeg-devel/2015-November/182781.html patch worked with 7ab37cae34b3845
@@ -1934,7 +1926,7 @@ build_ffmpeg_dependencies() {
   build_libx265
   build_libopenh264
   build_libaom
-  build_libx264 # at bottom as it might internally build a coy of ffmpeg (which needs all the above deps...
+  build_libx264 # at bottom as it might build a ffmpeg which needs all the above deps...
 }
 
 build_apps() {
@@ -2053,7 +2045,7 @@ while true; do
       --build-ismindex=n [builds ffmpeg utility ismindex.exe]
       -a 'build all' builds ffmpeg, mplayer, vlc, etc. with all fixings turned on
       --build-dvbtee=n [build dvbtee.exe a DVB profiler]
-      --compiler-flavors=[multi,win32,win64,native] [default prompt, or skip if you already have one built, multi is both win32 and win64]
+      --compiler-flavors=[multi,win32,win64] [default prompt, or skip if you already have one built, multi is both win32 and win64]
       --cflags=[default is $original_cflags, which works on any cpu, see README for options]
       --git-get-latest=y [do a git pull for latest code from repositories like FFmpeg--can force a rebuild if changes are detected]
       --build-x264-with-libav=n build x264.exe with bundled/included "libav" ffmpeg libraries within it
@@ -2121,18 +2113,6 @@ if [[ $OSTYPE == darwin* ]]; then
 fi
 
 original_path="$PATH"
-
-if [[ $compiler_flavors == "native" ]]; then
-  echo "starting native build..."
-  mingw_w64_x86_64_prefix="$cur_dir/cross_compilers/native"
-  export PKG_CONFIG_PATH="$mingw_w64_x86_64_prefix/lib/pkgconfig"
-  mkdir -p native
-  cd native
-    build_libx264 # small deps )
-    build_ffmpeg
-  cd ..
-fi
-
 if [[ $compiler_flavors == "multi" || $compiler_flavors == "win32" ]]; then
   echo
   echo "Starting 32-bit builds..."
@@ -2167,8 +2147,6 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win64" ]]; then
     build_ffmpeg_dependencies
     build_apps
   cd ..
-else
-  echo "doing local native build for your current OS!"
 fi
 
 echo "searching for all local exe's (some may not have been built this round, NB)..."
