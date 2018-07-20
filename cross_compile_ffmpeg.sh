@@ -218,32 +218,23 @@ install_cross_compiler() {
     echo "Starting to download and build cross compile version of gcc [requires working internet access] with thread count $gcc_cpu_count..."
     echo ""
 
-    # --disable-shared allows c++ to be distributed at all...which seemed necessary for some random dependency which happens to use/require c++...
-    local zeranoe_script_name=mingw-w64-build-r22.local
-    local zeranoe_script_options="--gcc-ver=7.1.0 --default-configure --cpu-count=$gcc_cpu_count --pthreads-w32-ver=2-9-1 --disable-shared --clean-build --verbose --allow-overwrite" # allow-overwrite to avoid some crufty prompts if I do rebuilds [or maybe should just nuke everything...]
+    # zee https://github.com/Zeranoe/mingw-w64-build/blob/master/mingw-w64-build for the 4.0.0 version
+    local zeranoe_script_name=mingw-w64-build-r23.local
+    download_gcc_build_script $zeranoe_script_name
+    local zeranoe_script_options=""
     if [[ ($compiler_flavors == "win32" || $compiler_flavors == "multi") && ! -f ../$win32_gcc ]]; then
-      echo "Building win32 cross compiler..."
-      download_gcc_build_script $zeranoe_script_name
-      if [[ `uname` =~ "5.1" ]]; then # Avoid using secure API functions for compatibility with msvcrt.dll on Windows XP.
-        sed -i "s/ --enable-secure-api//" $zeranoe_script_name
-      fi
-      nice ./$zeranoe_script_name $zeranoe_script_options --build-type=win32 || exit 1
-      if [[ ! -f ../$win32_gcc ]]; then
-        echo "Failure building 32 bit gcc? Recommend nuke sandbox (rm -rf sandbox) and start over..."
-        exit 1
-      fi
+      zeranoe_script_options="$zeranoe_script_options i686"
     fi
     if [[ ($compiler_flavors == "win64" || $compiler_flavors == "multi") && ! -f ../$win64_gcc ]]; then
-      echo "Building win64 x86_64 cross compiler..."
-      download_gcc_build_script $zeranoe_script_name
-      nice ./$zeranoe_script_name $zeranoe_script_options --build-type=win64 || exit 1
-      if [[ ! -f ../$win64_gcc ]]; then
-        echo "Failure building 64 bit gcc? Recommend nuke sandbox (rm -rf sandbox) and start over..."
-        exit 1
-      fi
+      zeranoe_script_options="$zeranoe_script_options x86_64"
     fi
-
-    # rm -f build.log # left over stuff... # sometimes useful...
+    nice ./$zeranoe_script_name $zeranoe_script_options || exit 1
+    if [[ ($compiler_flavors == "win32" || $compiler_flavors == "multi") && ! -f ../$win32_gcc ]]; then
+      ln -s i686-w64-mingw32 mingw-w64-i686
+    fi
+    if [[ ($compiler_flavors == "win64" || $compiler_flavors == "multi") && ! -f ../$win64_gcc ]]; then
+      ln -s x86_64-w64-mingw32 mingw-w64-x86_64
+    fi
     reset_cflags
   cd ..
   echo "Done building (or already built) MinGW-w64 cross-compiler(s) successfully..."
@@ -1723,7 +1714,7 @@ build_ffmpeg() {
       init_options+=" --disable-schannel"
       # Fix WinXP incompatibility by disabling Microsoft's Secure Channel, because Windows XP doesn't support TLS 1.1 and 1.2, but with GnuTLS or OpenSSL it does. The main reason I started this journey!
     fi
-    config_options="$init_options  --enable-libtesseract --enable-fontconfig --enable-gmp --enable-gnutls --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libflite --enable-libfreetype --enable-libfribidi --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libmysofa --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenh264 --enable-libopenjpeg --enable-libopus --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libzimg --enable-libzvbi  --enable-nvenc --enable-nvdec --enable-libaom"
+    config_options="$init_options --enable-fontconfig --enable-gmp --enable-gnutls --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libflite --enable-libfreetype --enable-libfribidi --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libmysofa --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenh264 --enable-libopenjpeg --enable-libopus --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libzimg --enable-nvenc --enable-nvdec --enable-libaom"
     # With the changes being made to 'configure' above and with '--pkg-config-flags=--static' there's no need anymore for '--extra-cflags=' and '--extra-libs='.
     if [[ ! -f configure.bak ]]; then # Changes being made to 'configure' are done with 'sed', because 'configure' gets updated a lot.
       sed -i "/enabled libtwolame/s/&&$/-DLIBTWOLAME_STATIC \&\& add_cppflags -DLIBTWOLAME_STATIC \&\&/;/enabled libmodplug/s/.*/& -DMODPLUG_STATIC \&\& add_cppflags -DMODPLUG_STATIC/;/enabled libcaca/s/.*/& -DCACA_STATIC \&\& add_cppflags -DCACA_STATIC/" configure # Add '-Dxxx_STATIC' to LibTwoLAME, LibModplug and Libcaca. FFmpeg should change this upstream, just like they did with libopenjpeg.
@@ -1916,7 +1907,7 @@ build_ffmpeg_dependencies() {
     build_fdk-aac # Uses dlfcn.
     build_libdecklink
   fi
-  build_zvbi # Uses iconv, libpng and dlfcn.
+#  build_zvbi # Uses iconv, libpng and dlfcn.
   build_fribidi # Uses dlfcn.
   build_libass # Needs freetype >= 9.10.3 (see https://bugs.launchpad.net/ubuntu/+source/freetype1/+bug/78573 o_O) and fribidi >= 0.19.0. Uses fontconfig >= 2.10.92, iconv and dlfcn.
   build_libxavs
@@ -1936,7 +1927,7 @@ build_my_ffmpeg() {
   local output_dir="ffmpeg_git"
   local download_url="http://ffmpeg.org/releases/ffmpeg-snapshot-git.tar.bz2"
 
-  local extra_configure_opts="--enable-gpl --enable-version3 --enable-bzlib --enable-decklink --enable-libmfx --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-fontconfig --enable-frei0r --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libmfx --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-avisynth --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DPTW32_STATIC_LIB --extra-cflags=-DLIBTWOLAME_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng"
+  local extra_configure_opts="--enable-gpl --enable-version3 --enable-bzlib --enable-libmfx --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va --enable-fontconfig --enable-frei0r --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libmfx --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va --enable-avisynth --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DPTW32_STATIC_LIB --extra-cflags=-DLIBTWOLAME_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng --extra-libs=-lm"
 
   # can't mix and match --enable-static --enable-shared unfortunately, or the final executable seems to just use shared if the're both present
   if [[ $shared = "shared" ]] || [[ $shared = "minimal" ]]; then
@@ -1983,7 +1974,7 @@ build_my_ffmpeg() {
 
   # minimal static build plus x264, x265 & faac
   if [[ $shared = "ministat" ]]; then
-    config_options="$build_options --enable-static --disable-shared --disable-w32threads --enable-gpl --enable-libmfx --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-libx264 --enable-nonfree --enable-libfdk-aac --disable-doc" #  -enable-libfaac
+    config_options="$build_options --enable-static --disable-shared --disable-w32threads --enable-gpl --enable-libmfx --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va --enable-libx264 --enable-nonfree --enable-libfdk-aac --disable-doc" #  -enable-libfaac
   fi
 
   # minimal build for php_av.dll
@@ -2220,6 +2211,7 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win32" ]]; then
   make_prefix_options="CC=${cross_prefix}gcc AR=${cross_prefix}ar PREFIX=$mingw_w64_x86_64_prefix RANLIB=${cross_prefix}ranlib LD=${cross_prefix}ld STRIP=${cross_prefix}strip CXX=${cross_prefix}g++"
   mkdir -p win32
   cd win32
+#    build_ffmpeg_dependencies
     build_my_ffmpeg    
   cd ..
 fi
@@ -2237,6 +2229,7 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win64" ]]; then
   make_prefix_options="CC=${cross_prefix}gcc AR=${cross_prefix}ar PREFIX=$mingw_w64_x86_64_prefix RANLIB=${cross_prefix}ranlib LD=${cross_prefix}ld STRIP=${cross_prefix}strip CXX=${cross_prefix}g++"
   mkdir -p win64
   cd win64
+#    build_ffmpeg_dependencies
     build_my_ffmpeg
   cd ..
 fi
