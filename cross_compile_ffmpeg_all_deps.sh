@@ -604,13 +604,13 @@ build_amd_amf_headers() {
   do_git_checkout https://github.com/GPUOpen-LibrariesAndSDKs/AMF.git amf_headers_git # Use: https://github.com/DeadSix27/AMF or your own stripped fork if needed (original is like 120MB of data we don't need).
   cd amf_headers_git
     if [ ! -f "already_installed" ] ; then
-	  rm -rf "./Thirdparty"
+      rm -rf "./Thirdparty"
       if [ ! -d "$mingw_w64_x86_64_prefix/include/AMF" ]; then
         mkdir -p "$mingw_w64_x86_64_prefix/include/AMF"
       fi
       cp -av "amf/public/include/." "$mingw_w64_x86_64_prefix/include/AMF" 
-	  touch "already_installed"
-	fi
+      touch "already_installed"
+    fi
   cd ..
 }
 
@@ -654,6 +654,7 @@ build_libtesseract() {
   cd tesseract_git
     generic_configure_make_install
     sed -i.bak 's/-ltesseract.*$/-ltesseract -lstdc++ -lws2_32 -llept -ltiff -llzma -ljpeg -lz/' $PKG_CONFIG_PATH/tesseract.pc # why does it needs winsock? LOL plus all of libtiff's <sigh>
+    sed -i.bak 's/-ltesseract.*$/-ltesseract -lstdc++ -lws2_32 -llept -ltiff -llzma -ljpeg -lz/' $PKG_CONFIG_PATH/tesseract.pc # 
   cd ..
 }
 
@@ -1167,7 +1168,7 @@ build_zvbi() {
   cd zvbi-0.2.35
     apply_patch file://$patch_dir/zvbi-win32.patch
     apply_patch file://$patch_dir/zvbi-no-contrib.diff # weird issues with some stuff in contrib...
-    generic_configure " --host=i686-w64-mingw32 --disable-dvb --disable-bktr --disable-proxy --disable-nls --without-doxygen --without-libiconv-prefix"
+    generic_configure " --disable-dvb --disable-bktr --disable-proxy --disable-nls --without-doxygen --without-libiconv-prefix"
     # Without '--without-libiconv-prefix' 'configure' would otherwise search for and only accept a shared Libiconv library.
     do_make_and_make_install
   cd ..
@@ -1985,11 +1986,11 @@ build_vlc=n
 build_lsw=n # To build x264 with L-Smash-Works.
 git_get_latest=y
 prefer_stable=y # Only for x264 and x265.
-# if [[ `uname` =~ "5.1" ]]; # Uncomment this if people report that AMF does not work on XP (I have no way to test this myself)
-#   build_amd_amf=n
-# else
-#   build_amd_amf=y
-# fi
+if [[ `uname` =~ "5.1" ]]; then # Uncomment this if people report that AMF does not work on XP (I have no way to test this myself)
+  build_amd_amf=n
+else
+  build_amd_amf=y
+fi
 if [[ `uname` =~ "5.1" ]]; then # Disable when WinXP is detected, or you'll get "The procedure entry point _wfopen_s could not be located in the dynamic link library msvcrt.dll".
   build_intel_qsv=n
 else
@@ -2118,7 +2119,7 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win32" ]]; then
   mkdir -p win32
   cd win32
     build_ffmpeg_dependencies
-#    build_apps
+    build_apps
   cd ..
 fi
 
@@ -2136,7 +2137,7 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win64" ]]; then
   mkdir -p win64
   cd win64
     build_ffmpeg_dependencies
-#    build_apps
+    build_apps
   cd ..
 fi
 
