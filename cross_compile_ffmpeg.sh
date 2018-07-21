@@ -229,11 +229,14 @@ install_cross_compiler() {
       zeranoe_script_options="$zeranoe_script_options x86_64"
     fi
     nice ./$zeranoe_script_name $zeranoe_script_options || exit 1
-    if [[ ($compiler_flavors == "win32" || $compiler_flavors == "multi") && ! -f ../$win32_gcc ]]; then
-      ln -s i686-w64-mingw32 mingw-w64-i686
-    fi
-    if [[ ($compiler_flavors == "win64" || $compiler_flavors == "multi") && ! -f ../$win64_gcc ]]; then
-      ln -s x86_64-w64-mingw32 mingw-w64-x86_64
+    # TODO symlinks on other platforms
+    if [[ `uname` == "Linux" ]]; then
+      if [[ ($compiler_flavors == "win32" || $compiler_flavors == "multi") && ! -f ../$win32_gcc ]]; then
+        ln -s i686-w64-mingw32 mingw-w64-i686
+      fi
+      if [[ ($compiler_flavors == "win64" || $compiler_flavors == "multi") && ! -f ../$win64_gcc ]]; then
+        ln -s x86_64-w64-mingw32 mingw-w64-x86_64
+      fi
     fi
     reset_cflags
   cd ..
@@ -604,13 +607,13 @@ build_amd_amf_headers() {
   do_git_checkout https://github.com/GPUOpen-LibrariesAndSDKs/AMF.git amf_headers_git # Use: https://github.com/DeadSix27/AMF or your own stripped fork if needed (original is like 120MB of data we don't need).
   cd amf_headers_git
     if [ ! -f "already_installed" ] ; then
-	  rm -rf "./Thirdparty"
       if [ ! -d "$mingw_w64_x86_64_prefix/include/AMF" ]; then
         mkdir -p "$mingw_w64_x86_64_prefix/include/AMF"
       fi
       cp -av "amf/public/include/." "$mingw_w64_x86_64_prefix/include/AMF" 
-	  touch "already_installed"
-	fi
+      touch "already_installed"
+    fi
+    rm -rf Thirdparty
   cd ..
 }
 
@@ -1907,7 +1910,9 @@ build_ffmpeg_dependencies() {
     build_fdk-aac # Uses dlfcn.
     build_libdecklink
   fi
-#  build_zvbi # Uses iconv, libpng and dlfcn.
+  if [[ -f "$mingw_w64_x86_64_prefix/include/pthread.h" ]] && [[ -f "$mingw_w64_x86_64_prefix/lib/libpthread.a" ]]; then
+    build_zvbi # Uses iconv, libpng and dlfcn.
+  fi
   build_fribidi # Uses dlfcn.
   build_libass # Needs freetype >= 9.10.3 (see https://bugs.launchpad.net/ubuntu/+source/freetype1/+bug/78573 o_O) and fribidi >= 0.19.0. Uses fontconfig >= 2.10.92, iconv and dlfcn.
   build_libxavs
@@ -1927,10 +1932,10 @@ build_my_ffmpeg() {
   local output_dir="ffmpeg_git"
   local download_url="http://ffmpeg.org/releases/ffmpeg-snapshot-git.tar.bz2"
 
-  local extra_configure_opts="--enable-gpl --enable-version3 --enable-bzlib --enable-libmfx --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va --enable-fontconfig --enable-frei0r --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libmfx --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va --enable-avisynth --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DPTW32_STATIC_LIB --extra-cflags=-DLIBTWOLAME_STATIC --extra-cflags=-DMODPLUG_STATIC --extra-cflags=-DCACA_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng --extra-libs=-lm"
+  local extra_configure_opts="--enable-gpl --enable-version3 --enable-bzlib --enable-amf --enable-libmfx --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va --enable-fontconfig --enable-frei0r --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwebp --enable-amf --enable-libmfx --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va --enable-avisynth --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DPTW32_STATIC_LIB --extra-cflags=-DLIBTWOLAME_STATIC --extra-cflags=-DMODPLUG_STATIC --extra-cflags=-DCACA_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng --extra-libs=-lm"
 
   # can't mix and match --enable-static --enable-shared unfortunately, or the final executable seems to just use shared if the're both present
-  if [[ $shared = "shared" ]] || [[ $shared = "minimal" ]]; then
+  if [[ $shared = "shared" ]] || [[ $shared = "minimal" ]] ; then
     output_dir=${output_dir}_shared
     rm -rf ${output_dir}
     # d6af706 = latest avcodec-55.dll
@@ -1957,7 +1962,9 @@ build_my_ffmpeg() {
   apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/mpegvideo_enc.patch
   apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/swscale.patch
   apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_new.patch
-  
+
+  apply_patch file://$patch_dir/frei0r_load-shared-libraries-dynamically.diff
+
   if [ "$bits_target" = "32" ]; then
     local arch=x86
   else
@@ -1972,14 +1979,25 @@ build_my_ffmpeg() {
     config_options="$config_options"
   fi
 
-  # minimal static build plus x264, x265 & faac
-  if [[ $shared = "ministat" ]]; then
-    config_options="$build_options --enable-static --disable-shared --disable-w32threads --enable-gpl --enable-libmfx --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va --enable-libx264 --enable-nonfree --enable-libfdk-aac --disable-doc" #  -enable-libfaac
+  # minimal static build plus x264 & fdk-aac
+  if [[ $shared = "ministat" ]] || [[ $shared = "ministat_w32threads" ]]; then
+    config_options="$build_options --enable-static --disable-shared"
+    if [[ $shared = "ministat_w32threads" ]]; then
+      config_options="$config_options --disable-pthreads --enable-w32threads"
+    else
+      if [[ -f "$mingw_w64_x86_64_prefix/include/pthread.h" ]] && [[ -f "$mingw_w64_x86_64_prefix/lib/libpthread.a" ]]; then
+        config_options="$config_options --enable-pthreads" # autodetect, but add it anyway
+      else
+        config_options="$config_options --disable-pthreads"
+      fi
+      config_options="$config_options --disable-w32threads"
+    fi
+    config_options="$config_options --enable-gpl --enable-amf --enable-libmfx --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va --enable-libx264 --enable-nonfree --enable-libfdk-aac --disable-doc" #  -enable-libfaac
   fi
 
   # minimal build for php_av.dll
   if [[ $shared = "minimal" ]]; then
-    config_options="$build_options --enable-shared --disable-static --disable-w32threads --enable-gpl --enable-avisynth --enable-libgme --enable-libmodplug --disable-doc"
+    config_options="$build_options --enable-shared --disable-static --disable-w32threads --enable-gpl --enable-amf --enable-libmfx --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va --disable-doc"
     # avoid installing this to system
     cd ..
     final_install_dir=`pwd`/${output_dir}.installed

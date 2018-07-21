@@ -604,13 +604,13 @@ build_amd_amf_headers() {
   do_git_checkout https://github.com/GPUOpen-LibrariesAndSDKs/AMF.git amf_headers_git # Use: https://github.com/DeadSix27/AMF or your own stripped fork if needed (original is like 120MB of data we don't need).
   cd amf_headers_git
     if [ ! -f "already_installed" ] ; then
-      rm -rf "./Thirdparty"
       if [ ! -d "$mingw_w64_x86_64_prefix/include/AMF" ]; then
         mkdir -p "$mingw_w64_x86_64_prefix/include/AMF"
       fi
       cp -av "amf/public/include/." "$mingw_w64_x86_64_prefix/include/AMF" 
       touch "already_installed"
     fi
+    rm -rf Thirdparty
   cd ..
 }
 
@@ -1648,6 +1648,33 @@ build_libMXF() {
   cd ..
 }
 
+build_pthreads() {
+  # Zeranoe 4.0.0 does not build libpthread
+  if [[ ! -f "$mingw_w64_x86_64_prefix/include/pthread.h" ]] || [[ ! -f "$mingw_w64_x86_64_prefix/lib/libpthread.a" ]]; then
+    download_and_unpack_file ftp://sourceware.org/pub/pthreads-win32/pthreads-w32-2-9-1-release.tar.gz pthreads-w32-2-9-1-release
+    cd pthreads-w32-2-9-1-release
+      # use the cross compiler binaries as gcc, windres, ar and ranlib
+      ln -s "${cross_prefix}gcc"     "$mingw_bin_path/gcc"
+      ln -s "${cross_prefix}windres" "$mingw_bin_path/windres"
+      ln -s "${cross_prefix}ar"      "$mingw_bin_path/ar"
+      ln -s "${cross_prefix}ranlib"  "$mingw_bin_path/ranlib"
+      which gcc
+      make -f GNUmakefile clean GC-static
+      rm    "$mingw_bin_path/gcc"
+      rm    "$mingw_bin_path/windres"
+      rm    "$mingw_bin_path/ar"
+      rm    "$mingw_bin_path/ranlib"
+      cp 'libpthreadGC2.a' "$mingw_w64_x86_64_prefix/lib" || exit 1
+      ln -s "$mingw_w64_x86_64_prefix/lib/libpthreadGC2.a" "$mingw_w64_x86_64_prefix/lib/libpthread.a"
+      cp 'pthread.h' 'sched.h' 'semaphore.h' "$mingw_w64_x86_64_prefix/include/" || exit 1
+      for file in 'pthread.h' 'sched.h' 'semaphore.h'; do
+        sed -i.bak 's/ __declspec (dllexport)//g' "$mingw_w64_x86_64_prefix/include/$file" #strip DLL import/export directives
+        sed -i.bak 's/ __declspec (dllimport)//g' "$mingw_w64_x86_64_prefix/include/$file"
+      done
+    cd ..
+  fi
+}
+
 apply_ffmpeg_patch() {
  local url=$1
  local patch_name=$(basename $url)
@@ -1850,6 +1877,7 @@ find_all_build_exes() {
 
 build_ffmpeg_dependencies() {
   echo "Building ffmpeg dependency libraries..." 
+  build_pthreads
   build_dlfcn
   build_bzip2 # Bzlib (bzip2) in FFmpeg is autodetected.
   build_liblzma # Lzma in FFmpeg is autodetected. Uses dlfcn.
@@ -1904,11 +1932,13 @@ build_ffmpeg_dependencies() {
   build_vidstab
   build_libmysofa # Needed for FFmpeg's SOFAlizer filter (https://ffmpeg.org/ffmpeg-filters.html#sofalizer). Uses dlfcn.
   build_libcaca # Uses zlib and dlfcn.
-#  if [[ "$non_free" = "y" ]]; then
+  if [[ "$non_free" = "y" ]]; then
     build_fdk-aac # Uses dlfcn.
     build_libdecklink
-#  fi
-#  build_zvbi # Uses iconv, libpng and dlfcn.
+  fi
+  if [[ -f "$mingw_w64_x86_64_prefix/include/pthread.h" ]] && [[ -f "$mingw_w64_x86_64_prefix/lib/libpthread.a" ]]; then
+    build_zvbi # Uses iconv, libpng and dlfcn.
+  fi
   build_fribidi # Uses dlfcn.
   build_libass # Needs freetype >= 9.10.3 (see https://bugs.launchpad.net/ubuntu/+source/freetype1/+bug/78573 o_O) and fribidi >= 0.19.0. Uses fontconfig >= 2.10.92, iconv and dlfcn.
   build_libxavs
