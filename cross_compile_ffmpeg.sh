@@ -1650,6 +1650,33 @@ build_libMXF() {
   cd ..
 }
 
+build_pthreads() {
+  # Zeranoe 4.0.0 does not build libpthread
+  if [[ ! -f "$mingw_w64_x86_64_prefix/include/pthread.h" ]] || [[ ! -f "$mingw_w64_x86_64_prefix/lib/libpthread.a" ]]; then
+    download_and_unpack_file ftp://sourceware.org/pub/pthreads-win32/pthreads-w32-2-9-1-release.tar.gz pthreads-w32-2-9-1-release
+    cd pthreads-w32-2-9-1-release
+      # use the cross compiler binaries as gcc, windres, ar and ranlib
+      ln -s "${cross_prefix}gcc"     "$mingw_bin_path/gcc"
+      ln -s "${cross_prefix}windres" "$mingw_bin_path/windres"
+      ln -s "${cross_prefix}ar"      "$mingw_bin_path/ar"
+      ln -s "${cross_prefix}ranlib"  "$mingw_bin_path/ranlib"
+      which gcc
+      make -f GNUmakefile clean GC-static
+      rm    "$mingw_bin_path/gcc"
+      rm    "$mingw_bin_path/windres"
+      rm    "$mingw_bin_path/ar"
+      rm    "$mingw_bin_path/ranlib"
+      cp 'libpthreadGC2.a' "$mingw_w64_x86_64_prefix/lib" || exit 1
+      ln -s "$mingw_w64_x86_64_prefix/lib/libpthreadGC2.a" "$mingw_w64_x86_64_prefix/lib/libpthread.a"
+      cp 'pthread.h' 'sched.h' 'semaphore.h' "$mingw_w64_x86_64_prefix/include/" || exit 1
+      for file in 'pthread.h' 'sched.h' 'semaphore.h'; do
+        sed -i.bak 's/ __declspec (dllexport)//g' "$mingw_w64_x86_64_prefix/include/$file" #strip DLL import/export directives
+        sed -i.bak 's/ __declspec (dllimport)//g' "$mingw_w64_x86_64_prefix/include/$file"
+      done
+    cd ..
+  fi
+}
+
 apply_ffmpeg_patch() {
  local url=$1
  local patch_name=$(basename $url)
@@ -2229,6 +2256,7 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win32" ]]; then
   make_prefix_options="CC=${cross_prefix}gcc AR=${cross_prefix}ar PREFIX=$mingw_w64_x86_64_prefix RANLIB=${cross_prefix}ranlib LD=${cross_prefix}ld STRIP=${cross_prefix}strip CXX=${cross_prefix}g++"
   mkdir -p win32
   cd win32
+    build_pthreads
 #    build_ffmpeg_dependencies
     build_my_ffmpeg    
   cd ..
@@ -2247,6 +2275,7 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win64" ]]; then
   make_prefix_options="CC=${cross_prefix}gcc AR=${cross_prefix}ar PREFIX=$mingw_w64_x86_64_prefix RANLIB=${cross_prefix}ranlib LD=${cross_prefix}ld STRIP=${cross_prefix}strip CXX=${cross_prefix}g++"
   mkdir -p win64
   cd win64
+    build_pthreads
 #    build_ffmpeg_dependencies
     build_my_ffmpeg
   cd ..
