@@ -1678,6 +1678,35 @@ build_pthreads() {
   fi
 }
 
+build_libfaac() {
+  if [[ ! -f "$mingw_w64_x86_64_prefix/include/faac.h" ]] || [[ ! -f "$mingw_w64_x86_64_prefix/lib/libfaac.a" ]]; then
+    download_and_unpack_file http://downloads.sourceforge.net/faac/faac-1.28.tar.bz2 faac-1.28
+    cd faac-1.28
+      # this works without dependency on a libfaac.dll
+      if [ "$bits_target" = "32" ]; then
+        yasmflags="YASMFLAGS='-f win32' " # obsolete?
+      else
+        yasmflags="YASMFLAGS='-f win64' " # obsolete?
+      fi
+      # Use the cross compiler binaries as gcc, windres, ar and ranlib
+      # Or does it use 'cc'? Anyway, it does not harm
+      ln -s "${cross_prefix}gcc"     "$mingw_bin_path/gcc"
+      ln -s "${cross_prefix}windres" "$mingw_bin_path/windres"
+      ln -s "${cross_prefix}ar"      "$mingw_bin_path/ar"
+      ln -s "${cross_prefix}ranlib"  "$mingw_bin_path/ranlib"
+      which gcc
+      gcc --version
+      echo $yasmflags ./configure --prefix=$mingw_w64_x86_64_prefix --host=$host_target --build=$host_build --enable-static --with-frontend=no --with-mp4v2=no --disable-shared
+      $yasmflags ./configure --prefix=$mingw_w64_x86_64_prefix --host=$host_target --build=$host_build --enable-static --with-frontend=no --with-mp4v2=no --disable-shared
+      make && make install || exit 1
+      rm    "$mingw_bin_path/gcc"
+      rm    "$mingw_bin_path/windres"
+      rm    "$mingw_bin_path/ar"
+      rm    "$mingw_bin_path/ranlib"
+    cd ..
+  fi
+}
+
 apply_ffmpeg_patch() {
  local url=$1
  local patch_name=$(basename $url)
@@ -1734,6 +1763,9 @@ build_ffmpeg() {
     apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/mpegvideo_enc.patch
     apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/swscale.patch
     apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_new.patch
+
+    apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/enable_libfaac.patch
+    apply_patch file://$patch_dir/add_libfaac.diff
 
     apply_patch file://$patch_dir/frei0r_load-shared-libraries-dynamically.diff
 
@@ -2003,6 +2035,9 @@ build_my_ffmpeg() {
   apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/swscale.patch
   apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_new.patch
 
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/enable_libfaac.patch
+  apply_patch file://$patch_dir/add_libfaac.diff
+
   apply_patch file://$patch_dir/frei0r_load-shared-libraries-dynamically.diff
 
   if [ "$bits_target" = "32" ]; then
@@ -2014,7 +2049,7 @@ build_my_ffmpeg() {
   build_options="--arch=$arch --target-os=mingw32 --cross-prefix=$cross_prefix --pkg-config=pkg-config --pkg-config-flags=--static"
   config_options="$build_options --disable-w32threads --disable-doc --prefix=$mingw_w64_x86_64_prefix $extra_configure_opts" # other possibilities: --enable-w32threads --enable-libflite
   if [[ "$non_free" = "y" ]]; then
-    config_options="$config_options --enable-nonfree --enable-libfdk-aac" # --enable-libfaac -- faac deemed too poor quality and becomes the default -- add it in and uncomment the build_faac line to include it --enable-openssl --enable-libaacplus
+    config_options="$config_options --enable-nonfree --enable-libfdk-aac --enable-libfaac" # faac deemed too poor quality and becomes the default
   else
     config_options="$config_options"
   fi
@@ -2032,7 +2067,7 @@ build_my_ffmpeg() {
       fi
       config_options="$config_options --disable-w32threads"
     fi
-    config_options="$config_options --enable-gpl --enable-amf --enable-libmfx --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va --enable-libx264 --enable-nonfree --enable-libfdk-aac --disable-doc" #  -enable-libfaac
+    config_options="$config_options --enable-gpl --enable-amf --enable-libmfx --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va --enable-libx264 --enable-nonfree --enable-libfdk-aac --enable-libfaac --disable-doc"
   fi
 
   # minimal build for php_av.dll
@@ -2260,6 +2295,7 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win32" ]]; then
   echo
   echo "Starting 32-bit builds..."
   host_target='i686-w64-mingw32'
+  host_build='i686-mingw32'
   mingw_w64_x86_64_prefix="$cur_dir/cross_compilers/mingw-w64-i686/$host_target"
   mingw_bin_path="$cur_dir/cross_compilers/mingw-w64-i686/bin"
   export PKG_CONFIG_PATH="$mingw_w64_x86_64_prefix/lib/pkgconfig"
@@ -2270,6 +2306,7 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win32" ]]; then
   mkdir -p win32
   cd win32
     build_pthreads
+    build_libfaac
 #    build_ffmpeg_dependencies
 #    build_apps
     build_my_ffmpeg    
@@ -2280,6 +2317,7 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win64" ]]; then
   echo
   echo "**************Starting 64-bit builds..." # make it have a bit easier to you can see when 32 bit is done
   host_target='x86_64-w64-mingw32'
+  host_build='x86_64-mingw32'
   mingw_w64_x86_64_prefix="$cur_dir/cross_compilers/mingw-w64-x86_64/$host_target"
   mingw_bin_path="$cur_dir/cross_compilers/mingw-w64-x86_64/bin"
   export PKG_CONFIG_PATH="$mingw_w64_x86_64_prefix/lib/pkgconfig"
@@ -2290,6 +2328,7 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win64" ]]; then
   mkdir -p win64
   cd win64
     build_pthreads
+    build_libfaac
 #    build_ffmpeg_dependencies
 #    build_apps
     build_my_ffmpeg

@@ -1,0 +1,219 @@
+diff --git a/LICENSE.md b/LICENSE.md
+index ba65b059c5..fb287071d2 100644
+--- a/LICENSE.md
++++ b/LICENSE.md
+@@ -113,6 +113,8 @@ The Fraunhofer FDK AAC and OpenSSL libraries are under licenses which are
+ incompatible with the GPLv2 and v3. To the best of our knowledge, they are
+ compatible with the LGPL.
+ 
++The FAAC library is incompatible with all versions of GPL and LGPL.
++
+ The NVENC library, while its header file is licensed under the compatible MIT
+ license, requires a proprietary binary blob at run time, and is deemed to be
+ incompatible with the GPL. We are not certain if it is compatible with the
+diff --git a/configure b/configure
+index 741f56d565..8d3f56de95 100755
+--- a/configure
++++ b/configure
+@@ -228,6 +228,7 @@ External library support:
+   --enable-libcodec2       enable codec2 en/decoding using libcodec2 [no]
+   --enable-libdc1394       enable IIDC-1394 grabbing using libdc1394
+                            and libraw1394 [no]
++  --enable-libfaac         enable AAC encoding via libfaac [no]
+   --enable-libfdk-aac      enable AAC de/encoding via libfdk-aac [no]
+   --enable-libflite        enable flite (voice synthesis) support via libflite [no]
+   --enable-libfontconfig   enable libfontconfig, useful for drawtext filter [no]
+@@ -1650,6 +1651,7 @@ EXTERNAL_LIBRARY_GPL_LIST="
+ EXTERNAL_LIBRARY_NONFREE_LIST="
+     decklink
+     libndi_newtek
++    libfaac
+     libfdk_aac
+     openssl
+     libtls
+@@ -3052,6 +3054,8 @@ libaom_av1_encoder_select="extract_extradata_bsf"
+ libcelt_decoder_deps="libcelt"
+ libcodec2_decoder_deps="libcodec2"
+ libcodec2_encoder_deps="libcodec2"
++libfaac_encoder_deps="libfaac"
++libfaac_encoder_select="audio_frame_queue"
+ libfdk_aac_decoder_deps="libfdk_aac"
+ libfdk_aac_encoder_deps="libfdk_aac"
+ libfdk_aac_encoder_select="audio_frame_queue"
+@@ -6011,6 +6015,7 @@ enabled libcaca           && require_pkg_config libcaca caca caca.h caca_create_
+ enabled libcodec2         && require libcodec2 codec2/codec2.h codec2_create -lcodec2
+ enabled libdc1394         && require_pkg_config libdc1394 libdc1394-2 dc1394/dc1394.h dc1394_new
+ enabled libdrm            && require_pkg_config libdrm libdrm xf86drm.h drmGetVersion
++enabled libfaac           && require libfaac faac.h faacEncGetVersion -lfaac
+ enabled libfdk_aac        && { check_pkg_config libfdk_aac fdk-aac "fdk-aac/aacenc_lib.h" aacEncOpen ||
+                                { require libfdk_aac fdk-aac/aacenc_lib.h aacEncOpen -lfdk-aac &&
+                                  warn "using libfdk without pkg-config"; } }
+diff --git a/doc/encoders.texi b/doc/encoders.texi
+index 7b095754d1..f342b19de7 100644
+--- a/doc/encoders.texi
++++ b/doc/encoders.texi
+@@ -637,6 +637,111 @@ Sets the maximum delay in milliseconds. Lower delays than 20ms will very quickly
+ decrease quality.
+ @end table
+ 
++@anchor{libfaac}
++@section libfaac
++
++libfaac AAC (Advanced Audio Coding) encoder wrapper.
++
++This encoder is of much lower quality and is more unstable than any other AAC
++encoders, so it's highly recommended to instead use other encoders, like
++@ref{aacenc,,the native FFmpeg AAC encoder}.
++
++This encoder also requires the presence of the libfaac headers and library
++during configuration. You need to explicitly configure the build with
++@code{--enable-libfaac --enable-nonfree}.
++
++@subsection Options
++
++The following shared FFmpeg codec options are recognized.
++
++The following options are supported by the libfaac wrapper. The
++@command{faac}-equivalent of the options are listed in parentheses.
++
++@table @option
++@item b (@emph{-b})
++Set bit rate in bits/s for ABR (Average Bit Rate) mode. If the bit rate
++is not explicitly specified, it is automatically set to a suitable
++value depending on the selected profile. @command{faac} bitrate is
++expressed in kilobits/s.
++
++Note that libfaac does not support CBR (Constant Bit Rate) but only
++ABR (Average Bit Rate).
++
++If VBR mode is enabled this option is ignored.
++
++@item ar (@emph{-R})
++Set audio sampling rate (in Hz).
++
++@item ac (@emph{-c})
++Set the number of audio channels.
++
++@item cutoff (@emph{-C})
++Set cutoff frequency. If not specified (or explicitly set to 0) it
++will use a value automatically computed by the library. Default value
++is 0.
++
++@item profile
++Set audio profile.
++
++The following profiles are recognized:
++@table @samp
++@item aac_main
++Main AAC (Main)
++
++@item aac_low
++Low Complexity AAC (LC)
++
++@item aac_ssr
++Scalable Sample Rate (SSR)
++
++@item aac_ltp
++Long Term Prediction (LTP)
++@end table
++
++If not specified it is set to @samp{aac_low}.
++
++@item flags +qscale
++Set constant quality VBR (Variable Bit Rate) mode.
++
++@item global_quality
++Set quality in VBR mode as an integer number of lambda units.
++
++Only relevant when VBR mode is enabled with @code{flags +qscale}.  The
++value is converted to QP units by dividing it by @code{FF_QP2LAMBDA},
++and used to set the quality value used by libfaac. A reasonable range
++for the option value in QP units is [10-500], the higher the value the
++higher the quality.
++
++@item q (@emph{-q})
++Enable VBR mode when set to a non-negative value, and set constant
++quality value as a double floating point value in QP units.
++
++The value sets the quality value used by libfaac. A reasonable range
++for the option value is [10-500], the higher the value the higher the
++quality.
++
++This option is valid only using the @command{ffmpeg} command-line
++tool. For library interface users, use @option{global_quality}.
++@end table
++
++@subsection Examples
++
++@itemize
++@item
++Use @command{ffmpeg} to convert an audio file to ABR 128 kbps AAC in an M4A (MP4)
++container:
++@example
++ffmpeg -i input.wav -codec:a libfaac -b:a 128k -output.m4a
++@end example
++
++@item
++Use @command{ffmpeg} to convert an audio file to VBR AAC, using the
++LTP AAC profile:
++@example
++ffmpeg -i input.wav -c:a libfaac -profile:a aac_ltp -q:a 100 output.m4a
++@end example
++@end itemize
++
+ @anchor{libfdk-aac-enc}
+ @section libfdk_aac
+ 
+diff --git a/doc/general.texi b/doc/general.texi
+index 8c3a04b078..cbbf88cab1 100644
+--- a/doc/general.texi
++++ b/doc/general.texi
+@@ -981,7 +981,7 @@ following image formats are supported:
+ @item 8SVX exponential       @tab     @tab  X
+ @item 8SVX fibonacci         @tab     @tab  X
+ @item AAC                    @tab EX  @tab  X
+-    @tab encoding supported through internal encoder and external library libfdk-aac
++    @tab encoding supported through internal encoder and external libraries libfaac and libfdk-aac
+ @item AAC+                   @tab  E  @tab  IX
+     @tab encoding supported through external library libfdk-aac
+ @item AC-3                   @tab IX  @tab  IX
+diff --git a/doc/muxers.texi b/doc/muxers.texi
+index 33f1f7bbaf..66c0a3db46 100644
+--- a/doc/muxers.texi
++++ b/doc/muxers.texi
+@@ -1928,9 +1928,9 @@ ffmpeg -i in.mkv -codec copy -map 0 -f segment -segment_list out.csv -segment_fr
+ 
+ @item
+ Convert the @file{in.mkv} to TS segments using the @code{libx264}
+-and @code{aac} encoders:
++and @code{libfaac} encoders:
+ @example
+-ffmpeg -i in.mkv -map 0 -codec:v libx264 -codec:a aac -f ssegment -segment_list out.list out%03d.ts
++ffmpeg -i in.mkv -map 0 -codec:v libx264 -codec:a libfaac -f ssegment -segment_list out.list out%03d.ts
+ @end example
+ 
+ @item
+diff --git a/libavcodec/Makefile b/libavcodec/Makefile
+index e62603f0dd..a7829e4c31 100644
+--- a/libavcodec/Makefile
++++ b/libavcodec/Makefile
+@@ -946,6 +946,7 @@ OBJS-$(CONFIG_LIBAOM_AV1_ENCODER)         += libaomenc.o
+ OBJS-$(CONFIG_LIBCELT_DECODER)            += libcelt_dec.o
+ OBJS-$(CONFIG_LIBCODEC2_DECODER)          += libcodec2.o codec2utils.o
+ OBJS-$(CONFIG_LIBCODEC2_ENCODER)          += libcodec2.o codec2utils.o
++OBJS-$(CONFIG_LIBFAAC_ENCODER)            += libfaac.o
+ OBJS-$(CONFIG_LIBFDK_AAC_DECODER)         += libfdk-aacdec.o
+ OBJS-$(CONFIG_LIBFDK_AAC_ENCODER)         += libfdk-aacenc.o
+ OBJS-$(CONFIG_LIBGSM_DECODER)             += libgsmdec.o
+diff --git a/libavcodec/allcodecs.c b/libavcodec/allcodecs.c
+index 505a361fb9..188b197f85 100644
+--- a/libavcodec/allcodecs.c
++++ b/libavcodec/allcodecs.c
+@@ -668,6 +668,7 @@ extern AVCodec ff_libaom_av1_encoder;
+ extern AVCodec ff_libcelt_decoder;
+ extern AVCodec ff_libcodec2_encoder;
+ extern AVCodec ff_libcodec2_decoder;
++extern AVCodec ff_libfaac_encoder;
+ extern AVCodec ff_libfdk_aac_encoder;
+ extern AVCodec ff_libfdk_aac_decoder;
+ extern AVCodec ff_libgsm_encoder;
