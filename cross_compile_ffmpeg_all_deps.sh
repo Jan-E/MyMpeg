@@ -151,7 +151,7 @@ EOL
     if  [[ $disable_nonfree = "n" ]]; then
       non_free="y"
     else
-      yes_no_sel "Would you like to include non-free (non GPL compatible) libraries, like [libfdk_aac,decklink -- note that the internal AAC encoder is ruled almost as high a quality as fdk-aac these days]
+      yes_no_sel "Would you like to include non-free (non GPL compatible) libraries, like [libfdk_aac,libfaac,decklink -- note that the internal AAC encoder is ruled almost as high a quality as fdk-aac these days]
 The resultant binary may not be distributable, but can be useful for in-house use. Include these non-free license libraries [y/N]?" "n"
       non_free="$user_input" # save it away
     fi
@@ -704,8 +704,8 @@ build_freetype() {
 }
 
 build_libxml2() {
-  download_and_unpack_file http://xmlsoft.org/sources/libxml2-2.9.4.tar.gz libxml2-2.9.4
-  cd libxml2-2.9.4
+  download_and_unpack_file http://xmlsoft.org/sources/libxml2-2.9.8.tar.gz libxml2-2.9.8
+  cd libxml2-2.9.8
     if [[ ! -f libxml.h.bak ]]; then # Otherwise you'll get "libxml.h:...: warning: "LIBXML_STATIC" redefined". Not an error, but still.
       sed -i.bak "/NOLIBTOOL/s/.*/& \&\& !defined(LIBXML_STATIC)/" libxml.h
     fi
@@ -1733,6 +1733,9 @@ build_ffmpeg() {
     apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/swscale.patch
     apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_new.patch
 
+    apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/enable_libfaac.patch
+    apply_patch file://$patch_dir/add_libfaac.diff
+
     apply_patch file://$patch_dir/frei0r_load-shared-libraries-dynamically.diff
 
     if [ "$bits_target" = "32" ]; then
@@ -1786,7 +1789,7 @@ build_ffmpeg() {
     config_options+=" $postpend_configure_opts"
 
     if [[ "$non_free" = "y" ]]; then
-      config_options+=" --enable-nonfree --enable-decklink --enable-libfdk-aac"
+      config_options+=" --enable-nonfree --enable-decklink --enable-libfdk-aac --enable-libfaac"
       # other possible options: --enable-openssl [unneeded since we use gnutls]
     fi
 
@@ -2067,7 +2070,7 @@ while true; do
       --build-ffmpeg-shared=n  (ffmpeg.exe (with libavformat-x.dll, etc., ffplay.exe, ffprobe.exe and dll-files)
       --ffmpeg-git-checkout-version=[master] if you want to build a particular version of FFmpeg, ex: n3.1.1 or a specific git hash
       --gcc-cpu-count=[number of cpu cores set it higher than 1 if you have multiple cores and > 1GB RAM, this speeds up initial cross compiler build. FFmpeg build uses number of cores no matter what]
-      --disable-nonfree=y (set to n to include nonfree like libfdk-aac,decklink)
+      --disable-nonfree=y (set to n to include nonfree like libfdk-aac,libfaac,decklink)
       --build-intel-qsv=y (set to y to include the [non windows xp compat.] qsv library and ffmpeg module. NB this not not hevc_qsv...
       --sandbox-ok=n [skip sandbox prompt if y]
       -d [meaning \"defaults\" skip all prompts, just build ffmpeg static with some reasonable defaults like no git updates]
@@ -2179,7 +2182,7 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win64" ]]; then
   mkdir -p win64
   cd win64
     build_ffmpeg_dependencies
- #   build_apps
+#    build_apps
   cd ..
 fi
 
