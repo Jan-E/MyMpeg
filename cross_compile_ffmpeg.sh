@@ -448,8 +448,8 @@ apply_patch() {
     patch $patch_type < "$patch_name" || exit 1
     touch $patch_done_name || exit 1
     rm -f already_ran* # if it's a new patch, reset everything too, in case it's really really really new
-  #else
-    #echo "patch $patch_name already applied"
+  else
+    echo "patch $patch_name already applied"
   fi
 }
 
@@ -1650,78 +1650,6 @@ build_libMXF() {
   cd ..
 }
 
-build_pthreads() {
-  # Zeranoe 4.0.0 does not build libpthread
-  if [[ ! -f "$mingw_w64_x86_64_prefix/include/pthread.h" ]] || [[ ! -f "$mingw_w64_x86_64_prefix/lib/libpthread.a" ]]; then
-    download_and_unpack_file ftp://sourceware.org/pub/pthreads-win32/pthreads-w32-2-9-1-release.tar.gz pthreads-w32-2-9-1-release
-    cd pthreads-w32-2-9-1-release
-      # use the cross compiler binaries as gcc, windres, ar and ranlib
-      ln -s "${cross_prefix}gcc"     "$mingw_bin_path/gcc"
-      ln -s "${cross_prefix}windres" "$mingw_bin_path/windres"
-      ln -s "${cross_prefix}ar"      "$mingw_bin_path/ar"
-      ln -s "${cross_prefix}ranlib"  "$mingw_bin_path/ranlib"
-      which gcc
-      gcc --version
-      make -f GNUmakefile clean GC-static
-      rm    "$mingw_bin_path/gcc"
-      rm    "$mingw_bin_path/windres"
-      rm    "$mingw_bin_path/ar"
-      rm    "$mingw_bin_path/ranlib"
-      cp 'libpthreadGC2.a' "$mingw_w64_x86_64_prefix/lib" || exit 1
-      ln -s "$mingw_w64_x86_64_prefix/lib/libpthreadGC2.a" "$mingw_w64_x86_64_prefix/lib/libpthread.a"
-      cp 'pthread.h' 'sched.h' 'semaphore.h' "$mingw_w64_x86_64_prefix/include/" || exit 1
-      for file in 'pthread.h' 'sched.h' 'semaphore.h'; do
-        sed -i.bak 's/ __declspec (dllexport)//g' "$mingw_w64_x86_64_prefix/include/$file" #strip DLL import/export directives
-        sed -i.bak 's/ __declspec (dllimport)//g' "$mingw_w64_x86_64_prefix/include/$file"
-      done
-    cd ..
-  fi
-}
-
-build_libfaac() {
-  if [[ ! -f "$mingw_w64_x86_64_prefix/include/faac.h" ]] || [[ ! -f "$mingw_w64_x86_64_prefix/lib/libfaac.a" ]]; then
-    download_and_unpack_file http://downloads.sourceforge.net/faac/faac-1.28.tar.bz2 faac-1.28
-    cd faac-1.28
-      # this works without dependency on a libfaac.dll
-      if [ "$bits_target" = "32" ]; then
-        yasmflags="YASMFLAGS='-f win32' " # obsolete?
-      else
-        yasmflags="YASMFLAGS='-f win64' " # obsolete?
-      fi
-      # Use the cross compiler binaries as gcc, windres, ar and ranlib
-      # Or does it use 'cc'? Anyway, it does not harm
-      ln -s "${cross_prefix}gcc"     "$mingw_bin_path/gcc"
-      ln -s "${cross_prefix}windres" "$mingw_bin_path/windres"
-      ln -s "${cross_prefix}ar"      "$mingw_bin_path/ar"
-      ln -s "${cross_prefix}ranlib"  "$mingw_bin_path/ranlib"
-      which gcc
-      gcc --version
-      echo $yasmflags ./configure --prefix=$mingw_w64_x86_64_prefix --host=$host_target --build=$host_build --enable-static --with-frontend=no --with-mp4v2=no --disable-shared
-      $yasmflags ./configure --prefix=$mingw_w64_x86_64_prefix --host=$host_target --build=$host_build --enable-static --with-frontend=no --with-mp4v2=no --disable-shared
-      make && make install || exit 1
-      rm    "$mingw_bin_path/gcc"
-      rm    "$mingw_bin_path/windres"
-      rm    "$mingw_bin_path/ar"
-      rm    "$mingw_bin_path/ranlib"
-    cd ..
-  fi
-}
-
-apply_ffmpeg_patch() {
- local url=$1
- local patch_name=$(basename $url)
- local patch_done_name="$patch_name.my_patch"
- if [[ ! -e $patch_done_name ]]; then
-   wget $url || exit 1
-   echo "applying patch $patch_name"
-   patch -p1 < "$patch_name" && touch $patch_done_name && git diff > "/mnt/winshare/mympeg/ffmpeg_patches/$patch_name" \
-     || git stash
-   git commit -a -m applied
- else
-   echo "patch $patch_name already applied"
- fi
-}
-
 build_ffmpeg() {
   local extra_postpend_configure_options=$2
   if [[ -z $3 ]]; then
@@ -1756,18 +1684,11 @@ build_ffmpeg() {
 
   do_git_checkout https://github.com/FFmpeg/FFmpeg.git $output_dir $ffmpeg_git_checkout_version
   cd $output_dir
-    apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/ass_fontsize.patch
-    apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/subtitles_non_fatal.patch
-    apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/asfenc.patch
-    apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/movenc.patch
-    apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/mpegvideo_enc.patch
-    apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/swscale.patch
-    apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_new.patch
-
-    apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/enable_libfaac.patch
-    apply_patch file://$patch_dir/add_libfaac.diff
-
+    if [[ ! -f 'add-libfaac.diff.done' ]]; then
+      apply_my_ffmpeg_patches
+    fi
     apply_patch file://$patch_dir/frei0r_load-shared-libraries-dynamically.diff
+    apply_patch file://$patch_dir/built-with-on-today.diff
 
     if [ "$bits_target" = "32" ]; then
       local arch=x86
@@ -1997,6 +1918,93 @@ build_ffmpeg_dependencies() {
   build_libx264 # at bottom as it might build a ffmpeg which needs all the above deps...
 }
 
+build_pthreads() {
+  # Zeranoe 4.0.0 does not build libpthread
+  if [[ ! -f "$mingw_w64_x86_64_prefix/include/pthread.h" ]] || [[ ! -f "$mingw_w64_x86_64_prefix/lib/libpthread.a" ]]; then
+    download_and_unpack_file ftp://sourceware.org/pub/pthreads-win32/pthreads-w32-2-9-1-release.tar.gz pthreads-w32-2-9-1-release
+    cd pthreads-w32-2-9-1-release
+      # use the cross compiler binaries as gcc, windres, ar and ranlib
+      ln -s "${cross_prefix}gcc"     "$mingw_bin_path/gcc"
+      ln -s "${cross_prefix}windres" "$mingw_bin_path/windres"
+      ln -s "${cross_prefix}ar"      "$mingw_bin_path/ar"
+      ln -s "${cross_prefix}ranlib"  "$mingw_bin_path/ranlib"
+      which gcc
+      gcc --version
+      make -f GNUmakefile clean GC-static
+      rm    "$mingw_bin_path/gcc"
+      rm    "$mingw_bin_path/windres"
+      rm    "$mingw_bin_path/ar"
+      rm    "$mingw_bin_path/ranlib"
+      cp 'libpthreadGC2.a' "$mingw_w64_x86_64_prefix/lib" || exit 1
+      ln -s "$mingw_w64_x86_64_prefix/lib/libpthreadGC2.a" "$mingw_w64_x86_64_prefix/lib/libpthread.a"
+      cp 'pthread.h' 'sched.h' 'semaphore.h' "$mingw_w64_x86_64_prefix/include/" || exit 1
+      for file in 'pthread.h' 'sched.h' 'semaphore.h'; do
+        sed -i.bak 's/ __declspec (dllexport)//g' "$mingw_w64_x86_64_prefix/include/$file" #strip DLL import/export directives
+        sed -i.bak 's/ __declspec (dllimport)//g' "$mingw_w64_x86_64_prefix/include/$file"
+      done
+    cd ..
+  fi
+}
+
+build_libfaac() {
+  if [[ ! -f "$mingw_w64_x86_64_prefix/include/faac.h" ]] || [[ ! -f "$mingw_w64_x86_64_prefix/lib/libfaac.a" ]]; then
+    rm -rf faac-1.28
+    download_and_unpack_file http://downloads.sourceforge.net/faac/faac-1.28.tar.bz2 faac-1.28
+    cd faac-1.28
+      # this works without dependency on a libfaac.dll
+      # add #include <string.h> in libfaac/bitstream.c
+      apply_patch file://$patch_dir/libfaac-bitstream.diff
+      if [ "$bits_target" = "32" ]; then
+        yasmflags="-f win32" # obsolete?
+      else
+        yasmflags="-f win64" # obsolete?
+      fi
+      # Use the cross compiler binaries as gcc, windres, ar and ranlib
+      ln -s "${cross_prefix}gcc"     "$mingw_bin_path/gcc"
+      ln -s "${cross_prefix}windres" "$mingw_bin_path/windres"
+      ln -s "${cross_prefix}ar"      "$mingw_bin_path/ar"
+      ln -s "${cross_prefix}ranlib"  "$mingw_bin_path/ranlib"
+      echo YASMFLAGS=\"$yasmflags\" ./configure --prefix=$mingw_w64_x86_64_prefix --host=$host_target --build=$host_build --enable-static --with-frontend=no --with-mp4v2=no --enable-shared=no
+      YASMFLAGS=\"$yasmflags\" ./configure --prefix=$mingw_w64_x86_64_prefix --host=$host_target --build=$host_build --enable-static --with-frontend=no --with-mp4v2=no --enable-shared=no
+      make && make install || exit 1
+      rm    "$mingw_bin_path/gcc"
+      rm    "$mingw_bin_path/windres"
+      rm    "$mingw_bin_path/ar"
+      rm    "$mingw_bin_path/ranlib"
+    cd ..
+  fi
+}
+
+apply_ffmpeg_patch() {
+ local url=$1
+ local patch_name=$(basename $url)
+ local patch_done_name="$patch_name.my_patch"
+ if [[ ! -e $patch_done_name ]]; then
+   wget $url || exit 1
+   echo "applying patch $patch_name"
+   patch -p1 < "$patch_name" && touch $patch_done_name && git diff > "/mnt/winshare/mympeg/ffmpeg_patches/$patch_name" \
+     || git stash
+   git commit -a -m applied
+ else
+   echo "patch $patch_name already applied"
+ fi
+}
+
+apply_my_ffmpeg_patches() {
+  git stash
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/ass_fontsize.patch
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/subtitles_non_fatal.patch
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/asfenc.patch
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/movenc.patch
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/mpegvideo_enc.patch
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/swscale.patch
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_new.patch
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/enable_libfaac.patch
+  # back to FFmpeg's original revision
+  git reset HEAD~8
+  apply_patch file://$patch_dir/add-libfaac.diff
+}
+
 build_my_ffmpeg() {
   local type="ffmpeg"
   local shared=$build_ffmpeg_shared
@@ -2010,9 +2018,8 @@ build_my_ffmpeg() {
   if [[ $shared = "shared" ]] || [[ $shared = "minimal" ]] ; then
     output_dir=${output_dir}_shared
     rm -rf ${output_dir}
-    # d6af706 = latest avcodec-55.dll
-    do_git_checkout $git_url ${output_dir} # d6af706
-    # download_and_unpack_file $download_url ${output_dir}
+    # 0bb5cd8c4d = for benchmarking
+    do_git_checkout $git_url ${output_dir} # 0bb5cd8c4d
 
     final_install_dir=`pwd`/${output_dir}.installed
     rm -rf $final_install_dir
@@ -2020,25 +2027,18 @@ build_my_ffmpeg() {
     # avoid installing this to system
     extra_configure_opts="$extra_configure_opts --prefix=$final_install_dir"
   else
+    output_dir="ffmpeg"
     rm -rf ${output_dir}
-    # do_git_checkout $git_url $output_dir
-    output_dir="ffmpeg" && download_and_unpack_file $download_url ${output_dir}
+    download_and_unpack_file $download_url ${output_dir}
     extra_configure_opts="--enable-static --disable-shared $extra_configure_opts"
   fi
   cd ${output_dir}
 
-  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/ass_fontsize.patch
-  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/subtitles_non_fatal.patch
-  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/asfenc.patch
-  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/movenc.patch
-  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/mpegvideo_enc.patch
-  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/swscale.patch
-  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_new.patch
-
-  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/enable_libfaac.patch
-  apply_patch file://$patch_dir/add_libfaac.diff
-
+  if [[ ! -f 'add-libfaac.diff.done' ]]; then
+    apply_my_ffmpeg_patches
+  fi
   apply_patch file://$patch_dir/frei0r_load-shared-libraries-dynamically.diff
+  apply_patch file://$patch_dir/built-with-on-today.diff
 
   if [ "$bits_target" = "32" ]; then
     local arch=x86
@@ -2095,6 +2095,7 @@ build_my_ffmpeg() {
 
   sed -i -e 's/require_pkg_config libmodplug libmodplug\/modplug\.h ModPlug_Load/require libmodplug libmodplug\/modplug\.h ModPlug_Load -lmodplug/' configure
   do_configure "$config_options"
+
   rm -f */*.a */*.dll *.exe # just in case some dependency library has changed, force it to re-link even if the ffmpeg source hasn't changed...
   rm already_ran_make*
   echo "doing ffmpeg make $(pwd)"

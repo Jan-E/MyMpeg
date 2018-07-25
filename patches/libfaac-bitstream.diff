@@ -1,0 +1,11 @@
+diff -u libfaac/bitstream.c libfaac/bitstream.c
+--- libfaac/bitstream.c	2007-06-05 20:59:47.000000000 +0200
++++ libfaac/bitstream.c	2018-07-25 02:19:14.961252800 +0200
+@@ -29,6 +29,7 @@
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <string.h>
+ 
+ #include "coder.h"
+ #include "channels.h"
