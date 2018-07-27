@@ -2012,7 +2012,15 @@ build_my_ffmpeg() {
   local output_dir="ffmpeg_git"
   local download_url="http://ffmpeg.org/releases/ffmpeg-snapshot-git.tar.bz2"
 
-  local extra_configure_opts="--enable-gpl --enable-version3 --enable-bzlib --enable-amf --enable-libmfx --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va --enable-fontconfig --enable-frei0r --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwebp --enable-amf --enable-libmfx --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va --enable-avisynth --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DLIBTWOLAME_STATIC --extra-cflags=-DMODPLUG_STATIC --extra-cflags=-DCACA_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng --extra-libs=-lm"
+  if [ "$bits_target" = "32" ]; then
+    local arch=x86
+    local arch_opts="--disable-libmfx"
+  else
+    local arch=x86_64
+    local arch_opts="--enable-libmfx"
+  fi
+
+  local extra_configure_opts="--enable-gpl --enable-version3 --enable-bzlib --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va $arch_opts --enable-fontconfig --enable-frei0r --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwebp --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va --enable-avisynth $arch_opts --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DLIBTWOLAME_STATIC --extra-cflags=-DMODPLUG_STATIC --extra-cflags=-DCACA_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng --extra-libs=-lm"
 
   # can't mix and match --enable-static --enable-shared unfortunately, or the final executable seems to just use shared if the're both present
   if [[ $shared = "shared" ]] || [[ $shared = "minimal" ]] ; then
@@ -2067,12 +2075,12 @@ build_my_ffmpeg() {
       fi
       config_options="$config_options --disable-w32threads"
     fi
-    config_options="$config_options --enable-gpl --enable-amf --enable-libmfx --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va --enable-libx264 --enable-nonfree --enable-libfdk-aac --enable-libfaac --disable-doc"
+    config_options="$config_options --enable-gpl --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va $arch_opts --enable-libx264 --enable-nonfree --enable-libfdk-aac --enable-libfaac --disable-doc"
   fi
 
   # minimal build for php_av.dll
   if [[ $shared = "minimal" ]]; then
-    config_options="$build_options --enable-shared --disable-static --disable-w32threads --enable-gpl --enable-amf --enable-libmfx --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va --disable-doc"
+    config_options="$build_options --enable-shared --disable-static --disable-w32threads --enable-gpl --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va $arch_opts --disable-doc"
     # avoid installing this to system
     cd ..
     final_install_dir=`pwd`/${output_dir}.installed
@@ -2095,6 +2103,11 @@ build_my_ffmpeg() {
 
   sed -i -e 's/require_pkg_config libmodplug libmodplug\/modplug\.h ModPlug_Load/require libmodplug libmodplug\/modplug\.h ModPlug_Load -lmodplug/' configure
   do_configure "$config_options"
+  if [ "$bits_target" = "32" ]; then
+    sed -i -e 's/#define HAVE_BCRYPT 1/#define HAVE_BCRYPT 0/' config.h
+    sed -i -e 's/-lbcrypt//' libavutil/libavutil.pc
+    sed -i -e 's/-lbcrypt//' $mingw_w64_x86_64_prefix/lib/pkgconfig/libavutil.pc
+  fi
 
   rm -f */*.a */*.dll *.exe # just in case some dependency library has changed, force it to re-link even if the ffmpeg source hasn't changed...
   rm already_ran_make*

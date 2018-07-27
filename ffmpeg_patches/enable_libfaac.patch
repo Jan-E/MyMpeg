@@ -12,7 +12,7 @@ index ba65b059c5..fb287071d2 100644
  license, requires a proprietary binary blob at run time, and is deemed to be
  incompatible with the GPL. We are not certain if it is compatible with the
 diff --git a/configure b/configure
-index 741f56d565..8d3f56de95 100755
+index d509f74e1a..ad8426f29e 100755
 --- a/configure
 +++ b/configure
 @@ -228,6 +228,7 @@ External library support:
@@ -40,7 +40,7 @@ index 741f56d565..8d3f56de95 100755
  libfdk_aac_decoder_deps="libfdk_aac"
  libfdk_aac_encoder_deps="libfdk_aac"
  libfdk_aac_encoder_select="audio_frame_queue"
-@@ -6011,6 +6015,7 @@ enabled libcaca           && require_pkg_config libcaca caca caca.h caca_create_
+@@ -6013,6 +6017,7 @@ enabled libcaca           && require_pkg_config libcaca caca caca.h caca_create_
  enabled libcodec2         && require libcodec2 codec2/codec2.h codec2_create -lcodec2
  enabled libdc1394         && require_pkg_config libdc1394 libdc1394-2 dc1394/dc1394.h dc1394_new
  enabled libdrm            && require_pkg_config libdrm libdrm xf86drm.h drmGetVersion
