@@ -12,18 +12,18 @@ index ba65b059c5..fb287071d2 100644
  license, requires a proprietary binary blob at run time, and is deemed to be
  incompatible with the GPL. We are not certain if it is compatible with the
 diff --git a/configure b/configure
-index d509f74e1a..ad8426f29e 100755
+index f57ef1844b..d1447a834d 100755
 --- a/configure
 +++ b/configure
-@@ -228,6 +228,7 @@ External library support:
-   --enable-libcodec2       enable codec2 en/decoding using libcodec2 [no]
+@@ -229,6 +229,7 @@ External library support:
+   --enable-libdavs2        enable AVS2 decoding via libdavs2 [no]
    --enable-libdc1394       enable IIDC-1394 grabbing using libdc1394
                             and libraw1394 [no]
 +  --enable-libfaac         enable AAC encoding via libfaac [no]
    --enable-libfdk-aac      enable AAC de/encoding via libfdk-aac [no]
    --enable-libflite        enable flite (voice synthesis) support via libflite [no]
    --enable-libfontconfig   enable libfontconfig, useful for drawtext filter [no]
-@@ -1650,6 +1651,7 @@ EXTERNAL_LIBRARY_GPL_LIST="
+@@ -1652,6 +1653,7 @@ EXTERNAL_LIBRARY_GPL_LIST="
  EXTERNAL_LIBRARY_NONFREE_LIST="
      decklink
      libndi_newtek
@@ -31,23 +31,23 @@ index d509f74e1a..ad8426f29e 100755
      libfdk_aac
      openssl
      libtls
-@@ -3052,6 +3054,8 @@ libaom_av1_encoder_select="extract_extradata_bsf"
- libcelt_decoder_deps="libcelt"
- libcodec2_decoder_deps="libcodec2"
- libcodec2_encoder_deps="libcodec2"
+@@ -3021,6 +3023,8 @@ avisynth_demuxer_deps="avisynth"
+ avisynth_demuxer_select="riffdec"
+ eac3_at_decoder_deps="audiotoolbox"
+ eac3_at_decoder_select="ac3_parser"
 +libfaac_encoder_deps="libfaac"
 +libfaac_encoder_select="audio_frame_queue"
- libfdk_aac_decoder_deps="libfdk_aac"
- libfdk_aac_encoder_deps="libfdk_aac"
- libfdk_aac_encoder_select="audio_frame_queue"
-@@ -6013,6 +6017,7 @@ enabled libcaca           && require_pkg_config libcaca caca caca.h caca_create_
- enabled libcodec2         && require libcodec2 codec2/codec2.h codec2_create -lcodec2
- enabled libdc1394         && require_pkg_config libdc1394 libdc1394-2 dc1394/dc1394.h dc1394_new
- enabled libdrm            && require_pkg_config libdrm libdrm xf86drm.h drmGetVersion
+ gsm_ms_at_decoder_deps="audiotoolbox"
+ ilbc_at_decoder_deps="audiotoolbox"
+ mp1_at_decoder_deps="audiotoolbox"
+@@ -6026,6 +6030,7 @@ enabled fontconfig        && enable libfontconfig
+ enabled libfontconfig     && require_pkg_config libfontconfig fontconfig "fontconfig/fontconfig.h" FcInit
+ enabled libfreetype       && require_pkg_config libfreetype freetype2 "ft2build.h FT_FREETYPE_H" FT_Init_FreeType
+ enabled libfribidi        && require_pkg_config libfribidi fribidi fribidi.h fribidi_version_info
 +enabled libfaac           && require libfaac faac.h faacEncGetVersion -lfaac
- enabled libfdk_aac        && { check_pkg_config libfdk_aac fdk-aac "fdk-aac/aacenc_lib.h" aacEncOpen ||
-                                { require libfdk_aac fdk-aac/aacenc_lib.h aacEncOpen -lfdk-aac &&
-                                  warn "using libfdk without pkg-config"; } }
+ enabled libgme            && { check_pkg_config libgme libgme gme/gme.h gme_new_emu ||
+                                require libgme gme/gme.h gme_new_emu -lgme -lstdc++; }
+ enabled libgsm            && { for gsm_hdr in "gsm.h" "gsm/gsm.h"; do
 diff --git a/doc/encoders.texi b/doc/encoders.texi
 index 7b095754d1..f342b19de7 100644
 --- a/doc/encoders.texi
@@ -165,10 +165,10 @@ index 7b095754d1..f342b19de7 100644
  @section libfdk_aac
  
 diff --git a/doc/general.texi b/doc/general.texi
-index 8c3a04b078..cbbf88cab1 100644
+index cd725bb51d..3fbc4d96c1 100644
 --- a/doc/general.texi
 +++ b/doc/general.texi
-@@ -981,7 +981,7 @@ following image formats are supported:
+@@ -995,7 +995,7 @@ following image formats are supported:
  @item 8SVX exponential       @tab     @tab  X
  @item 8SVX fibonacci         @tab     @tab  X
  @item AAC                    @tab EX  @tab  X
@@ -194,26 +194,26 @@ index 33f1f7bbaf..66c0a3db46 100644
  
  @item
 diff --git a/libavcodec/Makefile b/libavcodec/Makefile
-index e62603f0dd..a7829e4c31 100644
+index 6e40702947..9db2bc2239 100644
 --- a/libavcodec/Makefile
 +++ b/libavcodec/Makefile
-@@ -946,6 +946,7 @@ OBJS-$(CONFIG_LIBAOM_AV1_ENCODER)         += libaomenc.o
- OBJS-$(CONFIG_LIBCELT_DECODER)            += libcelt_dec.o
- OBJS-$(CONFIG_LIBCODEC2_DECODER)          += libcodec2.o codec2utils.o
- OBJS-$(CONFIG_LIBCODEC2_ENCODER)          += libcodec2.o codec2utils.o
+@@ -927,6 +927,7 @@ OBJS-$(CONFIG_ADPCM_IMA_QT_AT_DECODER)    += audiotoolboxdec.o
+ OBJS-$(CONFIG_ALAC_AT_DECODER)            += audiotoolboxdec.o
+ OBJS-$(CONFIG_AMR_NB_AT_DECODER)          += audiotoolboxdec.o
+ OBJS-$(CONFIG_EAC3_AT_DECODER)            += audiotoolboxdec.o
 +OBJS-$(CONFIG_LIBFAAC_ENCODER)            += libfaac.o
- OBJS-$(CONFIG_LIBFDK_AAC_DECODER)         += libfdk-aacdec.o
- OBJS-$(CONFIG_LIBFDK_AAC_ENCODER)         += libfdk-aacenc.o
- OBJS-$(CONFIG_LIBGSM_DECODER)             += libgsmdec.o
+ OBJS-$(CONFIG_GSM_MS_AT_DECODER)          += audiotoolboxdec.o
+ OBJS-$(CONFIG_ILBC_AT_DECODER)            += audiotoolboxdec.o
+ OBJS-$(CONFIG_MP1_AT_DECODER)             += audiotoolboxdec.o
 diff --git a/libavcodec/allcodecs.c b/libavcodec/allcodecs.c
-index 505a361fb9..188b197f85 100644
+index ab3ec04251..0d84952999 100644
 --- a/libavcodec/allcodecs.c
 +++ b/libavcodec/allcodecs.c
-@@ -668,6 +668,7 @@ extern AVCodec ff_libaom_av1_encoder;
- extern AVCodec ff_libcelt_decoder;
- extern AVCodec ff_libcodec2_encoder;
- extern AVCodec ff_libcodec2_decoder;
+@@ -651,6 +651,7 @@ extern AVCodec ff_alac_at_encoder;
+ extern AVCodec ff_alac_at_decoder;
+ extern AVCodec ff_amr_nb_at_decoder;
+ extern AVCodec ff_eac3_at_decoder;
 +extern AVCodec ff_libfaac_encoder;
- extern AVCodec ff_libfdk_aac_encoder;
- extern AVCodec ff_libfdk_aac_decoder;
- extern AVCodec ff_libgsm_encoder;
+ extern AVCodec ff_gsm_ms_at_decoder;
+ extern AVCodec ff_ilbc_at_encoder;
+ extern AVCodec ff_ilbc_at_decoder;
