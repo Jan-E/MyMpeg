@@ -2104,9 +2104,12 @@ build_my_ffmpeg() {
   sed -i -e 's/require_pkg_config libmodplug libmodplug\/modplug\.h ModPlug_Load/require libmodplug libmodplug\/modplug\.h ModPlug_Load -lmodplug/' configure
   do_configure "$config_options"
   if [ "$bits_target" = "32" ]; then
+    // #define HAVE_BCRYPT 0
     sed -i -e 's/#define HAVE_BCRYPT 1/#define HAVE_BCRYPT 0/' config.h
-    sed -i -e 's/-lbcrypt//' libavutil/libavutil.pc
+    sed -i -e 's/-lbcrypt//' ffbuild/config.sh
+    sed -i -e 's/-lbcrypt//' ffbuild/config.mak
     sed -i -e 's/-lbcrypt//' $mingw_w64_x86_64_prefix/lib/pkgconfig/libavutil.pc
+    sed -i -e 's/-lbcrypt//' libavutil/libavutil.pc # might not exist yet, but better safe than sorry
   fi
 
   rm -f */*.a */*.dll *.exe # just in case some dependency library has changed, force it to re-link even if the ffmpeg source hasn't changed...

@@ -12,7 +12,7 @@ index ba65b059c5..fb287071d2 100644
  license, requires a proprietary binary blob at run time, and is deemed to be
  incompatible with the GPL. We are not certain if it is compatible with the
 diff --git a/configure b/configure
-index f57ef1844b..d1447a834d 100755
+index 7e3121ead9..6d35193ac9 100755
 --- a/configure
 +++ b/configure
 @@ -229,6 +229,7 @@ External library support:
