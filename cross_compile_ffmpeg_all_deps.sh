@@ -591,7 +591,7 @@ build_sdl2() {
       sed -i.bak "s/ -mwindows//" configure # Allow ffmpeg to output anything to console.
     fi
     export CFLAGS=-DDECLSPEC=  # avoid SDL trac tickets 939 and 282 [broken shared builds], and not worried about optimizing yet...
-generic_configure "--bindir=$mingw_bin_path"
+    generic_configure "--bindir=$mingw_bin_path"
     do_make_and_make_install
     if [[ ! -f $mingw_bin_path/$host_target-sdl2-config ]]; then
       mv "$mingw_bin_path/sdl2-config" "$mingw_bin_path/$host_target-sdl2-config" # At the moment FFmpeg's 'configure' doesn't use 'sdl2-config', because it gives priority to 'sdl2.pc', but when it does, it expects 'i686-w64-mingw32-sdl2-config' in 'cross_compilers/mingw-w64-i686/bin'.
@@ -744,6 +744,207 @@ build_libnettle() {
   cd ..
 }
 
+build_librtmp() {
+  #  download_and_unpack_file http://rtmpdump.mplayerhq.hu/download/rtmpdump-2.3.tgz rtmpdump-2.3 # has some odd configure failure
+  #  cd rtmpdump-2.3/librtmp
+
+  do_git_checkout git://git.ffmpeg.org/rtmpdump rtmpdump_git a1900c3
+  cd rtmpdump_git/librtmp
+      # patch RTMP_GetTime() to return always 0
+      bash
+      do_make_install "CRYPTO=OPENSSL OPT=-O2 CROSS_COMPILE=$cross_prefix SHARED=no prefix=$mingw_w64_x86_64_prefix"
+      sed -i 's/-lrtmp -lz/-lrtmp -lwinmm -lws2_32 -lz/' "$PKG_CONFIG_PATH/librtmp.pc"
+    cd ..
+  cd ..
+}
+
+build_libssh2() {
+  download_and_unpack_file https://github.com/libssh2/libssh2/releases/download/libssh2-1.8.0/libssh2-1.8.0.tar.gz libssh2-1.8.0
+  cd libssh2-1.8.0
+    echo remove line with ENGINE_load_builtin_engines in src/openssl.h - unresolved
+    bash
+    do_cmake_and_install "-DBUILD_SHARED_LIBS=0 -DBUILD_EXAMPLES=OFF -DBUILD_TESTING=OFF -DCRYPTO_BACKEND=OpenSSL"
+  cd ..
+}
+
+build_libssh() {
+  libssh_version_branch="0.7"
+  libssh_version="0.7.5"
+  # download_and_unpack_file http://sources.openelec.tv/mirror/libssh/libssh-$libssh_version.tar.xz libssh-$libssh_version
+  download_and_unpack_file https://www.libssh.org/files/$libssh_version_branch/libssh-$libssh_version.tar.xz libssh-$libssh_version
+  cd libssh-$libssh_version
+    local touch_name=$(get_small_touchfile_name already_ran_cmake)
+
+    if [ ! -f $touch_name ]; then
+      local cur_dir2=$(pwd)
+      sed -i 's/add_subdirectory(doc.*)//g' CMakeLists.txt
+      mkdir build
+      cd build
+        # use the cross compiler binaries as gcc, windres, ar and ranlib
+        ln -s "${cross_prefix}gcc"     "$mingw_bin_path/gcc"
+        ln -s "${cross_prefix}g++"     "$mingw_bin_path/g++"
+        ln -s "${cross_prefix}windres" "$mingw_bin_path/windres"
+        ln -s "${cross_prefix}ar"      "$mingw_bin_path/ar"
+        ln -s "${cross_prefix}ranlib"  "$mingw_bin_path/ranlib"
+        which gcc
+        gcc --version
+        echo cmake .. -DWITH_STATIC_LIB=1 -DLIBSSH_THREADS=1 -DWITH_SERVER=0 -DWITH_PCAP=0 -DWITH_EXAMPLES=0 -DOPENSSL_ROOT_DIR=$mingw_w64_x86_64_prefix -DOPENSSL_INCLUDE_DIR=$mingw_w64_x86_64_prefix/../include -DCMAKE_INSTALL_PREFIX=$mingw_w64_x86_64_prefix
+        cmake      .. -DWITH_STATIC_LIB=1 -DLIBSSH_THREADS=1 -DWITH_SERVER=0 -DWITH_PCAP=0 -DWITH_EXAMPLES=0 -DOPENSSL_ROOT_DIR=$mingw_w64_x86_64_prefix -DOPENSSL_INCLUDE_DIR=$mingw_w64_x86_64_prefix/../include -DCMAKE_INSTALL_PREFIX=$mingw_w64_x86_64_prefix
+
+        # libssh 7.5.0
+        # -- Looking for openssl/des.h
+        # -- Looking for openssl/des.h - found
+        # -- Looking for openssl/aes.h
+        # -- Looking for openssl/aes.h - found
+        # -- Looking for openssl/blowfish.h
+        # -- Looking for openssl/blowfish.h - found
+        # -- Looking for openssl/ecdh.h
+        # -- Looking for openssl/ecdh.h - found
+        # -- Looking for openssl/ec.h
+        # -- Looking for openssl/ec.h - found
+        # -- Looking for openssl/ecdsa.h
+        # -- Looking for openssl/ecdsa.h - found
+
+        # -- Threads_FOUND=TRUE
+        # -- threads library: Threads_FOUND=TRUE
+        # -- libssh_threads_SRCS=pthread.c
+        # -- ********************************************
+        # -- ********** libssh build options : **********
+        # -- zlib support: ON
+        # -- libgcrypt support: OFF
+        # -- libnacl support: OFF
+        # -- SSH-1 support: OFF
+        # -- SFTP support: ON
+        # -- Server support : 0
+        # -- GSSAPI support : 0
+        # -- Pcap debugging support : 0
+        # -- With static library: 1
+        # -- Unit testing: OFF
+        # -- Client code Unit testing: OFF
+        # -- Public API documentation generation
+        # -- Benchmarks: OFF
+        # -- ********************************************
+
+        make clean
+	make ssh_static
+	make ssh_threads_static
+
+	mkdir                                        $mingw_w64_x86_64_prefix/include/libssh
+	chmod      755                               $mingw_w64_x86_64_prefix/include/libssh
+        install -m 644 ../include/libssh/callbacks.h $mingw_w64_x86_64_prefix/include/libssh/callbacks.h
+        install -m 644 ../include/libssh/libssh.h    $mingw_w64_x86_64_prefix/include/libssh/libssh.h
+        install -m 644 ../include/libssh/ssh2.h      $mingw_w64_x86_64_prefix/include/libssh/ssh2.h
+        install -m 644 ../include/libssh/legacy.h    $mingw_w64_x86_64_prefix/include/libssh/legacy.h
+        install -m 644 ../include/libssh/sftp.h      $mingw_w64_x86_64_prefix/include/libssh/sftp.h
+        install -m 644 src/libssh.a                  $mingw_w64_x86_64_prefix/lib/libssh.a
+        install -m 644 libssh.pc                     $mingw_w64_x86_64_prefix/lib/pkgconfig/libssh.pc
+        install -m 644 src/threads/libssh_threads.a  $mingw_w64_x86_64_prefix/lib/libssh_threads.a
+        install -m 644 libssh_threads.pc             $mingw_w64_x86_64_prefix/lib/pkgconfig/libssh_threads.pc
+
+        rm    "$mingw_bin_path/gcc"
+        rm    "$mingw_bin_path/g++"
+        rm    "$mingw_bin_path/windres"
+        rm    "$mingw_bin_path/ar"
+        rm    "$mingw_bin_path/ranlib"
+      cd ..
+      touch $touch_name
+    fi
+
+  cd ..
+}
+
+build_libgcrypt() {
+  download_and_unpack_file https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.3.tar.bz2 libgcrypt-1.8.3
+  cd libgcrypt-1.8.3
+    generic_configure_make_install
+  cd ..
+}
+
+build_nghttp2() {
+  do_git_checkout https://github.com/nghttp2/nghttp2.git nghttp2
+  cd nghttp2
+    local touch_name=$(get_small_touchfile_name already_ran_cmake)
+    if [ ! -f lib/libnghttp2.a ]; then
+      cd lib
+	rm CMakeCache.txt
+	rm -rf CMakeFiles
+	git stash
+	patch -p1 < ~/patches/nghttp2_static_export.patch
+	# 5 times __declspec(dllexport) in includes/nghttp2/nghttp2.h
+	#
+	# jan@box:~/sandbox/win32/nghttp2$ grep -R _nghttp2_session_want_write *
+	# Binary file lib/libnghttp2.dll.a matches
+	# Binary file lib/CMakeFiles/nghttp2.dir/nghttp2_session.c.obj matches
+	# Binary file lib/CMakeFiles/nghttp2.dir/objects.a matches
+	# Binary file lib/libnghttp2.dll matches
+	# Binary file lib/libnghttp2.a matches
+        do_cmake "-DENABLE_STATIC_LIB=1 -DNGHTTP2_STATICLIB=1 -DCMAKE_INSTALL_LIBDIR=$mingw_w64_x86_64_prefix/lib -Wno-dev"
+        # use the cross compiler binaries as gcc, windres, ar and ranlib
+        ln -s "${cross_prefix}gcc"     "$mingw_bin_path/gcc"
+        ln -s "${cross_prefix}g++"     "$mingw_bin_path/g++"
+        ln -s "${cross_prefix}windres" "$mingw_bin_path/windres"
+        ln -s "${cross_prefix}ar"      "$mingw_bin_path/ar"
+        ln -s "${cross_prefix}ranlib"  "$mingw_bin_path/ranlib"
+	export prefix=$mingw_w64_x86_64_prefix
+	export cross=${cross_prefix}
+        echo cmake . -DENABLE_STATIC_LIB=1 -DNGHTTP2_STATICLIB=1 -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_INSTALL_PREFIX=$mingw_w64_x86_64_prefix -DCMAKE_INSTALL_LIBDIR=$mingw_w64_x86_64_prefix/lib
+        rm    "$mingw_bin_path/gcc"
+        rm    "$mingw_bin_path/g++"
+        rm    "$mingw_bin_path/windres"
+        rm    "$mingw_bin_path/ar"
+        rm    "$mingw_bin_path/ranlib"
+        grep AC_INIT ../configure.ac | cut -d'[' -f3 | sed -e 's/], //g' -e 's/1/export nghttp2ver=1/g'
+      cd ..
+      do_cmake_and_install
+      echo "-- Installing: $mingw_w64_x86_64_prefix/lib/libnghttp2.a"
+      install -m 644 lib/libnghttp2.a $mingw_w64_x86_64_prefix/lib/libnghttp2.a
+    fi
+    strip $mingw_w64_x86_64_prefix/lib/libnghttp2.dll
+  cd ..
+}
+
+build_curl_cmake() {
+  download_and_unpack_file https://curl.haxx.se/download/curl-7.61.0.tar.gz curl-7.61.0
+  cd curl-7.61.0
+    echo apply ~/MyMpeg/patches/curl_winsock.patch and ~/MyMpeg/patches/curl_sftp_buffer.patch
+    echo "add #define USE_LIBRTMP 1 to lib/curl_config.h"
+    bash
+    do_cmake "-DCURL_STATICLIB=ON -DCMAKE_USE_LIBSSH2=1 -DCMAKE_USE_OPENSSL=1 -DUSE_LIBRTMP=1 -DUSE_NGHTTP2=0"
+    # -- Enabled features: OpenSSL IPv6 libz AsynchDNS NTLM
+    # -- Enabled protocols: DICT FILE FTP FTPS GOPHER HTTP HTTPS IMAP IMAPS LDAP POP3 POP3S RTMP RTSP SCP SFTP SMTP SMTPS TELNET TFTP
+    echo add -lrtmp -lws2_32 at the end of src/CMakeFiles/curl.dir/linklibs.rsp
+    make Makefile clean
+    bash
+    make || make -f src/CMakeFiles/curl.dir/build.make src/CMakeFiles/curl.dir/build
+  cd ..
+}
+
+build_curl() {
+  download_and_unpack_file https://curl.haxx.se/download/curl-7.61.0.tar.gz curl-7.61.0
+  cd curl-7.61.0
+    echo apply ~/MyMpeg/patches/curl_winsock.patch and ~/MyMpeg/patches/curl_sftp_buffer.patch
+        # use the cross compiler binaries as gcc, windres, ar and ranlib
+        ln -s "${cross_prefix}gcc"     "$mingw_bin_path/gcc"
+        ln -s "${cross_prefix}g++"     "$mingw_bin_path/g++"
+        ln -s "${cross_prefix}windres" "$mingw_bin_path/windres"
+        ln -s "${cross_prefix}ar"      "$mingw_bin_path/ar"
+        ln -s "${cross_prefix}ranlib"  "$mingw_bin_path/ranlib"
+	export prefix=$mingw_w64_x86_64_prefix
+	export cross=${cross_prefix}
+	./configure      --prefix=$mingw_w64_x86_64_prefix --host=$host_target --enable-shared=no --with-libssh2 --with-nghttp2 --with-winidn --enable-sspi
+	echo ./configure --prefix=$mingw_w64_x86_64_prefix --host=$host_target --enable-shared=no --with-libssh2 --with-nghttp2 --with-winidn --enable-sspi
+	# link the static libnghttp2
+	cp $mingw_w64_x86_64_prefix/lib/libnghttp2.a $mingw_w64_x86_64_prefix/lib/libnghttp2.dll.a
+        make
+	strip src/curl.exe
+        rm    "$mingw_bin_path/gcc"
+        rm    "$mingw_bin_path/g++"
+        rm    "$mingw_bin_path/windres"
+        rm    "$mingw_bin_path/ar"
+        rm    "$mingw_bin_path/ranlib"
+  cd ..
+}
+
 build_gnutls() {
   download_and_unpack_file https://www.gnupg.org/ftp/gcrypt/gnutls/v3.5/gnutls-3.5.18.tar.xz
   cd gnutls-3.5.18
@@ -761,8 +962,9 @@ build_gnutls() {
 }
 
 build_openssl-1.0.2() {
-  download_and_unpack_file https://www.openssl.org/source/openssl-1.0.2l.tar.gz
-  cd openssl-1.0.2l
+  rd -tf openssl-1.0.2o
+  download_and_unpack_file https://www.openssl.org/source/openssl-1.0.2p.tar.gz
+  cd openssl-1.0.2p
     apply_patch file://$patch_dir/openssl-1.0.2l_lib-only.diff
     export CC="${cross_prefix}gcc"
     export AR="${cross_prefix}ar"
@@ -1918,7 +2120,7 @@ build_ffmpeg_dependencies() {
   build_libnettle # Needs gmp >= 3.0. Uses dlfcn.
   build_gnutls # Needs nettle >= 3.1, hogweed (nettle) >= 3.1. Uses zlib and dlfcn.
   #if [[ "$non_free" = "y" ]]; then
-  #  build_openssl-1.0.2 # Nonfree alternative to GnuTLS. 'build_openssl-1.0.2 "dllonly"' to build shared libraries only.
+    build_openssl-1.0.2 # Nonfree alternative to GnuTLS. 'build_openssl-1.0.2 "dllonly"' to build shared libraries only.
   #  build_openssl-1.1.0 # Nonfree alternative to GnuTLS. Can't be used with LibRTMP. 'build_openssl-1.1.0 "dllonly"' to build shared libraries only.
   #fi
   build_libogg # Uses dlfcn.
@@ -1963,6 +2165,12 @@ build_ffmpeg_dependencies() {
   build_libx265
   build_libopenh264
   build_libaom
+#  build_librtmp
+#  build_libssh2
+  build_libssh
+#  build_libgcrypt
+  build_nghttp2
+  build_curl
   build_libx264 # at bottom as it might build a ffmpeg which needs all the above deps...
 }
 
@@ -2154,6 +2362,7 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win32" ]]; then
   echo
   echo "Starting 32-bit builds..."
   host_target='i686-w64-mingw32'
+  host_build='i686-mingw32'
   mingw_w64_x86_64_prefix="$cur_dir/cross_compilers/mingw-w64-i686/$host_target"
   mingw_bin_path="$cur_dir/cross_compilers/mingw-w64-i686/bin"
   export PKG_CONFIG_PATH="$mingw_w64_x86_64_prefix/lib/pkgconfig"
@@ -2172,6 +2381,7 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win64" ]]; then
   echo
   echo "**************Starting 64-bit builds..." # make it have a bit easier to you can see when 32 bit is done
   host_target='x86_64-w64-mingw32'
+  host_build='x86_64-mingw32'
   mingw_w64_x86_64_prefix="$cur_dir/cross_compilers/mingw-w64-x86_64/$host_target"
   mingw_bin_path="$cur_dir/cross_compilers/mingw-w64-x86_64/bin"
   export PKG_CONFIG_PATH="$mingw_w64_x86_64_prefix/lib/pkgconfig"

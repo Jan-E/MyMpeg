@@ -12,7 +12,7 @@ index ba65b059c5..fb287071d2 100644
  license, requires a proprietary binary blob at run time, and is deemed to be
  incompatible with the GPL. We are not certain if it is compatible with the
 diff --git a/configure b/configure
-index 7e3121ead9..6d35193ac9 100755
+index beeeff7862..0019914905 100755
 --- a/configure
 +++ b/configure
 @@ -229,6 +229,7 @@ External library support:
@@ -40,7 +40,7 @@ index 7e3121ead9..6d35193ac9 100755
  gsm_ms_at_decoder_deps="audiotoolbox"
  ilbc_at_decoder_deps="audiotoolbox"
  mp1_at_decoder_deps="audiotoolbox"
-@@ -6026,6 +6030,7 @@ enabled fontconfig        && enable libfontconfig
+@@ -6029,6 +6033,7 @@ enabled fontconfig        && enable libfontconfig
  enabled libfontconfig     && require_pkg_config libfontconfig fontconfig "fontconfig/fontconfig.h" FcInit
  enabled libfreetype       && require_pkg_config libfreetype freetype2 "ft2build.h FT_FREETYPE_H" FT_Init_FreeType
  enabled libfribidi        && require_pkg_config libfribidi fribidi fribidi.h fribidi_version_info
@@ -165,7 +165,7 @@ index 7b095754d1..f342b19de7 100644
  @section libfdk_aac
  
 diff --git a/doc/general.texi b/doc/general.texi
-index cd725bb51d..3fbc4d96c1 100644
+index 3d1584097e..374bb71bce 100644
 --- a/doc/general.texi
 +++ b/doc/general.texi
 @@ -995,7 +995,7 @@ following image formats are supported:
