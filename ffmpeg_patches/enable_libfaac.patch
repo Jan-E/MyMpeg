@@ -12,7 +12,7 @@ index ba65b059c5..fb287071d2 100644
  license, requires a proprietary binary blob at run time, and is deemed to be
  incompatible with the GPL. We are not certain if it is compatible with the
 diff --git a/configure b/configure
-index beeeff7862..0019914905 100755
+index b9c9d0b307..1624812a59 100755
 --- a/configure
 +++ b/configure
 @@ -229,6 +229,7 @@ External library support:
@@ -40,7 +40,7 @@ index beeeff7862..0019914905 100755
  gsm_ms_at_decoder_deps="audiotoolbox"
  ilbc_at_decoder_deps="audiotoolbox"
  mp1_at_decoder_deps="audiotoolbox"
-@@ -6029,6 +6033,7 @@ enabled fontconfig        && enable libfontconfig
+@@ -6028,6 +6032,7 @@ enabled fontconfig        && enable libfontconfig
  enabled libfontconfig     && require_pkg_config libfontconfig fontconfig "fontconfig/fontconfig.h" FcInit
  enabled libfreetype       && require_pkg_config libfreetype freetype2 "ft2build.h FT_FREETYPE_H" FT_Init_FreeType
  enabled libfribidi        && require_pkg_config libfribidi fribidi fribidi.h fribidi_version_info
@@ -165,10 +165,10 @@ index 7b095754d1..f342b19de7 100644
  @section libfdk_aac
  
 diff --git a/doc/general.texi b/doc/general.texi
-index 3d1584097e..374bb71bce 100644
+index 06f7a78d8a..f4a768f041 100644
 --- a/doc/general.texi
 +++ b/doc/general.texi
-@@ -995,7 +995,7 @@ following image formats are supported:
+@@ -997,7 +997,7 @@ following image formats are supported:
  @item 8SVX exponential       @tab     @tab  X
  @item 8SVX fibonacci         @tab     @tab  X
  @item AAC                    @tab EX  @tab  X
@@ -194,10 +194,10 @@ index 33f1f7bbaf..66c0a3db46 100644
  
  @item
 diff --git a/libavcodec/Makefile b/libavcodec/Makefile
-index 6e40702947..9db2bc2239 100644
+index f0c8226283..f6625164a1 100644
 --- a/libavcodec/Makefile
 +++ b/libavcodec/Makefile
-@@ -927,6 +927,7 @@ OBJS-$(CONFIG_ADPCM_IMA_QT_AT_DECODER)    += audiotoolboxdec.o
+@@ -928,6 +928,7 @@ OBJS-$(CONFIG_ADPCM_IMA_QT_AT_DECODER)    += audiotoolboxdec.o
  OBJS-$(CONFIG_ALAC_AT_DECODER)            += audiotoolboxdec.o
  OBJS-$(CONFIG_AMR_NB_AT_DECODER)          += audiotoolboxdec.o
  OBJS-$(CONFIG_EAC3_AT_DECODER)            += audiotoolboxdec.o
@@ -206,10 +206,10 @@ index 6e40702947..9db2bc2239 100644
  OBJS-$(CONFIG_ILBC_AT_DECODER)            += audiotoolboxdec.o
  OBJS-$(CONFIG_MP1_AT_DECODER)             += audiotoolboxdec.o
 diff --git a/libavcodec/allcodecs.c b/libavcodec/allcodecs.c
-index ab3ec04251..0d84952999 100644
+index fd35fc1d0b..a5fd2d4d39 100644
 --- a/libavcodec/allcodecs.c
 +++ b/libavcodec/allcodecs.c
-@@ -651,6 +651,7 @@ extern AVCodec ff_alac_at_encoder;
+@@ -652,6 +652,7 @@ extern AVCodec ff_alac_at_encoder;
  extern AVCodec ff_alac_at_decoder;
  extern AVCodec ff_amr_nb_at_decoder;
  extern AVCodec ff_eac3_at_decoder;
