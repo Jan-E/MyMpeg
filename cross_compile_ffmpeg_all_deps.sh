@@ -1936,7 +1936,7 @@ build_ffmpeg() {
     apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_new.patch
 
     apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/enable_libfaac.patch
-    apply_patch file://$patch_dir/add_libfaac.diff
+    apply_patch file://$patch_dir/add-libfaac.diff
 
     apply_patch file://$patch_dir/frei0r_load-shared-libraries-dynamically.diff
 
@@ -2373,7 +2373,7 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win32" ]]; then
   mkdir -p win32
   cd win32
     build_ffmpeg_dependencies
-#    build_apps
+    build_apps
   cd ..
 fi
 
@@ -2392,7 +2392,7 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win64" ]]; then
   mkdir -p win64
   cd win64
     build_ffmpeg_dependencies
-#    build_apps
+    build_apps
   cd ..
 fi
 

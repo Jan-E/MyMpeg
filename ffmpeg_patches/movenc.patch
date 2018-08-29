@@ -1,5 +1,5 @@
 diff --git a/libavformat/movenc.c b/libavformat/movenc.c
-index 8ad7026741..507e9fd030 100644
+index 72a6e12d52..d3031dfafd 100644
 --- a/libavformat/movenc.c
 +++ b/libavformat/movenc.c
 @@ -5306,7 +5306,9 @@ int ff_mov_write_packet(AVFormatContext *s, AVPacket *pkt)
