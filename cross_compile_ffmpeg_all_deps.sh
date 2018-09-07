@@ -432,7 +432,7 @@ apply_patch() {
   local url=$1 # if you want it to use a local file instead of a url one [i.e. local file with local modifications] specify it like file://localhost/full/path/to/filename.patch
   local patch_type=$2
   if [[ -z $patch_type ]]; then
-    patch_type="-p0" # some are -p1 unfortunately, git's default
+    patch_type="-p0"
   fi
   local patch_name=$(basename $url)
   local patch_done_name="$patch_name.done"
@@ -761,9 +761,30 @@ build_librtmp() {
 build_libssh2() {
   download_and_unpack_file https://github.com/libssh2/libssh2/releases/download/libssh2-1.8.0/libssh2-1.8.0.tar.gz libssh2-1.8.0
   cd libssh2-1.8.0
+	ln -s "${cross_prefix}gcc"     "$mingw_bin_path/gcc"
+	ln -s "${cross_prefix}g++"     "$mingw_bin_path/g++"
+	ln -s "${cross_prefix}windres" "$mingw_bin_path/windres"
+	ln -s "${cross_prefix}ar"      "$mingw_bin_path/ar"
+	ln -s "${cross_prefix}ranlib"  "$mingw_bin_path/ranlib"
     echo remove line with ENGINE_load_builtin_engines in src/openssl.h - unresolved
-    bash
+    apply_patch file://$patch_dir/ssh2_load_builtin_engines.diff
+    echo Implement sftp writeback https://github.com/djelinski/libssh2/commit/e3fd7f8cca77f03225829ab975cc3aae0026ae36
+    apply_patch file://$patch_dir/ssh2_sftp_writeback.diff -p1
     do_cmake_and_install "-DBUILD_SHARED_LIBS=0 -DBUILD_EXAMPLES=OFF -DBUILD_TESTING=OFF -DCRYPTO_BACKEND=OpenSSL"
+	rm    "$mingw_bin_path/gcc"
+	rm    "$mingw_bin_path/g++"
+	rm    "$mingw_bin_path/windres"
+	rm    "$mingw_bin_path/ar"
+	rm    "$mingw_bin_path/ranlib"
+  cd ..
+}
+
+build_libssh2-1.8.0() {
+  download_and_unpack_file https://github.com/libssh2/libssh2/releases/download/libssh2-1.8.0/libssh2-1.8.0.tar.gz libssh2-1.8.0
+  cd libssh2-1.8.0
+    echo remove line with ENGINE_load_builtin_engines in src/openssl.h - unresolved
+    apply_patch file://$patch_dir/ssh2_load_builtin_engines.diff
+    do_cmake "-DBUILD_SHARED_LIBS=0 -DBUILD_EXAMPLES=OFF -DBUILD_TESTING=OFF -DCRYPTO_BACKEND=OpenSSL"
   cd ..
 }
 
@@ -903,45 +924,32 @@ build_nghttp2() {
   cd ..
 }
 
-build_curl_cmake() {
-  download_and_unpack_file https://curl.haxx.se/download/curl-7.61.0.tar.gz curl-7.61.0
-  cd curl-7.61.0
-    echo apply ~/MyMpeg/patches/curl_winsock.patch and ~/MyMpeg/patches/curl_sftp_buffer.patch
-    echo "add #define USE_LIBRTMP 1 to lib/curl_config.h"
-    bash
-    do_cmake "-DCURL_STATICLIB=ON -DCMAKE_USE_LIBSSH2=1 -DCMAKE_USE_OPENSSL=1 -DUSE_LIBRTMP=1 -DUSE_NGHTTP2=0"
-    # -- Enabled features: OpenSSL IPv6 libz AsynchDNS NTLM
-    # -- Enabled protocols: DICT FILE FTP FTPS GOPHER HTTP HTTPS IMAP IMAPS LDAP POP3 POP3S RTMP RTSP SCP SFTP SMTP SMTPS TELNET TFTP
-    echo add -lrtmp -lws2_32 at the end of src/CMakeFiles/curl.dir/linklibs.rsp
-    make Makefile clean
-    bash
-    make || make -f src/CMakeFiles/curl.dir/build.make src/CMakeFiles/curl.dir/build
-  cd ..
-}
-
 build_curl() {
-  download_and_unpack_file https://curl.haxx.se/download/curl-7.61.0.tar.gz curl-7.61.0
-  cd curl-7.61.0
-    echo apply ~/MyMpeg/patches/curl_winsock.patch and ~/MyMpeg/patches/curl_sftp_buffer.patch
-        # use the cross compiler binaries as gcc, windres, ar and ranlib
-        ln -s "${cross_prefix}gcc"     "$mingw_bin_path/gcc"
-        ln -s "${cross_prefix}g++"     "$mingw_bin_path/g++"
-        ln -s "${cross_prefix}windres" "$mingw_bin_path/windres"
-        ln -s "${cross_prefix}ar"      "$mingw_bin_path/ar"
-        ln -s "${cross_prefix}ranlib"  "$mingw_bin_path/ranlib"
-	export prefix=$mingw_w64_x86_64_prefix
-	export cross=${cross_prefix}
-	./configure      --prefix=$mingw_w64_x86_64_prefix --host=$host_target --enable-shared=no --with-libssh2 --with-nghttp2 --with-winidn --enable-sspi
-	echo ./configure --prefix=$mingw_w64_x86_64_prefix --host=$host_target --enable-shared=no --with-libssh2 --with-nghttp2 --with-winidn --enable-sspi
-	# link the static libnghttp2
-	cp $mingw_w64_x86_64_prefix/lib/libnghttp2.a $mingw_w64_x86_64_prefix/lib/libnghttp2.dll.a
-        make
-	strip src/curl.exe
-        rm    "$mingw_bin_path/gcc"
-        rm    "$mingw_bin_path/g++"
-        rm    "$mingw_bin_path/windres"
-        rm    "$mingw_bin_path/ar"
-        rm    "$mingw_bin_path/ranlib"
+  local curl_version="7.61.1"
+  local curl_previous="7.61.0"
+  rm -rf curl-$curl_previous
+  download_and_unpack_file https://curl.haxx.se/download/curl-$curl_version.tar.gz curl-$curl_version
+  cd curl-$curl_version
+    apply_patch file://$patch_dir/curl_sftp_buffer.patch
+    # use the cross compiler binaries as gcc, windres, ar and ranlib
+    ln -s "${cross_prefix}gcc"     "$mingw_bin_path/gcc"
+    ln -s "${cross_prefix}g++"     "$mingw_bin_path/g++"
+    ln -s "${cross_prefix}windres" "$mingw_bin_path/windres"
+    ln -s "${cross_prefix}ar"      "$mingw_bin_path/ar"
+    ln -s "${cross_prefix}ranlib"  "$mingw_bin_path/ranlib"
+    export prefix=$mingw_w64_x86_64_prefix
+    export cross=${cross_prefix}
+    ./configure      --prefix=$mingw_w64_x86_64_prefix --host=$host_target --enable-shared=no --with-libssh2 --with-nghttp2 --with-winidn --enable-sspi
+    echo ./configure --prefix=$mingw_w64_x86_64_prefix --host=$host_target --enable-shared=no --with-libssh2 --with-nghttp2 --with-winidn --enable-sspi
+    # link the static libnghttp2
+    cp $mingw_w64_x86_64_prefix/lib/libnghttp2.a $mingw_w64_x86_64_prefix/lib/libnghttp2.dll.a
+    make
+    strip src/curl.exe
+    rm    "$mingw_bin_path/gcc"
+    rm    "$mingw_bin_path/g++"
+    rm    "$mingw_bin_path/windres"
+    rm    "$mingw_bin_path/ar"
+    rm    "$mingw_bin_path/ranlib"
   cd ..
 }
 
@@ -2166,7 +2174,7 @@ build_ffmpeg_dependencies() {
   build_libopenh264
   build_libaom
 #  build_librtmp
-#  build_libssh2
+  build_libssh2
   build_libssh
 #  build_libgcrypt
   build_nghttp2

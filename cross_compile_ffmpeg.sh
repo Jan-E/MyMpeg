@@ -1,3 +1,4 @@
+
 #!/usr/bin/env bash
 # ffmpeg windows cross compile helper/download script, see github repo README
 # Copyright (C) 2012 Roger Pack, the script is under the GPLv3, but output FFmpeg's executables aren't
@@ -1658,9 +1659,9 @@ build_ffmpeg() {
   else
     local output_dir=$3
   fi
-  if [[ "$non_free" = "y" ]]; then
-    output_dir+="_with_fdk_aac"
-  fi
+#  if [[ "$non_free" = "y" ]]; then
+#    output_dir+="_with_fdk_aac"
+#  fi
   if [[ $high_bitdepth == "y" ]]; then
     output_dir+="_x26x_high_bitdepth"
   fi
@@ -1742,7 +1743,7 @@ build_ffmpeg() {
     config_options+=" $postpend_configure_opts"
 
     if [[ "$non_free" = "y" ]]; then
-      config_options+=" --enable-nonfree --enable-decklink --enable-libfdk-aac"
+      config_options+=" --enable-nonfree --enable-decklink" # --enable-libfdk-aac"
       # other possible options: --enable-openssl [unneeded since we use gnutls]
     fi
 
@@ -2058,7 +2059,7 @@ build_my_ffmpeg() {
   build_options="--arch=$arch --target-os=mingw32 --cross-prefix=$cross_prefix --pkg-config=pkg-config --pkg-config-flags=--static"
   config_options="$build_options --disable-w32threads --disable-doc --prefix=$mingw_w64_x86_64_prefix $extra_configure_opts" # other possibilities: --enable-w32threads --enable-libflite
   if [[ "$non_free" = "y" ]]; then
-    config_options="$config_options --enable-nonfree --enable-libfdk-aac --enable-libfaac" # faac deemed too poor quality and becomes the default
+    config_options="$config_options --enable-nonfree --enable-libfaac" # faac deemed too poor quality and becomes the default, --enable-libfdk-aac broken
   else
     config_options="$config_options"
   fi
@@ -2076,7 +2077,7 @@ build_my_ffmpeg() {
       fi
       config_options="$config_options --disable-w32threads"
     fi
-    config_options="$config_options --enable-gpl --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va $arch_opts --enable-libx264 --enable-nonfree --enable-libfdk-aac --enable-libfaac --disable-doc"
+    config_options="$config_options --enable-gpl --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va $arch_opts --enable-libx264 --enable-nonfree --enable-libfaac --disable-doc" #  --enable-libfdk-aac
   fi
 
   # minimal build for php_av.dll

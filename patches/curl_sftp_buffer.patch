@@ -1,0 +1,17 @@
+diff --git a/lib/urldata.h b/lib/urldata.h
+index 7d396f3f2..ccfe83b3b 100644
+--- a/lib/urldata.h
++++ b/lib/urldata.h
+@@ -142,11 +142,11 @@ typedef ssize_t (Curl_recv)(struct connectdata *conn, /* connection data */
+ #include <libssh2_sftp.h>
+ #endif /* HAVE_LIBSSH2_H */
+ 
+ /* The upload buffer size, should not be smaller than CURL_MAX_WRITE_SIZE, as
+    it needs to hold a full buffer as could be sent in a write callback */
+-#define UPLOAD_BUFSIZE CURL_MAX_WRITE_SIZE
++#define UPLOAD_BUFSIZE (512*1024)
+
+ /* The "master buffer" is for HTTP pipelining */
+ #define MASTERBUF_SIZE 16384
+
+ /* Initial size of the buffer to store headers in, it'll be enlarged in case
