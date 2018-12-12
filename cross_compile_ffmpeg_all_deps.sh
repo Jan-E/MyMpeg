@@ -973,9 +973,8 @@ build_gnutls() {
 }
 
 build_openssl-1.0.2() {
-  rd -tf openssl-1.0.2o
-  download_and_unpack_file https://www.openssl.org/source/openssl-1.0.2p.tar.gz
-  cd openssl-1.0.2p
+  download_and_unpack_file https://www.openssl.org/source/openssl-1.0.2q.tar.gz
+  cd openssl-1.0.2q
     apply_patch file://$patch_dir/openssl-1.0.2l_lib-only.diff
     export CC="${cross_prefix}gcc"
     export AR="${cross_prefix}ar"
@@ -984,7 +983,7 @@ build_openssl-1.0.2() {
     if [ "$1" = "dllonly" ]; then
       config_options+="shared "
     else
-      config_options+="no-shared no-dso "
+      config_options+="no-shared no-dso no-hw no-gost no-capieng "
     fi
     if [ "$bits_target" = "32" ]; then
       config_options+="mingw" # Build shared libraries ('libeay32.dll' and 'ssleay32.dll') if "dllonly" is specified.

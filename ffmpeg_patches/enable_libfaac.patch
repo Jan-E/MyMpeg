@@ -12,7 +12,7 @@ index ba65b059c5..fb287071d2 100644
  license, requires a proprietary binary blob at run time, and is deemed to be
  incompatible with the GPL. We are not certain if it is compatible with the
 diff --git a/configure b/configure
-index 642c13d839..228a4cd75d 100755
+index b062b6318e..1e1536e152 100755
 --- a/configure
 +++ b/configure
 @@ -230,6 +230,7 @@ External library support:
@@ -49,7 +49,7 @@ index 642c13d839..228a4cd75d 100755
                                 require libgme gme/gme.h gme_new_emu -lgme -lstdc++; }
  enabled libgsm            && { for gsm_hdr in "gsm.h" "gsm/gsm.h"; do
 diff --git a/doc/encoders.texi b/doc/encoders.texi
-index 4db7764f4d..65f4414ee9 100644
+index ca3892d682..3dac4437a1 100644
 --- a/doc/encoders.texi
 +++ b/doc/encoders.texi
 @@ -637,6 +637,111 @@ Sets the maximum delay in milliseconds. Lower delays than 20ms will very quickly
@@ -165,10 +165,10 @@ index 4db7764f4d..65f4414ee9 100644
  @section libfdk_aac
  
 diff --git a/doc/general.texi b/doc/general.texi
-index 36e5f91d89..be698ba79e 100644
+index 2bc33d180d..c456eeaa86 100644
 --- a/doc/general.texi
 +++ b/doc/general.texi
-@@ -1029,7 +1029,7 @@ following image formats are supported:
+@@ -1040,7 +1040,7 @@ following image formats are supported:
  @item 8SVX exponential       @tab     @tab  X
  @item 8SVX fibonacci         @tab     @tab  X
  @item AAC                    @tab EX  @tab  X
@@ -178,10 +178,10 @@ index 36e5f91d89..be698ba79e 100644
      @tab encoding supported through external library libfdk-aac
  @item AC-3                   @tab IX  @tab  IX
 diff --git a/doc/muxers.texi b/doc/muxers.texi
-index 5565fd5f45..7f67188fcd 100644
+index 809f88662e..27f9f5a4a9 100644
 --- a/doc/muxers.texi
 +++ b/doc/muxers.texi
-@@ -1944,9 +1944,9 @@ ffmpeg -i in.mkv -codec copy -map 0 -f segment -segment_list out.csv -segment_fr
+@@ -1951,9 +1951,9 @@ ffmpeg -i in.mkv -codec copy -map 0 -f segment -segment_list out.csv -segment_fr
  
  @item
  Convert the @file{in.mkv} to TS segments using the @code{libx264}
@@ -194,7 +194,7 @@ index 5565fd5f45..7f67188fcd 100644
  
  @item
 diff --git a/libavcodec/Makefile b/libavcodec/Makefile
-index 5feadac729..298d773435 100644
+index d53b8ff330..413a554fe9 100644
 --- a/libavcodec/Makefile
 +++ b/libavcodec/Makefile
 @@ -938,6 +938,7 @@ OBJS-$(CONFIG_ADPCM_IMA_QT_AT_DECODER)    += audiotoolboxdec.o
