@@ -691,8 +691,11 @@ build_libwebp() {
 }
 
 build_freetype() {
-  download_and_unpack_file https://sourceforge.net/projects/freetype/files/freetype2/2.8/freetype-2.8.tar.bz2
-  cd freetype-2.8
+  local freetype_version="2.9.1"
+  local freetype_previous="2.8"
+  rm -rf freetype-$freetype_previous
+  download_and_unpack_file https://sourceforge.net/projects/freetype/files/freetype2/$freetype_version/freetype-$freetype_version.tar.bz2
+  cd freetype-$freetype_version
     if [[ `uname` == CYGWIN* ]]; then
       generic_configure "--build=i686-pc-cygwin --with-bzip2" # hard to believe but needed...
       # 'configure' can't detect bzip2 without '--with-bzip2', because there's no 'bzip2.pc'.
@@ -925,8 +928,8 @@ build_nghttp2() {
 }
 
 build_curl() {
-  local curl_version="7.61.1"
-  local curl_previous="7.61.0"
+  local curl_version="7.63.0"
+  local curl_previous="7.62.0"
   rm -rf curl-$curl_previous
   download_and_unpack_file https://curl.haxx.se/download/curl-$curl_version.tar.gz curl-$curl_version
   cd curl-$curl_version
