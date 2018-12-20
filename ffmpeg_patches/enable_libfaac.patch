@@ -12,7 +12,7 @@ index ba65b059c5..fb287071d2 100644
  license, requires a proprietary binary blob at run time, and is deemed to be
  incompatible with the GPL. We are not certain if it is compatible with the
 diff --git a/configure b/configure
-index b062b6318e..1e1536e152 100755
+index 2205751402..b31ea1ed60 100755
 --- a/configure
 +++ b/configure
 @@ -230,6 +230,7 @@ External library support:
@@ -31,7 +31,7 @@ index b062b6318e..1e1536e152 100755
      libfdk_aac
      openssl
      libtls
-@@ -3062,6 +3064,8 @@ avisynth_demuxer_deps="avisynth"
+@@ -3063,6 +3065,8 @@ avisynth_demuxer_deps="avisynth"
  avisynth_demuxer_select="riffdec"
  eac3_at_decoder_deps="audiotoolbox"
  eac3_at_decoder_select="ac3_parser"
@@ -40,7 +40,7 @@ index b062b6318e..1e1536e152 100755
  gsm_ms_at_decoder_deps="audiotoolbox"
  ilbc_at_decoder_deps="audiotoolbox"
  mp1_at_decoder_deps="audiotoolbox"
-@@ -6094,6 +6098,7 @@ enabled fontconfig        && enable libfontconfig
+@@ -6100,6 +6104,7 @@ enabled fontconfig        && enable libfontconfig
  enabled libfontconfig     && require_pkg_config libfontconfig fontconfig "fontconfig/fontconfig.h" FcInit
  enabled libfreetype       && require_pkg_config libfreetype freetype2 "ft2build.h FT_FREETYPE_H" FT_Init_FreeType
  enabled libfribidi        && require_pkg_config libfribidi fribidi fribidi.h fribidi_version_info
@@ -49,7 +49,7 @@ index b062b6318e..1e1536e152 100755
                                 require libgme gme/gme.h gme_new_emu -lgme -lstdc++; }
  enabled libgsm            && { for gsm_hdr in "gsm.h" "gsm/gsm.h"; do
 diff --git a/doc/encoders.texi b/doc/encoders.texi
-index ca3892d682..3dac4437a1 100644
+index 3d5b9fc2d2..213f47a716 100644
 --- a/doc/encoders.texi
 +++ b/doc/encoders.texi
 @@ -637,6 +637,111 @@ Sets the maximum delay in milliseconds. Lower delays than 20ms will very quickly
@@ -178,10 +178,10 @@ index 2bc33d180d..c456eeaa86 100644
      @tab encoding supported through external library libfdk-aac
  @item AC-3                   @tab IX  @tab  IX
 diff --git a/doc/muxers.texi b/doc/muxers.texi
-index 809f88662e..27f9f5a4a9 100644
+index 4ed46a2220..2280007540 100644
 --- a/doc/muxers.texi
 +++ b/doc/muxers.texi
-@@ -1951,9 +1951,9 @@ ffmpeg -i in.mkv -codec copy -map 0 -f segment -segment_list out.csv -segment_fr
+@@ -1959,9 +1959,9 @@ ffmpeg -i in.mkv -codec copy -map 0 -f segment -segment_list out.csv -segment_fr
  
  @item
  Convert the @file{in.mkv} to TS segments using the @code{libx264}
