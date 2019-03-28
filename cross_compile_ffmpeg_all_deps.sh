@@ -764,8 +764,11 @@ build_librtmp() {
 }
 
 build_libssh2() {
-  download_and_unpack_file https://github.com/libssh2/libssh2/releases/download/libssh2-1.8.0/libssh2-1.8.0.tar.gz libssh2-1.8.0
-  cd libssh2-1.8.0
+  local ssh2_version="1.8.2"
+  local ssh2_previous="1.8.0"
+  rm -rf libssh2-$ssh2_previous
+  download_and_unpack_file https://github.com/libssh2/libssh2/releases/download/libssh2-$ssh2_version/libssh2-$ssh2_version.tar.gz libssh2-$ssh2_version
+  cd libssh2-$ssh2_version
 	ln -s "${cross_prefix}gcc"     "$mingw_bin_path/gcc"
 	ln -s "${cross_prefix}g++"     "$mingw_bin_path/g++"
 	ln -s "${cross_prefix}windres" "$mingw_bin_path/windres"
@@ -930,8 +933,8 @@ build_nghttp2() {
 }
 
 build_curl() {
-  local curl_version="7.63.0"
-  local curl_previous="7.62.0"
+  local curl_version="7.64.1"
+  local curl_previous="7.64.0"
   rm -rf curl-$curl_previous
   download_and_unpack_file https://curl.haxx.se/download/curl-$curl_version.tar.gz curl-$curl_version
   cd curl-$curl_version
@@ -975,8 +978,9 @@ build_gnutls() {
 }
 
 build_openssl-1.0.2() {
-  download_and_unpack_file https://www.openssl.org/source/openssl-1.0.2q.tar.gz
-  cd openssl-1.0.2q
+  rm -rf openssl-1.0.2q
+  download_and_unpack_file https://www.openssl.org/source/openssl-1.0.2r.tar.gz
+  cd openssl-1.0.2r
     apply_patch file://$patch_dir/openssl-1.0.2l_lib-only.diff
     export CC="${cross_prefix}gcc"
     export AR="${cross_prefix}ar"
@@ -1020,8 +1024,9 @@ build_openssl-1.0.2() {
 }
 
 build_openssl-1.1.0() {
-  download_and_unpack_file https://www.openssl.org/source/openssl-1.1.0f.tar.gz
-  cd openssl-1.1.0f
+  rm -rf openssl-1.1.0f
+  download_and_unpack_file https://www.openssl.org/source/openssl-1.1.0j.tar.gz
+  cd openssl-1.1.0j
     export CC="${cross_prefix}gcc"
     export AR="${cross_prefix}ar"
     export RANLIB="${cross_prefix}ranlib"
@@ -1048,7 +1053,7 @@ build_openssl-1.1.0() {
     do_make "build_libs"
     if [ "$1" = "dllonly" ]; then
       mkdir -p $cur_dir/redist # Strip and pack shared libraries.
-      archive="$cur_dir/redist/openssl-${arch}-v1.1.0f.7z"
+      archive="$cur_dir/redist/openssl-${arch}-v1.1.0j.7z"
       if [[ ! -f $archive ]]; then
         for sharedlib in *.dll; do
           ${cross_prefix}strip $sharedlib
@@ -1683,7 +1688,7 @@ build_lua() {
 }
 
 build_libcurl() {
-  generic_download_and_make_and_install https://curl.haxx.se/download/curl-7.46.0.tar.gz
+  generic_download_and_make_and_install https://curl.haxx.se/download/curl-7.64.0.tar.gz
 }
 
 build_libhdhomerun() {
