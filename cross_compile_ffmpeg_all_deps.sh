@@ -2121,9 +2121,9 @@ build_ffmpeg_dependencies() {
   if [[ $build_amd_amf = y ]]; then
     build_amd_amf_headers
   fi
-  if [[ $build_intel_qsv = y ]]; then
-    build_intel_quicksync_mfx
-  fi
+#  if [[ $build_intel_qsv = y ]]; then
+#    build_intel_quicksync_mfx
+#  fi
   build_nv_headers
   build_libzimg # Uses dlfcn.
   build_libopenjpeg
