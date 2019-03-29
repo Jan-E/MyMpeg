@@ -1,0 +1,25 @@
+diff --git a/includes/nghttp2/nghttp2.h b/includes/nghttp2/nghttp2.h
+index 925a4cbc..96ed71c9 100644
+--- a/includes/nghttp2/nghttp2.h
++++ b/includes/nghttp2/nghttp2.h
+@@ -55,7 +55,7 @@ extern "C" {
+ #include <nghttp2/nghttp2ver.h>
+ 
+ #ifdef NGHTTP2_STATICLIB
+-#  define NGHTTP2_EXTERN
++#  define NGHTTP2_EXTERN __declspec(dllexport)
+ #elif defined(WIN32) || (__has_declspec_attribute(dllexport) &&                \
+                          __has_declspec_attribute(dllimport))
+ #  ifdef BUILDING_NGHTTP2
+@@ -65,9 +65,9 @@ extern "C" {
+ #  endif /* !BUILDING_NGHTTP2 */
+ #else    /* !defined(WIN32) */
+ #  ifdef BUILDING_NGHTTP2
+-#    define NGHTTP2_EXTERN __attribute__((visibility("default")))
++#    define NGHTTP2_EXTERN __declspec(dllexport)
+ #  else /* !BUILDING_NGHTTP2 */
+-#    define NGHTTP2_EXTERN
++#    define NGHTTP2_EXTERN __declspec(dllexport)
+ #  endif /* !BUILDING_NGHTTP2 */
+ #endif   /* !defined(WIN32) */
+ 

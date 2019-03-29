@@ -923,9 +923,9 @@ build_nghttp2() {
         rm    "$mingw_bin_path/ar"
         rm    "$mingw_bin_path/ranlib"
         grep AC_INIT ../configure.ac | cut -d'[' -f3 | sed -e 's/], //g' -e 's/1/export nghttp2ver=1/g'
+	do_make
       cd ..
-      do_cmake_and_install
-      echo "-- Installing: $mingw_w64_x86_64_prefix/lib/libnghttp2.a"
+      #do_cmake_and_install
       install -m 644 lib/libnghttp2.a $mingw_w64_x86_64_prefix/lib/libnghttp2.a
     fi
     strip $mingw_w64_x86_64_prefix/lib/libnghttp2.dll
@@ -947,8 +947,8 @@ build_curl() {
     ln -s "${cross_prefix}ranlib"  "$mingw_bin_path/ranlib"
     export prefix=$mingw_w64_x86_64_prefix
     export cross=${cross_prefix}
-    ./configure      --prefix=$mingw_w64_x86_64_prefix --host=$host_target --enable-shared=no --with-libssh2 --with-nghttp2 --with-winidn --enable-sspi
-    echo ./configure --prefix=$mingw_w64_x86_64_prefix --host=$host_target --enable-shared=no --with-libssh2 --with-nghttp2 --with-winidn --enable-sspi
+    CPPFLAGS="-DNGHTTP2_STATICLIB" ./configure      --prefix=$mingw_w64_x86_64_prefix --host=$host_target --enable-shared=no --with-libssh2 --with-nghttp2 --with-winidn --enable-sspi
+    echo CPPFLAGS="-DNGHTTP2_STATICLIB" ./configure --prefix=$mingw_w64_x86_64_prefix --host=$host_target --enable-shared=no --with-libssh2 --with-nghttp2 --with-winidn --enable-sspi
     # link the static libnghttp2
     cp $mingw_w64_x86_64_prefix/lib/libnghttp2.a $mingw_w64_x86_64_prefix/lib/libnghttp2.dll.a
     make
