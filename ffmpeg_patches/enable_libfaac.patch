@@ -12,7 +12,7 @@ index ba65b059c5..fb287071d2 100644
  license, requires a proprietary binary blob at run time, and is deemed to be
  incompatible with the GPL. We are not certain if it is compatible with the
 diff --git a/configure b/configure
-index dcead3a300..928a0a9933 100755
+index f6123f53e5..79ada81e75 100755
 --- a/configure
 +++ b/configure
 @@ -231,6 +231,7 @@ External library support:
@@ -23,15 +23,15 @@ index dcead3a300..928a0a9933 100755
    --enable-libfdk-aac      enable AAC de/encoding via libfdk-aac [no]
    --enable-libflite        enable flite (voice synthesis) support via libflite [no]
    --enable-libfontconfig   enable libfontconfig, useful for drawtext filter [no]
-@@ -1714,6 +1715,7 @@ EXTERNAL_LIBRARY_GPL_LIST="
+@@ -1712,6 +1713,7 @@ EXTERNAL_LIBRARY_GPL_LIST="
+ 
  EXTERNAL_LIBRARY_NONFREE_LIST="
      decklink
-     libndi_newtek
 +    libfaac
      libfdk_aac
      openssl
      libtls
-@@ -3104,6 +3106,8 @@ avisynth_demuxer_deps="avisynth"
+@@ -3102,6 +3104,8 @@ avisynth_demuxer_deps="avisynth"
  avisynth_demuxer_select="riffdec"
  eac3_at_decoder_deps="audiotoolbox"
  eac3_at_decoder_select="ac3_parser"
@@ -40,7 +40,7 @@ index dcead3a300..928a0a9933 100755
  gsm_ms_at_decoder_deps="audiotoolbox"
  ilbc_at_decoder_deps="audiotoolbox"
  mp1_at_decoder_deps="audiotoolbox"
-@@ -6155,6 +6159,7 @@ enabled fontconfig        && enable libfontconfig
+@@ -6140,6 +6144,7 @@ enabled fontconfig        && enable libfontconfig
  enabled libfontconfig     && require_pkg_config libfontconfig fontconfig "fontconfig/fontconfig.h" FcInit
  enabled libfreetype       && require_pkg_config libfreetype freetype2 "ft2build.h FT_FREETYPE_H" FT_Init_FreeType
  enabled libfribidi        && require_pkg_config libfribidi fribidi fribidi.h fribidi_version_info
@@ -49,7 +49,7 @@ index dcead3a300..928a0a9933 100755
                                 require libgme gme/gme.h gme_new_emu -lgme -lstdc++; }
  enabled libgsm            && { for gsm_hdr in "gsm.h" "gsm/gsm.h"; do
 diff --git a/doc/encoders.texi b/doc/encoders.texi
-index 29625ba07c..c5667b0450 100644
+index 94337d009c..27635cc8b7 100644
 --- a/doc/encoders.texi
 +++ b/doc/encoders.texi
 @@ -637,6 +637,111 @@ Sets the maximum delay in milliseconds. Lower delays than 20ms will very quickly
@@ -178,7 +178,7 @@ index fe94c40386..3a35c72242 100644
      @tab encoding supported through external library libfdk-aac
  @item AC-3                   @tab IX  @tab  IX
 diff --git a/doc/muxers.texi b/doc/muxers.texi
-index 372fab2f92..98a4133e26 100644
+index aac7d94edf..9f510253e1 100644
 --- a/doc/muxers.texi
 +++ b/doc/muxers.texi
 @@ -1995,9 +1995,9 @@ ffmpeg -i in.mkv -codec copy -map 0 -f segment -segment_list out.csv -segment_fr
