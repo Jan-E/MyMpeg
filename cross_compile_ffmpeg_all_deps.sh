@@ -947,8 +947,10 @@ build_curl() {
     ln -s "${cross_prefix}ranlib"  "$mingw_bin_path/ranlib"
     export prefix=$mingw_w64_x86_64_prefix
     export cross=${cross_prefix}
-    CPPFLAGS="-DNGHTTP2_STATICLIB" ./configure      --prefix=$mingw_w64_x86_64_prefix --host=$host_target --enable-shared=no --with-libssh2 --with-nghttp2 --with-winidn --enable-sspi
-    echo CPPFLAGS="-DNGHTTP2_STATICLIB" ./configure --prefix=$mingw_w64_x86_64_prefix --host=$host_target --enable-shared=no --with-libssh2 --with-nghttp2 --with-winidn --enable-sspi
+#    CPPFLAGS="-DNGHTTP2_STATICLIB" ./configure      --prefix=$mingw_w64_x86_64_prefix --host=$host_target --enable-shared=no --with-libssh2 --with-nghttp2 --with-winidn --enable-sspi
+#    echo CPPFLAGS="-DNGHTTP2_STATICLIB" ./configure --prefix=$mingw_w64_x86_64_prefix --host=$host_target --enable-shared=no --with-libssh2 --with-nghttp2 --with-winidn --enable-sspi
+    CPPFLAGS="-DNGHTTP2_STATICLIB" ./configure      --prefix=$mingw_w64_x86_64_prefix --host=$host_target --with-winssl --enable-shared=no --with-libssh2 --with-nghttp2 --with-winidn --enable-sspi
+    echo CPPFLAGS="-DNGHTTP2_STATICLIB" ./configure --prefix=$mingw_w64_x86_64_prefix --host=$host_target --with-winssl --enable-shared=no --with-libssh2 --with-nghttp2 --with-winidn --enable-sspi
     # link the static libnghttp2
     cp $mingw_w64_x86_64_prefix/lib/libnghttp2.a $mingw_w64_x86_64_prefix/lib/libnghttp2.dll.a
     make
@@ -960,6 +962,36 @@ build_curl() {
     rm    "$mingw_bin_path/ranlib"
   cd ..
 }
+#  curl version:     7.64.1
+#  SSL:              enabled (Windows-native, OpenSSL)
+#  SSH:              enabled (libSSH2)
+#  zlib:             enabled
+#  brotli:           no      (--with-brotli)
+#  GSS-API:          no      (--with-gssapi)
+#  TLS-SRP:          enabled
+#  resolver:         POSIX threaded
+#  IPv6:             enabled
+#  Unix sockets:     no      (--enable-unix-sockets)
+#  IDN:              enabled (Windows-native)
+#  Build libcurl:    Shared=no, Static=yes
+#  Built-in manual:  enabled
+#  --libcurl option: enabled (--disable-libcurl-option)
+#  Verbose errors:   enabled (--disable-verbose)
+#  Code coverage:    disabled
+#  SSPI:             enabled
+#  ca cert bundle:   no
+#  ca cert path:     no
+#  ca fallback:      no
+#  LDAP:             enabled (winldap)
+#  LDAPS:            enabled
+#  RTSP:             enabled
+#  RTMP:             no      (--with-librtmp)
+#  Metalink:         no      (--with-libmetalink)
+#  PSL:              no      (libpsl not found)
+#  Alt-svc:          no      (--enable-alt-svc)
+#  HTTP2:            enabled (nghttp2)
+#  Protocols:        DICT FILE FTP FTPS GOPHER HTTP HTTPS IMAP IMAPS LDAP LDAPS POP3 POP3S RTSP SCP SFTP SMB SMBS SMTP SMTPS TELNET TFTP
+#  Features:         SSL IPv6 libz AsynchDNS IDN SSPI SPNEGO Kerberos NTLM TLS-SRP HTTP2 MultiSSL HTTPS-proxy
 
 build_gnutls() {
   download_and_unpack_file https://www.gnupg.org/ftp/gcrypt/gnutls/v3.5/gnutls-3.5.18.tar.xz
@@ -1054,6 +1086,53 @@ build_openssl-1.1.0() {
     if [ "$1" = "dllonly" ]; then
       mkdir -p $cur_dir/redist # Strip and pack shared libraries.
       archive="$cur_dir/redist/openssl-${arch}-v1.1.0j.7z"
+      if [[ ! -f $archive ]]; then
+        for sharedlib in *.dll; do
+          ${cross_prefix}strip $sharedlib
+        done
+        sed "s/$/\r/" LICENSE > LICENSE.txt
+        7z a -mx=9 $archive *.dll LICENSE.txt && rm -f LICENSE.txt
+      fi
+    else
+      do_make_install "" "install_dev"
+    fi
+    unset CC
+    unset AR
+    unset RANLIB
+  cd ..
+}
+
+build_openssl-1.1.1() {
+  rm -rf openssl-1.1.1a
+  download_and_unpack_file https://www.openssl.org/source/openssl-1.1.1b.tar.gz
+  cd openssl-1.1.1b
+    export CC="${cross_prefix}gcc"
+    export AR="${cross_prefix}ar"
+    export RANLIB="${cross_prefix}ranlib"
+    local config_options="--prefix=$mingw_w64_x86_64_prefix zlib "
+    if [ "$1" = "dllonly" ]; then
+      config_options+="shared no-engine "
+    else
+      config_options+="no-shared no-dso no-engine "
+    fi
+    if [[ `uname` =~ "5.1" ]] || [[ `uname` =~ "6.0" ]]; then
+      config_options+="no-async " # "Note: on older OSes, like CentOS 5, BSD 5, and Windows XP or Vista, you will need to configure with no-async when building OpenSSL 1.1.0 and above. The configuration system does not detect lack of the Posix feature on the platforms." (https://wiki.openssl.org/index.php/Compilation_and_Installation)
+    fi
+    if [ "$bits_target" = "32" ]; then
+      config_options+="mingw" # Build shared libraries ('libcrypto-1_1.dll' and 'libssl-1_1.dll') if "dllonly" is specified.
+      local arch=x86
+    else
+      config_options+="mingw64" # Build shared libraries ('libcrypto-1_1-x64.dll' and 'libssl-1_1-x64.dll') if "dllonly" is specified.
+      local arch=x86_64
+    fi
+    do_configure "$config_options" ./Configure
+    if [[ ! -f Makefile.bak ]]; then # Change CFLAGS.
+      sed -i.bak "s/-O3/-O2/" Makefile
+    fi
+    do_make "build_libs"
+    if [ "$1" = "dllonly" ]; then
+      mkdir -p $cur_dir/redist # Strip and pack shared libraries.
+      archive="$cur_dir/redist/openssl-${arch}-v1.1.1b.7z"
       if [[ ! -f $archive ]]; then
         for sharedlib in *.dll; do
           ${cross_prefix}strip $sharedlib
@@ -2137,8 +2216,9 @@ build_ffmpeg_dependencies() {
   build_libnettle # Needs gmp >= 3.0. Uses dlfcn.
   build_gnutls # Needs nettle >= 3.1, hogweed (nettle) >= 3.1. Uses zlib and dlfcn.
   #if [[ "$non_free" = "y" ]]; then
-    build_openssl-1.0.2 # Nonfree alternative to GnuTLS. 'build_openssl-1.0.2 "dllonly"' to build shared libraries only.
+  #  build_openssl-1.0.2 # Nonfree alternative to GnuTLS. 'build_openssl-1.0.2 "dllonly"' to build shared libraries only.
   #  build_openssl-1.1.0 # Nonfree alternative to GnuTLS. Can't be used with LibRTMP. 'build_openssl-1.1.0 "dllonly"' to build shared libraries only.
+    build_openssl-1.1.1 # Nonfree alternative to GnuTLS. Can't be used with LibRTMP. 'build_openssl-1.1.1 "dllonly"' to build shared libraries only.
   #fi
   build_libogg # Uses dlfcn.
   build_libvorbis # Needs libogg >= 1.0. Uses dlfcn.

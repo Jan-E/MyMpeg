@@ -1,10 +1,13 @@
---- src/openssl.h.orig	2016-02-17 22:59:57.000000000 +0100
-+++ src/openssl.h	2018-09-07 02:11:46.075923647 +0200
-@@ -228,7 +228,6 @@
+--- src/openssl.h.orig	2019-03-18 22:30:01.000000000 +0100
++++ src/openssl.h	2019-03-22 03:08:07.000000000 +0100
+@@ -227,9 +227,7 @@
+ #endif
  
  #define libssh2_crypto_init() \
-   OpenSSL_add_all_algorithms(); \
+-  OpenSSL_add_all_algorithms(); \
 -  ENGINE_load_builtin_engines(); \
-   ENGINE_register_all_complete()
+-  ENGINE_register_all_complete()
++  OpenSSL_add_all_algorithms();
  
  #define libssh2_crypto_exit()
+ 
