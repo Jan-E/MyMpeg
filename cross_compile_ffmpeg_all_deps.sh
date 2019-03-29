@@ -763,6 +763,30 @@ build_librtmp() {
   cd ..
 }
 
+build_libssh2_wincng() {
+  local ssh2_version="1.8.2"
+  local ssh2_previous="1.8.0"
+  rm -rf libssh2-$ssh2_previous
+  download_and_unpack_file https://github.com/libssh2/libssh2/releases/download/libssh2-$ssh2_version/libssh2-$ssh2_version.tar.gz libssh2-$ssh2_version
+  cd libssh2-$ssh2_version
+	ln -s "${cross_prefix}gcc"     "$mingw_bin_path/gcc"
+	ln -s "${cross_prefix}g++"     "$mingw_bin_path/g++"
+	ln -s "${cross_prefix}windres" "$mingw_bin_path/windres"
+	ln -s "${cross_prefix}ar"      "$mingw_bin_path/ar"
+	ln -s "${cross_prefix}ranlib"  "$mingw_bin_path/ranlib"
+    echo remove line with ENGINE_load_builtin_engines in src/openssl.h - unresolved
+    apply_patch file://$patch_dir/ssh2_load_builtin_engines.diff
+    echo Implement sftp writeback https://github.com/djelinski/libssh2/commit/e3fd7f8cca77f03225829ab975cc3aae0026ae36
+    apply_patch file://$patch_dir/ssh2_sftp_writeback.diff -p1
+    do_cmake_and_install "-DBUILD_SHARED_LIBS=0 -DBUILD_EXAMPLES=OFF -DBUILD_TESTING=OFF -DCRYPTO_BACKEND=WinCNG"
+	rm    "$mingw_bin_path/gcc"
+	rm    "$mingw_bin_path/g++"
+	rm    "$mingw_bin_path/windres"
+	rm    "$mingw_bin_path/ar"
+	rm    "$mingw_bin_path/ranlib"
+  cd ..
+}
+
 build_libssh2() {
   local ssh2_version="1.8.2"
   local ssh2_previous="1.8.0"
@@ -784,15 +808,6 @@ build_libssh2() {
 	rm    "$mingw_bin_path/windres"
 	rm    "$mingw_bin_path/ar"
 	rm    "$mingw_bin_path/ranlib"
-  cd ..
-}
-
-build_libssh2-1.8.0() {
-  download_and_unpack_file https://github.com/libssh2/libssh2/releases/download/libssh2-1.8.0/libssh2-1.8.0.tar.gz libssh2-1.8.0
-  cd libssh2-1.8.0
-    echo remove line with ENGINE_load_builtin_engines in src/openssl.h - unresolved
-    apply_patch file://$patch_dir/ssh2_load_builtin_engines.diff
-    do_cmake "-DBUILD_SHARED_LIBS=0 -DBUILD_EXAMPLES=OFF -DBUILD_TESTING=OFF -DCRYPTO_BACKEND=OpenSSL"
   cd ..
 }
 
@@ -949,8 +964,10 @@ build_curl() {
     export cross=${cross_prefix}
 #    CPPFLAGS="-DNGHTTP2_STATICLIB" ./configure      --prefix=$mingw_w64_x86_64_prefix --host=$host_target --enable-shared=no --with-libssh2 --with-nghttp2 --with-winidn --enable-sspi
 #    echo CPPFLAGS="-DNGHTTP2_STATICLIB" ./configure --prefix=$mingw_w64_x86_64_prefix --host=$host_target --enable-shared=no --with-libssh2 --with-nghttp2 --with-winidn --enable-sspi
-    CPPFLAGS="-DNGHTTP2_STATICLIB" ./configure      --prefix=$mingw_w64_x86_64_prefix --host=$host_target --with-winssl --enable-shared=no --with-libssh2 --with-nghttp2 --with-winidn --enable-sspi
-    echo CPPFLAGS="-DNGHTTP2_STATICLIB" ./configure --prefix=$mingw_w64_x86_64_prefix --host=$host_target --with-winssl --enable-shared=no --with-libssh2 --with-nghttp2 --with-winidn --enable-sspi
+#    CPPFLAGS="-DNGHTTP2_STATICLIB" ./configure      --prefix=$mingw_w64_x86_64_prefix --host=$host_target --with-ssl=no --enable-shared=no --with-winidn --enable-sspi --with-winssl --with-libssh2 --with-nghttp2=no
+#    echo CPPFLAGS="-DNGHTTP2_STATICLIB" ./configure --prefix=$mingw_w64_x86_64_prefix --host=$host_target --with-ssl=no --enable-shared=no --with-winidn --enable-sspi --with-winssl --with-libssh2 --with-nghttp2=no
+    CPPFLAGS="-DNGHTTP2_STATICLIB" ./configure      --prefix=$mingw_w64_x86_64_prefix --host=$host_target --enable-shared=no --with-libssh2 --with-nghttp2 --with-winidn --enable-sspi --with-winssl
+    echo CPPFLAGS="-DNGHTTP2_STATICLIB" ./configure --prefix=$mingw_w64_x86_64_prefix --host=$host_target --enable-shared=no --with-libssh2 --with-nghttp2 --with-winidn --enable-sspi --with-winssl
     # link the static libnghttp2
     cp $mingw_w64_x86_64_prefix/lib/libnghttp2.a $mingw_w64_x86_64_prefix/lib/libnghttp2.dll.a
     make
@@ -2264,6 +2281,7 @@ build_ffmpeg_dependencies() {
   build_libaom
 #  build_librtmp
   build_libssh2
+#  build_libssh2_wincng
   build_libssh
 #  build_libgcrypt
   build_nghttp2
