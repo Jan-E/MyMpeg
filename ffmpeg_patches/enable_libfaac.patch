@@ -165,7 +165,7 @@ index 94337d009c..27635cc8b7 100644
  @section libfdk_aac
  
 diff --git a/doc/general.texi b/doc/general.texi
-index fe94c40386..3a35c72242 100644
+index 109c8c58cc..290d5ff34b 100644
 --- a/doc/general.texi
 +++ b/doc/general.texi
 @@ -1040,7 +1040,7 @@ following image formats are supported:
@@ -178,10 +178,10 @@ index fe94c40386..3a35c72242 100644
      @tab encoding supported through external library libfdk-aac
  @item AC-3                   @tab IX  @tab  IX
 diff --git a/doc/muxers.texi b/doc/muxers.texi
-index aac7d94edf..9f510253e1 100644
+index 83ae017d6c..f5e08d0ac5 100644
 --- a/doc/muxers.texi
 +++ b/doc/muxers.texi
-@@ -1995,9 +1995,9 @@ ffmpeg -i in.mkv -codec copy -map 0 -f segment -segment_list out.csv -segment_fr
+@@ -1998,9 +1998,9 @@ ffmpeg -i in.mkv -codec copy -map 0 -f segment -segment_list out.csv -segment_fr
  
  @item
  Convert the @file{in.mkv} to TS segments using the @code{libx264}
@@ -194,10 +194,10 @@ index aac7d94edf..9f510253e1 100644
  
  @item
 diff --git a/libavcodec/Makefile b/libavcodec/Makefile
-index 15c43a8a6a..f0e6b12ea2 100644
+index de873c1643..10e72016ac 100644
 --- a/libavcodec/Makefile
 +++ b/libavcodec/Makefile
-@@ -941,6 +941,7 @@ OBJS-$(CONFIG_ADPCM_IMA_QT_AT_DECODER)    += audiotoolboxdec.o
+@@ -943,6 +943,7 @@ OBJS-$(CONFIG_ADPCM_IMA_QT_AT_DECODER)    += audiotoolboxdec.o
  OBJS-$(CONFIG_ALAC_AT_DECODER)            += audiotoolboxdec.o
  OBJS-$(CONFIG_AMR_NB_AT_DECODER)          += audiotoolboxdec.o
  OBJS-$(CONFIG_EAC3_AT_DECODER)            += audiotoolboxdec.o
@@ -206,10 +206,10 @@ index 15c43a8a6a..f0e6b12ea2 100644
  OBJS-$(CONFIG_ILBC_AT_DECODER)            += audiotoolboxdec.o
  OBJS-$(CONFIG_MP1_AT_DECODER)             += audiotoolboxdec.o
 diff --git a/libavcodec/allcodecs.c b/libavcodec/allcodecs.c
-index b26aeca239..06ab377b46 100644
+index 71fd74a07e..dc54cc4d2b 100644
 --- a/libavcodec/allcodecs.c
 +++ b/libavcodec/allcodecs.c
-@@ -663,6 +663,7 @@ extern AVCodec ff_alac_at_encoder;
+@@ -664,6 +664,7 @@ extern AVCodec ff_alac_at_encoder;
  extern AVCodec ff_alac_at_decoder;
  extern AVCodec ff_amr_nb_at_decoder;
  extern AVCodec ff_eac3_at_decoder;

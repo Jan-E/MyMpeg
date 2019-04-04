@@ -691,10 +691,8 @@ build_libwebp() {
 }
 
 build_freetype() {
-  local freetype_version="2.8.1"
-  # https://trac.ffmpeg.org/ticket/7229
-  # https://savannah.nongnu.org/bugs/?53969
-  local freetype_previous="2.9.1"
+  local freetype_version="2.10.0"
+  local freetype_previous="2.8.1"
   rm -rf freetype-$freetype_previous
   download_and_unpack_file https://sourceforge.net/projects/freetype/files/freetype2/$freetype_version/freetype-$freetype_version.tar.bz2
   cd freetype-$freetype_version

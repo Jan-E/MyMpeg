@@ -2022,7 +2022,7 @@ build_my_ffmpeg() {
     local arch_opts="--enable-libmfx"
   fi
 
-  local extra_configure_opts="--enable-gpl --enable-version3 --enable-bzlib --enable-fontconfig --enable-frei0r --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwebp --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va --enable-avisynth $arch_opts --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DLIBTWOLAME_STATIC --extra-cflags=-DMODPLUG_STATIC --extra-cflags=-DCACA_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng --extra-libs=-lm"
+  local extra_configure_opts="--enable-gpl --enable-version3 --enable-bzlib --enable-fontconfig --enable-frei0r --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwebp --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va --enable-avisynth $arch_opts --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-zlib --enable-gray --extra-libs=-ldl --enable-filter=frei0r --extra-cflags=-DLIBTWOLAME_STATIC --extra-cflags=-DMODPLUG_STATIC --extra-cflags=-DCACA_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng --extra-libs=-lm"
 
   # can't mix and match --enable-static --enable-shared unfortunately, or the final executable seems to just use shared if the're both present
   if [[ $shared = "shared" ]] || [[ $shared = "minimal" ]] ; then
@@ -2106,7 +2106,7 @@ build_my_ffmpeg() {
   sed -i -e 's/require_pkg_config libmodplug libmodplug\/modplug\.h ModPlug_Load/require libmodplug libmodplug\/modplug\.h ModPlug_Load -lmodplug/' configure
   do_configure "$config_options"
   if [ "$bits_target" = "32" ]; then
-    // #define HAVE_BCRYPT 0
+    ## #define HAVE_BCRYPT 0
     sed -i -e 's/#define HAVE_BCRYPT 1/#define HAVE_BCRYPT 0/' config.h
     sed -i -e 's/-lbcrypt//' ffbuild/config.sh
     sed -i -e 's/-lbcrypt//' ffbuild/config.mak
