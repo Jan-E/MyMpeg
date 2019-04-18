@@ -624,6 +624,11 @@ build_nv_headers() {
 build_intel_quicksync_mfx() { # i.e. qsv
   do_git_checkout https://github.com/lu-zero/mfx_dispatch.git # lu-zero??
   cd mfx_dispatch_git
+    apply_patch file://$patch_dir/revert_fix_linking_for_UWP_targets.patch
+    if [[ ! -f "compile" ]]; then
+      autoreconf -fiv || exit 1
+      automake --add-missing || exit 1
+    fi
     if [[ ! -f "configure" ]]; then
       autoreconf -fiv || exit 1
       automake --add-missing || exit 1
@@ -2215,9 +2220,9 @@ build_ffmpeg_dependencies() {
   if [[ $build_amd_amf = y ]]; then
     build_amd_amf_headers
   fi
-#  if [[ $build_intel_qsv = y ]]; then
-#    build_intel_quicksync_mfx
-#  fi
+  if [[ $build_intel_qsv = y ]]; then
+    build_intel_quicksync_mfx
+  fi
   build_nv_headers
   build_libzimg # Uses dlfcn.
   build_libopenjpeg

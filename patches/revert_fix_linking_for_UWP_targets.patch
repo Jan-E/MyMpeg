@@ -1,0 +1,113 @@
+diff --git Makefile.am Makefile.am
+index 34102e4..c3ebf6b 100644
+--- Makefile.am
++++ Makefile.am
+@@ -46,21 +46,6 @@ libmfx_la_LDFLAGS += -version-info $(MFX_LT_CURRENT):$(MFX_LT_REVISION):$(MFX_LT
+ libmfx_la_LIBADD = $(DLLIB) $(LIBVA_DRM_LIBS) $(LIBVA_X11_LIBS)
+ libmfx_la_CPPFLAGS = $(LIBVA_DRM_CFLAGS) $(LIBVA_X11_CFLAGS) $(AM_CPPFLAGS)
+ 
+-if WINDOWS_STORE
+-libintel_gfx_api-x86.a: src/intel_gfx_api-x86.def
+-	$(DLLTOOL) --as=as --output-lib $@ --input-def $< --as-flags=--32 -m i386 
+-libintel_gfx_api-x64.a: src/intel_gfx_api-x64.def
+-	$(DLLTOOL) --as=as --output-lib $@ --input-def $< --as-flags=--64 -m i386:x86-64
+-
+-if DLLTOOL_X86
+-lib_LTLIBRARIES += libintel_gfx_api-x86.a
+-endif
+-if DLLTOOL_X64
+-lib_LTLIBRARIES += libintel_gfx_api-x64.a
+-endif
+-endif
+-
+-
+ pkgconfigdir = $(libdir)/pkgconfig
+ pkgconfig_DATA = libmfx.pc
+ 
+diff --git configure.ac configure.ac
+index d91eab7..c75271a 100644
+--- configure.ac
++++ configure.ac
+@@ -40,23 +40,6 @@ AS_CASE([${host_os}],
+     ]
+ )
+ 
+-IMPORT_GFX_X86=false
+-IMPORT_GFX_X64=false
+-AS_IF([test -z "${WINDOWS_STORE_TRUE}"],[
+-    AS_CASE([${host_cpu}],
+-        [i?86],[
+-            IMPORT_GFX_X86=true
+-            DLLIB="$(DLLIB) -lintel_gfx_api-x86"
+-        ],
+-        [x86_64],[
+-            IMPORT_GFX_X64=true
+-            DLLIB="$(DLLIB) -lintel_gfx_api-x64"
+-        ]
+-)
+-])
+-AM_CONDITIONAL([DLLTOOL_X86], [test "${IMPORT_GFX_X86}" = "true"])
+-AM_CONDITIONAL([DLLTOOL_X64], [test "${IMPORT_GFX_X64}" = "true"])
+-
+ PKG_HAVE_DEFINE_WITH_MODULES(LIBVA_DRM, [libva-drm])
+ PKG_HAVE_DEFINE_WITH_MODULES(LIBVA_X11, [libva-x11])
+ 
+diff --git src/intel_api_factory.h src/intel_api_factory.h
+deleted file mode 100644
+index 0be5dcb..0000000
+--- src/intel_api_factory.h
++++ /dev/null
+@@ -1,33 +0,0 @@
+-// Copyright (c) 2018 Intel Corporation
+-// 
+-// Permission is hereby granted, free of charge, to any person obtaining a copy
+-// of this software and associated documentation files (the "Software"), to deal
+-// in the Software without restriction, including without limitation the rights
+-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-// copies of the Software, and to permit persons to whom the Software is
+-// furnished to do so, subject to the following conditions:
+-// 
+-// The above copyright notice and this permission notice shall be included in all
+-// copies or substantial portions of the Software.
+-// 
+-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-// SOFTWARE.
+-
+-#pragma once
+-
+-#ifdef __cplusplus
+-extern "C"
+-{
+-#endif /* __cplusplus */
+-
+-HRESULT APIENTRY InitialiseMediaSession(_Out_ HANDLE* handle, _In_ LPVOID lpParam, _Reserved_ LPVOID lpReserved);
+-HRESULT APIENTRY DisposeMediaSession(_In_ const HANDLE handle);
+-
+-#ifdef __cplusplus
+-}
+-#endif /* __cplusplus */
+diff --git src/intel_gfx_api-x64.def src/intel_gfx_api-x64.def
+deleted file mode 100644
+index 5f667ba..0000000
+--- src/intel_gfx_api-x64.def
++++ /dev/null
+@@ -1,4 +0,0 @@
+-LIBRARY intel_gfx_api-x64.dll
+-EXPORTS
+-InitialiseMediaSession
+-DisposeMediaSession
+diff --git src/intel_gfx_api-x86.def src/intel_gfx_api-x86.def
+deleted file mode 100644
+index 19d0727..0000000
+--- src/intel_gfx_api-x86.def
++++ /dev/null
+@@ -1,4 +0,0 @@
+-LIBRARY intel_gfx_api-x86.dll
+-EXPORTS
+-InitialiseMediaSession@12
+-DisposeMediaSession@4
