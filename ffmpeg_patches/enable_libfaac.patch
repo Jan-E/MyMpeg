@@ -12,7 +12,7 @@ index ba65b059c5..fb287071d2 100644
  license, requires a proprietary binary blob at run time, and is deemed to be
  incompatible with the GPL. We are not certain if it is compatible with the
 diff --git a/configure b/configure
-index f6123f53e5..79ada81e75 100755
+index e10e2c2c46..9e7c3aa2ae 100755
 --- a/configure
 +++ b/configure
 @@ -231,6 +231,7 @@ External library support:
@@ -31,7 +31,7 @@ index f6123f53e5..79ada81e75 100755
      libfdk_aac
      openssl
      libtls
-@@ -3102,6 +3104,8 @@ avisynth_demuxer_deps="avisynth"
+@@ -3105,6 +3107,8 @@ avisynth_demuxer_deps="avisynth"
  avisynth_demuxer_select="riffdec"
  eac3_at_decoder_deps="audiotoolbox"
  eac3_at_decoder_select="ac3_parser"
@@ -40,7 +40,7 @@ index f6123f53e5..79ada81e75 100755
  gsm_ms_at_decoder_deps="audiotoolbox"
  ilbc_at_decoder_deps="audiotoolbox"
  mp1_at_decoder_deps="audiotoolbox"
-@@ -6140,6 +6144,7 @@ enabled fontconfig        && enable libfontconfig
+@@ -6144,6 +6148,7 @@ enabled fontconfig        && enable libfontconfig
  enabled libfontconfig     && require_pkg_config libfontconfig fontconfig "fontconfig/fontconfig.h" FcInit
  enabled libfreetype       && require_pkg_config libfreetype freetype2 "ft2build.h FT_FREETYPE_H" FT_Init_FreeType
  enabled libfribidi        && require_pkg_config libfribidi fribidi fribidi.h fribidi_version_info
@@ -49,7 +49,7 @@ index f6123f53e5..79ada81e75 100755
                                 require libgme gme/gme.h gme_new_emu -lgme -lstdc++; }
  enabled libgsm            && { for gsm_hdr in "gsm.h" "gsm/gsm.h"; do
 diff --git a/doc/encoders.texi b/doc/encoders.texi
-index 94337d009c..27635cc8b7 100644
+index ef12c73ed5..6de62c9f58 100644
 --- a/doc/encoders.texi
 +++ b/doc/encoders.texi
 @@ -637,6 +637,111 @@ Sets the maximum delay in milliseconds. Lower delays than 20ms will very quickly
@@ -194,10 +194,10 @@ index 83ae017d6c..f5e08d0ac5 100644
  
  @item
 diff --git a/libavcodec/Makefile b/libavcodec/Makefile
-index de873c1643..10e72016ac 100644
+index f37135fc07..8ecfd864ea 100644
 --- a/libavcodec/Makefile
 +++ b/libavcodec/Makefile
-@@ -943,6 +943,7 @@ OBJS-$(CONFIG_ADPCM_IMA_QT_AT_DECODER)    += audiotoolboxdec.o
+@@ -945,6 +945,7 @@ OBJS-$(CONFIG_ADPCM_IMA_QT_AT_DECODER)    += audiotoolboxdec.o
  OBJS-$(CONFIG_ALAC_AT_DECODER)            += audiotoolboxdec.o
  OBJS-$(CONFIG_AMR_NB_AT_DECODER)          += audiotoolboxdec.o
  OBJS-$(CONFIG_EAC3_AT_DECODER)            += audiotoolboxdec.o
@@ -206,10 +206,10 @@ index de873c1643..10e72016ac 100644
  OBJS-$(CONFIG_ILBC_AT_DECODER)            += audiotoolboxdec.o
  OBJS-$(CONFIG_MP1_AT_DECODER)             += audiotoolboxdec.o
 diff --git a/libavcodec/allcodecs.c b/libavcodec/allcodecs.c
-index 71fd74a07e..dc54cc4d2b 100644
+index 6178d31b5c..e9073963f1 100644
 --- a/libavcodec/allcodecs.c
 +++ b/libavcodec/allcodecs.c
-@@ -664,6 +664,7 @@ extern AVCodec ff_alac_at_encoder;
+@@ -666,6 +666,7 @@ extern AVCodec ff_alac_at_encoder;
  extern AVCodec ff_alac_at_decoder;
  extern AVCodec ff_amr_nb_at_decoder;
  extern AVCodec ff_eac3_at_decoder;
