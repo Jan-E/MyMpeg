@@ -12,7 +12,7 @@ index ba65b059c5..fb287071d2 100644
  license, requires a proprietary binary blob at run time, and is deemed to be
  incompatible with the GPL. We are not certain if it is compatible with the
 diff --git a/configure b/configure
-index e10e2c2c46..9e7c3aa2ae 100755
+index d644a5b1d4..4fee31c461 100755
 --- a/configure
 +++ b/configure
 @@ -231,6 +231,7 @@ External library support:
@@ -40,7 +40,7 @@ index e10e2c2c46..9e7c3aa2ae 100755
  gsm_ms_at_decoder_deps="audiotoolbox"
  ilbc_at_decoder_deps="audiotoolbox"
  mp1_at_decoder_deps="audiotoolbox"
-@@ -6144,6 +6148,7 @@ enabled fontconfig        && enable libfontconfig
+@@ -6149,6 +6153,7 @@ enabled fontconfig        && enable libfontconfig
  enabled libfontconfig     && require_pkg_config libfontconfig fontconfig "fontconfig/fontconfig.h" FcInit
  enabled libfreetype       && require_pkg_config libfreetype freetype2 "ft2build.h FT_FREETYPE_H" FT_Init_FreeType
  enabled libfribidi        && require_pkg_config libfribidi fribidi fribidi.h fribidi_version_info
@@ -165,10 +165,10 @@ index ef12c73ed5..6de62c9f58 100644
  @section libfdk_aac
  
 diff --git a/doc/general.texi b/doc/general.texi
-index 109c8c58cc..290d5ff34b 100644
+index d2324612c2..ae2b688985 100644
 --- a/doc/general.texi
 +++ b/doc/general.texi
-@@ -1040,7 +1040,7 @@ following image formats are supported:
+@@ -1042,7 +1042,7 @@ following image formats are supported:
  @item 8SVX exponential       @tab     @tab  X
  @item 8SVX fibonacci         @tab     @tab  X
  @item AAC                    @tab EX  @tab  X
