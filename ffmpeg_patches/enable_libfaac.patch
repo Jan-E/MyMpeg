@@ -1,18 +1,15 @@
 diff --git a/LICENSE.md b/LICENSE.md
-index ba65b059c5..fb287071d2 100644
+index c7d6bf7121..f56cd0b0d1 100644
 --- a/LICENSE.md
 +++ b/LICENSE.md
-@@ -113,6 +113,8 @@ The Fraunhofer FDK AAC and OpenSSL libraries are under licenses which are
+@@ -109,3 +109,5 @@ unredistributable.
+ The Fraunhofer FDK AAC and OpenSSL libraries are under licenses which are
  incompatible with the GPLv2 and v3. To the best of our knowledge, they are
  compatible with the LGPL.
- 
-+The FAAC library is incompatible with all versions of GPL and LGPL.
 +
- The NVENC library, while its header file is licensed under the compatible MIT
- license, requires a proprietary binary blob at run time, and is deemed to be
- incompatible with the GPL. We are not certain if it is compatible with the
++The FAAC library is incompatible with all versions of GPL and LGPL.
 diff --git a/configure b/configure
-index d644a5b1d4..4fee31c461 100755
+index 9b4305cf0d..6c30d12af2 100755
 --- a/configure
 +++ b/configure
 @@ -231,6 +231,7 @@ External library support:
@@ -23,7 +20,7 @@ index d644a5b1d4..4fee31c461 100755
    --enable-libfdk-aac      enable AAC de/encoding via libfdk-aac [no]
    --enable-libflite        enable flite (voice synthesis) support via libflite [no]
    --enable-libfontconfig   enable libfontconfig, useful for drawtext filter [no]
-@@ -1712,6 +1713,7 @@ EXTERNAL_LIBRARY_GPL_LIST="
+@@ -1717,6 +1718,7 @@ EXTERNAL_LIBRARY_GPL_LIST="
  
  EXTERNAL_LIBRARY_NONFREE_LIST="
      decklink
@@ -31,7 +28,7 @@ index d644a5b1d4..4fee31c461 100755
      libfdk_aac
      openssl
      libtls
-@@ -3105,6 +3107,8 @@ avisynth_demuxer_deps="avisynth"
+@@ -3110,6 +3112,8 @@ avisynth_demuxer_deps="avisynth"
  avisynth_demuxer_select="riffdec"
  eac3_at_decoder_deps="audiotoolbox"
  eac3_at_decoder_select="ac3_parser"
@@ -40,7 +37,7 @@ index d644a5b1d4..4fee31c461 100755
  gsm_ms_at_decoder_deps="audiotoolbox"
  ilbc_at_decoder_deps="audiotoolbox"
  mp1_at_decoder_deps="audiotoolbox"
-@@ -6149,6 +6153,7 @@ enabled fontconfig        && enable libfontconfig
+@@ -6155,6 +6159,7 @@ enabled fontconfig        && enable libfontconfig
  enabled libfontconfig     && require_pkg_config libfontconfig fontconfig "fontconfig/fontconfig.h" FcInit
  enabled libfreetype       && require_pkg_config libfreetype freetype2 "ft2build.h FT_FREETYPE_H" FT_Init_FreeType
  enabled libfribidi        && require_pkg_config libfribidi fribidi fribidi.h fribidi_version_info
@@ -194,7 +191,7 @@ index 83ae017d6c..f5e08d0ac5 100644
  
  @item
 diff --git a/libavcodec/Makefile b/libavcodec/Makefile
-index f37135fc07..8ecfd864ea 100644
+index edccd73037..df91246eaf 100644
 --- a/libavcodec/Makefile
 +++ b/libavcodec/Makefile
 @@ -945,6 +945,7 @@ OBJS-$(CONFIG_ADPCM_IMA_QT_AT_DECODER)    += audiotoolboxdec.o
