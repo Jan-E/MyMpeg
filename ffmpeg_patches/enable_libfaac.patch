@@ -162,10 +162,10 @@ index ef12c73ed5..6de62c9f58 100644
  @section libfdk_aac
  
 diff --git a/doc/general.texi b/doc/general.texi
-index d2324612c2..ae2b688985 100644
+index ec437230e3..fa7ba74aa4 100644
 --- a/doc/general.texi
 +++ b/doc/general.texi
-@@ -1042,7 +1042,7 @@ following image formats are supported:
+@@ -1049,7 +1049,7 @@ following image formats are supported:
  @item 8SVX exponential       @tab     @tab  X
  @item 8SVX fibonacci         @tab     @tab  X
  @item AAC                    @tab EX  @tab  X
