@@ -767,8 +767,8 @@ build_librtmp() {
 }
 
 build_libssh2_wincng() {
-  local ssh2_version="1.8.2"
-  local ssh2_previous="1.8.0"
+  local ssh2_version="1.9.0"
+  local ssh2_previous="1.8.2"
   rm -rf libssh2-$ssh2_previous
   download_and_unpack_file https://github.com/libssh2/libssh2/releases/download/libssh2-$ssh2_version/libssh2-$ssh2_version.tar.gz libssh2-$ssh2_version
   cd libssh2-$ssh2_version
@@ -777,10 +777,10 @@ build_libssh2_wincng() {
 	ln -s "${cross_prefix}windres" "$mingw_bin_path/windres"
 	ln -s "${cross_prefix}ar"      "$mingw_bin_path/ar"
 	ln -s "${cross_prefix}ranlib"  "$mingw_bin_path/ranlib"
-    echo remove line with ENGINE_load_builtin_engines in src/openssl.h - unresolved
-    apply_patch file://$patch_dir/ssh2_load_builtin_engines.diff
-    echo Implement sftp writeback https://github.com/djelinski/libssh2/commit/e3fd7f8cca77f03225829ab975cc3aae0026ae36
-    apply_patch file://$patch_dir/ssh2_sftp_writeback.diff -p1
+    # echo remove line with ENGINE_load_builtin_engines in src/openssl.h - unresolved
+    # apply_patch file://$patch_dir/ssh2_load_builtin_engines.diff
+    # echo Implement sftp writeback https://github.com/djelinski/libssh2/commit/e3fd7f8cca77f03225829ab975cc3aae0026ae36
+    # apply_patch file://$patch_dir/ssh2_sftp_writeback.diff -p1
     do_cmake_and_install "-DBUILD_SHARED_LIBS=0 -DBUILD_EXAMPLES=OFF -DBUILD_TESTING=OFF -DCRYPTO_BACKEND=WinCNG"
 	rm    "$mingw_bin_path/gcc"
 	rm    "$mingw_bin_path/g++"
@@ -791,8 +791,8 @@ build_libssh2_wincng() {
 }
 
 build_libssh2() {
-  local ssh2_version="1.8.2"
-  local ssh2_previous="1.8.0"
+  local ssh2_version="1.9.0"
+  local ssh2_previous="1.8.2"
   rm -rf libssh2-$ssh2_previous
   download_and_unpack_file https://github.com/libssh2/libssh2/releases/download/libssh2-$ssh2_version/libssh2-$ssh2_version.tar.gz libssh2-$ssh2_version
   cd libssh2-$ssh2_version
@@ -801,10 +801,10 @@ build_libssh2() {
 	ln -s "${cross_prefix}windres" "$mingw_bin_path/windres"
 	ln -s "${cross_prefix}ar"      "$mingw_bin_path/ar"
 	ln -s "${cross_prefix}ranlib"  "$mingw_bin_path/ranlib"
-    echo remove line with ENGINE_load_builtin_engines in src/openssl.h - unresolved
-    apply_patch file://$patch_dir/ssh2_load_builtin_engines.diff
-    echo Implement sftp writeback https://github.com/djelinski/libssh2/commit/e3fd7f8cca77f03225829ab975cc3aae0026ae36
-    apply_patch file://$patch_dir/ssh2_sftp_writeback.diff -p1
+    # echo remove line with ENGINE_load_builtin_engines in src/openssl.h - unresolved
+    # apply_patch file://$patch_dir/ssh2_load_builtin_engines.diff
+    # echo Implement sftp writeback https://github.com/djelinski/libssh2/commit/e3fd7f8cca77f03225829ab975cc3aae0026ae36
+    # apply_patch file://$patch_dir/ssh2_sftp_writeback.diff -p1
     do_cmake_and_install "-DBUILD_SHARED_LIBS=0 -DBUILD_EXAMPLES=OFF -DBUILD_TESTING=OFF -DCRYPTO_BACKEND=OpenSSL"
 	rm    "$mingw_bin_path/gcc"
 	rm    "$mingw_bin_path/g++"
@@ -911,7 +911,11 @@ build_nghttp2() {
   do_git_checkout https://github.com/nghttp2/nghttp2.git nghttp2
   cd nghttp2
     local touch_name=$(get_small_touchfile_name already_ran_cmake)
-    if [ ! -f lib/libnghttp2.a ]; then
+    # if [ ! -f lib/libnghttp2.a ]; then
+      if [[ ! -f configure ]]; then
+        autoreconf -fiv
+      fi
+      ./configure
       cd lib
 	rm CMakeCache.txt
 	rm -rf CMakeFiles
@@ -932,6 +936,7 @@ build_nghttp2() {
         ln -s "${cross_prefix}windres" "$mingw_bin_path/windres"
         ln -s "${cross_prefix}ar"      "$mingw_bin_path/ar"
         ln -s "${cross_prefix}ranlib"  "$mingw_bin_path/ranlib"
+        ln -s "${cross_prefix}ld"  "$mingw_bin_path/ld"
 	export prefix=$mingw_w64_x86_64_prefix
 	export cross=${cross_prefix}
         echo cmake . -DENABLE_STATIC_LIB=1 -DNGHTTP2_STATICLIB=1 -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_INSTALL_PREFIX=$mingw_w64_x86_64_prefix -DCMAKE_INSTALL_LIBDIR=$mingw_w64_x86_64_prefix/lib
@@ -940,19 +945,22 @@ build_nghttp2() {
         rm    "$mingw_bin_path/windres"
         rm    "$mingw_bin_path/ar"
         rm    "$mingw_bin_path/ranlib"
+        rm    "$mingw_bin_path/ld"
         grep AC_INIT ../configure.ac | cut -d'[' -f3 | sed -e 's/], //g' -e 's/1/export nghttp2ver=1/g'
 	do_make
       cd ..
       #do_cmake_and_install
+      install -d                                       $mingw_w64_x86_64_prefix/include/nghttp2
+      install -m 644 lib/includes/nghttp2/nghttp2.h    $mingw_w64_x86_64_prefix/include/nghttp2/nghttp2.h
+      install -m 644 lib/includes/nghttp2/nghttp2ver.h $mingw_w64_x86_64_prefix/include/nghttp2/nghttp2ver.h
       install -m 644 lib/libnghttp2.a $mingw_w64_x86_64_prefix/lib/libnghttp2.a
-    fi
-    strip $mingw_w64_x86_64_prefix/lib/libnghttp2.dll
+    # fi
   cd ..
 }
 
 build_curl() {
-  local curl_version="7.65.1"
-  local curl_previous="7.65.0"
+  local curl_version="7.65.2"
+  local curl_previous="7.65.1"
   rm -rf curl-$curl_previous
   download_and_unpack_file https://curl.haxx.se/download/curl-$curl_version.tar.gz curl-$curl_version
   cd curl-$curl_version

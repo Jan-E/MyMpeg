@@ -1,5 +1,5 @@
 diff --git a/LICENSE.md b/LICENSE.md
-index c7d6bf7121..f56cd0b0d1 100644
+index c7d6bf7..f56cd0b 100644
 --- a/LICENSE.md
 +++ b/LICENSE.md
 @@ -109,3 +109,5 @@ unredistributable.
@@ -9,7 +9,7 @@ index c7d6bf7121..f56cd0b0d1 100644
 +
 +The FAAC library is incompatible with all versions of GPL and LGPL.
 diff --git a/configure b/configure
-index 32fc26356c..c70306f668 100755
+index 5a4f507..769bb3f 100755
 --- a/configure
 +++ b/configure
 @@ -231,6 +231,7 @@ External library support:
@@ -20,7 +20,7 @@ index 32fc26356c..c70306f668 100755
    --enable-libfdk-aac      enable AAC de/encoding via libfdk-aac [no]
    --enable-libflite        enable flite (voice synthesis) support via libflite [no]
    --enable-libfontconfig   enable libfontconfig, useful for drawtext filter [no]
-@@ -1717,6 +1718,7 @@ EXTERNAL_LIBRARY_GPL_LIST="
+@@ -1718,6 +1719,7 @@ EXTERNAL_LIBRARY_GPL_LIST="
  
  EXTERNAL_LIBRARY_NONFREE_LIST="
      decklink
@@ -28,7 +28,7 @@ index 32fc26356c..c70306f668 100755
      libfdk_aac
      openssl
      libtls
-@@ -3110,6 +3112,8 @@ avisynth_demuxer_deps="avisynth"
+@@ -3114,6 +3116,8 @@ avisynth_demuxer_deps="avisynth"
  avisynth_demuxer_select="riffdec"
  eac3_at_decoder_deps="audiotoolbox"
  eac3_at_decoder_select="ac3_parser"
@@ -37,7 +37,7 @@ index 32fc26356c..c70306f668 100755
  gsm_ms_at_decoder_deps="audiotoolbox"
  ilbc_at_decoder_deps="audiotoolbox"
  mp1_at_decoder_deps="audiotoolbox"
-@@ -6156,6 +6160,7 @@ enabled fontconfig        && enable libfontconfig
+@@ -6176,6 +6180,7 @@ enabled fontconfig        && enable libfontconfig
  enabled libfontconfig     && require_pkg_config libfontconfig fontconfig "fontconfig/fontconfig.h" FcInit
  enabled libfreetype       && require_pkg_config libfreetype freetype2 "ft2build.h FT_FREETYPE_H" FT_Init_FreeType
  enabled libfribidi        && require_pkg_config libfribidi fribidi fribidi.h fribidi_version_info
@@ -46,7 +46,7 @@ index 32fc26356c..c70306f668 100755
                                 require libgme gme/gme.h gme_new_emu -lgme -lstdc++; }
  enabled libgsm            && { for gsm_hdr in "gsm.h" "gsm/gsm.h"; do
 diff --git a/doc/encoders.texi b/doc/encoders.texi
-index ef12c73ed5..6de62c9f58 100644
+index eefd124..5cc8c9f 100644
 --- a/doc/encoders.texi
 +++ b/doc/encoders.texi
 @@ -637,6 +637,111 @@ Sets the maximum delay in milliseconds. Lower delays than 20ms will very quickly
@@ -162,10 +162,10 @@ index ef12c73ed5..6de62c9f58 100644
  @section libfdk_aac
  
 diff --git a/doc/general.texi b/doc/general.texi
-index ec437230e3..fa7ba74aa4 100644
+index 3c0c803..e4ce154 100644
 --- a/doc/general.texi
 +++ b/doc/general.texi
-@@ -1049,7 +1049,7 @@ following image formats are supported:
+@@ -1053,7 +1053,7 @@ following image formats are supported:
  @item 8SVX exponential       @tab     @tab  X
  @item 8SVX fibonacci         @tab     @tab  X
  @item AAC                    @tab EX  @tab  X
@@ -175,10 +175,10 @@ index ec437230e3..fa7ba74aa4 100644
      @tab encoding supported through external library libfdk-aac
  @item AC-3                   @tab IX  @tab  IX
 diff --git a/doc/muxers.texi b/doc/muxers.texi
-index 83ae017d6c..f5e08d0ac5 100644
+index b109297..4bd1a33 100644
 --- a/doc/muxers.texi
 +++ b/doc/muxers.texi
-@@ -1998,9 +1998,9 @@ ffmpeg -i in.mkv -codec copy -map 0 -f segment -segment_list out.csv -segment_fr
+@@ -2026,9 +2026,9 @@ ffmpeg -i in.mkv -codec copy -map 0 -f segment -segment_list out.csv -segment_fr
  
  @item
  Convert the @file{in.mkv} to TS segments using the @code{libx264}
@@ -191,7 +191,7 @@ index 83ae017d6c..f5e08d0ac5 100644
  
  @item
 diff --git a/libavcodec/Makefile b/libavcodec/Makefile
-index edccd73037..df91246eaf 100644
+index 3cd73fb..b2d14fb 100644
 --- a/libavcodec/Makefile
 +++ b/libavcodec/Makefile
 @@ -945,6 +945,7 @@ OBJS-$(CONFIG_ADPCM_IMA_QT_AT_DECODER)    += audiotoolboxdec.o
@@ -203,10 +203,10 @@ index edccd73037..df91246eaf 100644
  OBJS-$(CONFIG_ILBC_AT_DECODER)            += audiotoolboxdec.o
  OBJS-$(CONFIG_MP1_AT_DECODER)             += audiotoolboxdec.o
 diff --git a/libavcodec/allcodecs.c b/libavcodec/allcodecs.c
-index 6178d31b5c..e9073963f1 100644
+index d2f9a39..d59eb3f 100644
 --- a/libavcodec/allcodecs.c
 +++ b/libavcodec/allcodecs.c
-@@ -666,6 +666,7 @@ extern AVCodec ff_alac_at_encoder;
+@@ -667,6 +667,7 @@ extern AVCodec ff_alac_at_encoder;
  extern AVCodec ff_alac_at_decoder;
  extern AVCodec ff_amr_nb_at_decoder;
  extern AVCodec ff_eac3_at_decoder;

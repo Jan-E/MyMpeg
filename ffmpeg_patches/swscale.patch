@@ -1,5 +1,5 @@
 diff --git a/libswscale/swscale.c b/libswscale/swscale.c
-index 40695503ad..10b189d147 100644
+index 4069550..10b189d 100644
 --- a/libswscale/swscale.c
 +++ b/libswscale/swscale.c
 @@ -845,7 +845,11 @@ int attribute_align_arg sws_scale(struct SwsContext *c,
