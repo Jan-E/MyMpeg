@@ -1130,9 +1130,9 @@ build_openssl-1.1.0() {
 }
 
 build_openssl-1.1.1() {
-  rm -rf openssl-1.1.1b
-  download_and_unpack_file https://www.openssl.org/source/openssl-1.1.1c.tar.gz
-  cd openssl-1.1.1c
+  rm -rf openssl-1.1.1c
+  download_and_unpack_file https://www.openssl.org/source/openssl-1.1.1d.tar.gz
+  cd openssl-1.1.1d
     export CC="${cross_prefix}gcc"
     export AR="${cross_prefix}ar"
     export RANLIB="${cross_prefix}ranlib"
@@ -1159,7 +1159,7 @@ build_openssl-1.1.1() {
     do_make "build_libs"
     if [ "$1" = "dllonly" ]; then
       mkdir -p $cur_dir/redist # Strip and pack shared libraries.
-      archive="$cur_dir/redist/openssl-${arch}-v1.1.1c.7z"
+      archive="$cur_dir/redist/openssl-${arch}-v1.1.1d.7z"
       if [[ ! -f $archive ]]; then
         for sharedlib in *.dll; do
           ${cross_prefix}strip $sharedlib
