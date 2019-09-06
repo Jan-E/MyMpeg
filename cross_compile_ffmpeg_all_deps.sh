@@ -1299,6 +1299,9 @@ build_libmodplug() {
       autoreconf -fiv || exit 1
       automake --add-missing || exit 1
     fi
+    if [[ ! -f "compile" ]]; then
+      automake --add-missing || exit 1
+    fi
     generic_configure_make_install # or could use cmake I guess
   cd ..
 }
