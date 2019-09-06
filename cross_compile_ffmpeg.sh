@@ -764,10 +764,10 @@ build_gnutls() {
 }
 
 build_openssl-1.0.2() {
-  rd -rf openssl-1.0.2l
-  download_and_unpack_file https://www.openssl.org/source/openssl-1.0.2p.tar.gz
-  cd openssl-1.0.2p
-    apply_patch file://$patch_dir/openssl-1.0.2p_lib-only.diff
+  rd -rf openssl-1.0.2s
+  download_and_unpack_file https://www.openssl.org/source/openssl-1.0.2t.tar.gz
+  cd openssl-1.0.2t
+    apply_patch file://$patch_dir/openssl-1.0.2l_lib-only.diff
     export CC="${cross_prefix}gcc"
     export AR="${cross_prefix}ar"
     export RANLIB="${cross_prefix}ranlib"

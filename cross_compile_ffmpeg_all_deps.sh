@@ -959,8 +959,8 @@ build_nghttp2() {
 }
 
 build_curl() {
-  local curl_version="7.65.2"
-  local curl_previous="7.65.1"
+  local curl_version="7.65.3"
+  local curl_previous="7.65.2"
   rm -rf curl-$curl_previous
   download_and_unpack_file https://curl.haxx.se/download/curl-$curl_version.tar.gz curl-$curl_version
   cd curl-$curl_version
@@ -1038,9 +1038,9 @@ build_gnutls() {
 }
 
 build_openssl-1.0.2() {
-  rm -rf openssl-1.0.2r
-  download_and_unpack_file https://www.openssl.org/source/openssl-1.0.2s.tar.gz
-  cd openssl-1.0.2s
+  rm -rf openssl-1.0.2s
+  download_and_unpack_file https://www.openssl.org/source/openssl-1.0.2t.tar.gz
+  cd openssl-1.0.2t
     apply_patch file://$patch_dir/openssl-1.0.2l_lib-only.diff
     export CC="${cross_prefix}gcc"
     export AR="${cross_prefix}ar"

@@ -175,10 +175,10 @@ index 3c0c803..e4ce154 100644
      @tab encoding supported through external library libfdk-aac
  @item AC-3                   @tab IX  @tab  IX
 diff --git a/doc/muxers.texi b/doc/muxers.texi
-index b109297..4bd1a33 100644
+index bc38cf6..b7abc37 100644
 --- a/doc/muxers.texi
 +++ b/doc/muxers.texi
-@@ -2026,9 +2026,9 @@ ffmpeg -i in.mkv -codec copy -map 0 -f segment -segment_list out.csv -segment_fr
+@@ -2030,9 +2030,9 @@ ffmpeg -i in.mkv -codec copy -map 0 -f segment -segment_list out.csv -segment_fr
  
  @item
  Convert the @file{in.mkv} to TS segments using the @code{libx264}
