@@ -1,8 +1,8 @@
 diff --git a/libswscale/swscale.c b/libswscale/swscale.c
-index 4069550..10b189d 100644
+index 4ecfa88..7b9856f 100644
 --- a/libswscale/swscale.c
 +++ b/libswscale/swscale.c
-@@ -845,7 +845,11 @@ int attribute_align_arg sws_scale(struct SwsContext *c,
+@@ -837,7 +837,11 @@ int attribute_align_arg sws_scale(struct SwsContext *c,
  
      if (c->sliceDir == 0 && srcSliceY != 0 && srcSliceY + srcSliceH != c->srcH) {
          av_log(c, AV_LOG_ERROR, "Slices start in the middle!\n");

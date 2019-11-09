@@ -1,15 +1,15 @@
 diff --git a/LICENSE.md b/LICENSE.md
-index c7d6bf7..f56cd0b 100644
+index e2ab65c..b1f6aac 100644
 --- a/LICENSE.md
 +++ b/LICENSE.md
-@@ -109,3 +109,5 @@ unredistributable.
+@@ -128,3 +128,5 @@ unredistributable.
  The Fraunhofer FDK AAC and OpenSSL libraries are under licenses which are
  incompatible with the GPLv2 and v3. To the best of our knowledge, they are
  compatible with the LGPL.
 +
 +The FAAC library is incompatible with all versions of GPL and LGPL.
 diff --git a/configure b/configure
-index 5a4f507..769bb3f 100755
+index 48e1426..cc15c27 100755
 --- a/configure
 +++ b/configure
 @@ -231,6 +231,7 @@ External library support:
@@ -20,7 +20,7 @@ index 5a4f507..769bb3f 100755
    --enable-libfdk-aac      enable AAC de/encoding via libfdk-aac [no]
    --enable-libflite        enable flite (voice synthesis) support via libflite [no]
    --enable-libfontconfig   enable libfontconfig, useful for drawtext filter [no]
-@@ -1718,6 +1719,7 @@ EXTERNAL_LIBRARY_GPL_LIST="
+@@ -1723,6 +1724,7 @@ EXTERNAL_LIBRARY_GPL_LIST="
  
  EXTERNAL_LIBRARY_NONFREE_LIST="
      decklink
@@ -28,7 +28,7 @@ index 5a4f507..769bb3f 100755
      libfdk_aac
      openssl
      libtls
-@@ -3114,6 +3116,8 @@ avisynth_demuxer_deps="avisynth"
+@@ -3139,6 +3141,8 @@ avisynth_demuxer_deps="avisynth"
  avisynth_demuxer_select="riffdec"
  eac3_at_decoder_deps="audiotoolbox"
  eac3_at_decoder_select="ac3_parser"
@@ -37,7 +37,7 @@ index 5a4f507..769bb3f 100755
  gsm_ms_at_decoder_deps="audiotoolbox"
  ilbc_at_decoder_deps="audiotoolbox"
  mp1_at_decoder_deps="audiotoolbox"
-@@ -6176,6 +6180,7 @@ enabled fontconfig        && enable libfontconfig
+@@ -6240,6 +6244,7 @@ enabled fontconfig        && enable libfontconfig
  enabled libfontconfig     && require_pkg_config libfontconfig fontconfig "fontconfig/fontconfig.h" FcInit
  enabled libfreetype       && require_pkg_config libfreetype freetype2 "ft2build.h FT_FREETYPE_H" FT_Init_FreeType
  enabled libfribidi        && require_pkg_config libfribidi fribidi fribidi.h fribidi_version_info
@@ -162,10 +162,10 @@ index eefd124..5cc8c9f 100644
  @section libfdk_aac
  
 diff --git a/doc/general.texi b/doc/general.texi
-index 3c0c803..e4ce154 100644
+index 79a23e1..8685d92 100644
 --- a/doc/general.texi
 +++ b/doc/general.texi
-@@ -1053,7 +1053,7 @@ following image formats are supported:
+@@ -1063,7 +1063,7 @@ following image formats are supported:
  @item 8SVX exponential       @tab     @tab  X
  @item 8SVX fibonacci         @tab     @tab  X
  @item AAC                    @tab EX  @tab  X
@@ -175,7 +175,7 @@ index 3c0c803..e4ce154 100644
      @tab encoding supported through external library libfdk-aac
  @item AC-3                   @tab IX  @tab  IX
 diff --git a/doc/muxers.texi b/doc/muxers.texi
-index bc38cf6..b7abc37 100644
+index 09ded7d..b77e077 100644
 --- a/doc/muxers.texi
 +++ b/doc/muxers.texi
 @@ -2030,9 +2030,9 @@ ffmpeg -i in.mkv -codec copy -map 0 -f segment -segment_list out.csv -segment_fr
@@ -191,10 +191,10 @@ index bc38cf6..b7abc37 100644
  
  @item
 diff --git a/libavcodec/Makefile b/libavcodec/Makefile
-index 3cd73fb..b2d14fb 100644
+index eee1e50..58af376 100644
 --- a/libavcodec/Makefile
 +++ b/libavcodec/Makefile
-@@ -945,6 +945,7 @@ OBJS-$(CONFIG_ADPCM_IMA_QT_AT_DECODER)    += audiotoolboxdec.o
+@@ -950,6 +950,7 @@ OBJS-$(CONFIG_ADPCM_IMA_QT_AT_DECODER)    += audiotoolboxdec.o
  OBJS-$(CONFIG_ALAC_AT_DECODER)            += audiotoolboxdec.o
  OBJS-$(CONFIG_AMR_NB_AT_DECODER)          += audiotoolboxdec.o
  OBJS-$(CONFIG_EAC3_AT_DECODER)            += audiotoolboxdec.o
@@ -203,10 +203,10 @@ index 3cd73fb..b2d14fb 100644
  OBJS-$(CONFIG_ILBC_AT_DECODER)            += audiotoolboxdec.o
  OBJS-$(CONFIG_MP1_AT_DECODER)             += audiotoolboxdec.o
 diff --git a/libavcodec/allcodecs.c b/libavcodec/allcodecs.c
-index d2f9a39..d59eb3f 100644
+index 23a778e..fe3928e 100644
 --- a/libavcodec/allcodecs.c
 +++ b/libavcodec/allcodecs.c
-@@ -667,6 +667,7 @@ extern AVCodec ff_alac_at_encoder;
+@@ -669,6 +669,7 @@ extern AVCodec ff_alac_at_encoder;
  extern AVCodec ff_alac_at_decoder;
  extern AVCodec ff_amr_nb_at_decoder;
  extern AVCodec ff_eac3_at_decoder;
