@@ -9,7 +9,7 @@ index e2ab65c..b1f6aac 100644
 +
 +The FAAC library is incompatible with all versions of GPL and LGPL.
 diff --git a/configure b/configure
-index 48e1426..cc15c27 100755
+index ca7137f..794714f 100755
 --- a/configure
 +++ b/configure
 @@ -231,6 +231,7 @@ External library support:
@@ -20,7 +20,7 @@ index 48e1426..cc15c27 100755
    --enable-libfdk-aac      enable AAC de/encoding via libfdk-aac [no]
    --enable-libflite        enable flite (voice synthesis) support via libflite [no]
    --enable-libfontconfig   enable libfontconfig, useful for drawtext filter [no]
-@@ -1723,6 +1724,7 @@ EXTERNAL_LIBRARY_GPL_LIST="
+@@ -1724,6 +1725,7 @@ EXTERNAL_LIBRARY_GPL_LIST="
  
  EXTERNAL_LIBRARY_NONFREE_LIST="
      decklink
@@ -28,7 +28,7 @@ index 48e1426..cc15c27 100755
      libfdk_aac
      openssl
      libtls
-@@ -3139,6 +3141,8 @@ avisynth_demuxer_deps="avisynth"
+@@ -3143,6 +3145,8 @@ avisynth_demuxer_deps="avisynth"
  avisynth_demuxer_select="riffdec"
  eac3_at_decoder_deps="audiotoolbox"
  eac3_at_decoder_select="ac3_parser"
@@ -37,7 +37,7 @@ index 48e1426..cc15c27 100755
  gsm_ms_at_decoder_deps="audiotoolbox"
  ilbc_at_decoder_deps="audiotoolbox"
  mp1_at_decoder_deps="audiotoolbox"
-@@ -6240,6 +6244,7 @@ enabled fontconfig        && enable libfontconfig
+@@ -6249,6 +6253,7 @@ enabled fontconfig        && enable libfontconfig
  enabled libfontconfig     && require_pkg_config libfontconfig fontconfig "fontconfig/fontconfig.h" FcInit
  enabled libfreetype       && require_pkg_config libfreetype freetype2 "ft2build.h FT_FREETYPE_H" FT_Init_FreeType
  enabled libfribidi        && require_pkg_config libfribidi fribidi fribidi.h fribidi_version_info
@@ -46,7 +46,7 @@ index 48e1426..cc15c27 100755
                                 require libgme gme/gme.h gme_new_emu -lgme -lstdc++; }
  enabled libgsm            && { for gsm_hdr in "gsm.h" "gsm/gsm.h"; do
 diff --git a/doc/encoders.texi b/doc/encoders.texi
-index eefd124..5cc8c9f 100644
+index 4ee518a..506a6f8 100644
 --- a/doc/encoders.texi
 +++ b/doc/encoders.texi
 @@ -637,6 +637,111 @@ Sets the maximum delay in milliseconds. Lower delays than 20ms will very quickly
@@ -162,10 +162,10 @@ index eefd124..5cc8c9f 100644
  @section libfdk_aac
  
 diff --git a/doc/general.texi b/doc/general.texi
-index 79a23e1..8685d92 100644
+index a5b77e0..e5c5682 100644
 --- a/doc/general.texi
 +++ b/doc/general.texi
-@@ -1063,7 +1063,7 @@ following image formats are supported:
+@@ -1070,7 +1070,7 @@ following image formats are supported:
  @item 8SVX exponential       @tab     @tab  X
  @item 8SVX fibonacci         @tab     @tab  X
  @item AAC                    @tab EX  @tab  X
@@ -191,10 +191,10 @@ index 09ded7d..b77e077 100644
  
  @item
 diff --git a/libavcodec/Makefile b/libavcodec/Makefile
-index eee1e50..58af376 100644
+index c1f35b4..1db2ce9 100644
 --- a/libavcodec/Makefile
 +++ b/libavcodec/Makefile
-@@ -950,6 +950,7 @@ OBJS-$(CONFIG_ADPCM_IMA_QT_AT_DECODER)    += audiotoolboxdec.o
+@@ -952,6 +952,7 @@ OBJS-$(CONFIG_ADPCM_IMA_QT_AT_DECODER)    += audiotoolboxdec.o
  OBJS-$(CONFIG_ALAC_AT_DECODER)            += audiotoolboxdec.o
  OBJS-$(CONFIG_AMR_NB_AT_DECODER)          += audiotoolboxdec.o
  OBJS-$(CONFIG_EAC3_AT_DECODER)            += audiotoolboxdec.o
@@ -203,10 +203,10 @@ index eee1e50..58af376 100644
  OBJS-$(CONFIG_ILBC_AT_DECODER)            += audiotoolboxdec.o
  OBJS-$(CONFIG_MP1_AT_DECODER)             += audiotoolboxdec.o
 diff --git a/libavcodec/allcodecs.c b/libavcodec/allcodecs.c
-index 23a778e..fe3928e 100644
+index c33edf2..2854bdd 100644
 --- a/libavcodec/allcodecs.c
 +++ b/libavcodec/allcodecs.c
-@@ -669,6 +669,7 @@ extern AVCodec ff_alac_at_encoder;
+@@ -671,6 +671,7 @@ extern AVCodec ff_alac_at_encoder;
  extern AVCodec ff_alac_at_decoder;
  extern AVCodec ff_amr_nb_at_decoder;
  extern AVCodec ff_eac3_at_decoder;
