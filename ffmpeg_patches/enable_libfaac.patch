@@ -9,7 +9,7 @@ index 613070e..3e4c977 100644
 +
 +The FAAC library is incompatible with all versions of GPL and LGPL.
 diff --git a/configure b/configure
-index 46f2038..0f3697b 100755
+index 1f3d0fd..50eee3c 100755
 --- a/configure
 +++ b/configure
 @@ -231,6 +231,7 @@ External library support:
@@ -42,11 +42,12 @@ index 46f2038..0f3697b 100755
  enabled libfreetype       && require_pkg_config libfreetype freetype2 "ft2build.h FT_FREETYPE_H" FT_Init_FreeType
  enabled libfribidi        && require_pkg_config libfribidi fribidi fribidi.h fribidi_version_info
 +enabled libfaac           && require libfaac faac.h faacEncGetVersion -lfaac
+ enabled libglslang        && require_cpp libglslang glslang/SPIRV/GlslangToSpv.h "glslang::TIntermediate*" -lglslang -lOSDependent -lHLSL -lOGLCompiler -lSPVRemapper -lSPIRV -lSPIRV-Tools-opt -lSPIRV-Tools -lpthread -lstdc++
  enabled libgme            && { check_pkg_config libgme libgme gme/gme.h gme_new_emu ||
                                 require libgme gme/gme.h gme_new_emu -lgme -lstdc++; }
  enabled libgsm            && { for gsm_hdr in "gsm.h" "gsm/gsm.h"; do
 diff --git a/doc/encoders.texi b/doc/encoders.texi
-index 61e674c..09fb7e5 100644
+index 20bcb4e..6db714b 100644
 --- a/doc/encoders.texi
 +++ b/doc/encoders.texi
 @@ -637,6 +637,111 @@ Sets the maximum delay in milliseconds. Lower delays than 20ms will very quickly
@@ -175,10 +176,10 @@ index 4bd4b4f..504b352 100644
      @tab encoding supported through external library libfdk-aac
  @item AC-3                   @tab IX  @tab  IX
 diff --git a/doc/muxers.texi b/doc/muxers.texi
-index fb5c9bc..e6c5cf7 100644
+index 05bf483..7bde63c 100644
 --- a/doc/muxers.texi
 +++ b/doc/muxers.texi
-@@ -2031,9 +2031,9 @@ ffmpeg -i in.mkv -codec copy -map 0 -f segment -segment_list out.csv -segment_fr
+@@ -2064,9 +2064,9 @@ ffmpeg -i in.mkv -codec copy -map 0 -f segment -segment_list out.csv -segment_fr
  
  @item
  Convert the @file{in.mkv} to TS segments using the @code{libx264}
