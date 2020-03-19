@@ -9,7 +9,7 @@ index 613070e..3e4c977 100644
 +
 +The FAAC library is incompatible with all versions of GPL and LGPL.
 diff --git a/configure b/configure
-index 6ceb0c7..d20030c 100755
+index 18f2841..495142a 100755
 --- a/configure
 +++ b/configure
 @@ -231,6 +231,7 @@ External library support:
