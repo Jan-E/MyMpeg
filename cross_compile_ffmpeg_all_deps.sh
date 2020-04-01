@@ -1130,9 +1130,9 @@ build_openssl-1.1.0() {
 }
 
 build_openssl-1.1.1() {
-  rm -rf openssl-1.1.1d
-  download_and_unpack_file https://www.openssl.org/source/openssl-1.1.1e.tar.gz
-  cd openssl-1.1.1e
+  rm -rf openssl-1.1.1e
+  download_and_unpack_file https://www.openssl.org/source/openssl-1.1.1f.tar.gz
+  cd openssl-1.1.1f
     export CC="${cross_prefix}gcc"
     export AR="${cross_prefix}ar"
     export RANLIB="${cross_prefix}ranlib"
@@ -1159,7 +1159,7 @@ build_openssl-1.1.1() {
     do_make "build_libs"
     if [ "$1" = "dllonly" ]; then
       mkdir -p $cur_dir/redist # Strip and pack shared libraries.
-      archive="$cur_dir/redist/openssl-${arch}-v1.1.1e.7z"
+      archive="$cur_dir/redist/openssl-${arch}-v1.1.1f.7z"
       if [[ ! -f $archive ]]; then
         for sharedlib in *.dll; do
           ${cross_prefix}strip $sharedlib
@@ -1863,7 +1863,7 @@ build_vlc() {
   build_lua
   build_libdvdread
   build_libdvdnav
-  build_libx265
+#  build_libx265
   build_libjpeg_turbo
   build_ffmpeg
   build_qt
@@ -2289,7 +2289,7 @@ build_ffmpeg_dependencies() {
   build_libxvid # FFmpeg now has native support, but libxvid still provides a better image.
   build_libtesseract
   build_libvpx
-  build_libx265
+#  build_libx265
   build_libopenh264
   build_libaom
 #  build_librtmp
