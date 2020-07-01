@@ -46,7 +46,7 @@ index 7495f35..8c6414e 100755
  enabled libgme            && { check_pkg_config libgme libgme gme/gme.h gme_new_emu ||
                                 require libgme gme/gme.h gme_new_emu -lgme -lstdc++; }
 diff --git a/doc/encoders.texi b/doc/encoders.texi
-index 1331b79..bbaf3c5 100644
+index 17a0f4c..19cf53b 100644
 --- a/doc/encoders.texi
 +++ b/doc/encoders.texi
 @@ -633,6 +633,111 @@ Sets the maximum delay in milliseconds. Lower delays than 20ms will very quickly
@@ -162,10 +162,10 @@ index 1331b79..bbaf3c5 100644
  @section libfdk_aac
  
 diff --git a/doc/general.texi b/doc/general.texi
-index 9b0ee96..4baab43 100644
+index ea34b96..8aafd11 100644
 --- a/doc/general.texi
 +++ b/doc/general.texi
-@@ -1079,7 +1079,7 @@ following image formats are supported:
+@@ -1081,7 +1081,7 @@ following image formats are supported:
  @item 8SVX exponential       @tab     @tab  X
  @item 8SVX fibonacci         @tab     @tab  X
  @item AAC                    @tab EX  @tab  X

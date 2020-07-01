@@ -1,5 +1,5 @@
 diff --git a/libavfilter/af_volume.c b/libavfilter/af_volume.c
-index 213c571..bf4b270 100644
+index 5fc00d8..6373121 100644
 --- a/libavfilter/af_volume.c
 +++ b/libavfilter/af_volume.c
 @@ -55,6 +55,7 @@ static const char *const var_names[] = {
@@ -51,7 +51,7 @@ index 213c571..bf4b270 100644
      vol->var_values[VAR_VOLUME] = NAN;
  
      vol->var_values[VAR_NB_CHANNELS] = inlink->channels;
-@@ -388,6 +398,30 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
+@@ -384,6 +394,30 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
          av_frame_remove_side_data(buf, AV_FRAME_DATA_REPLAYGAIN);
      }
  
