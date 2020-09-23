@@ -959,8 +959,8 @@ build_nghttp2() {
 }
 
 build_curl() {
-  local curl_version="7.71.1"
-  local curl_previous="7.71.0"
+  local curl_version="7.72.0"
+  local curl_previous="7.71.1"
   rm -rf curl-$curl_previous
   download_and_unpack_file https://curl.haxx.se/download/curl-$curl_version.tar.gz curl-$curl_version
   cd curl-$curl_version
@@ -1130,9 +1130,9 @@ build_openssl-1.1.0() {
 }
 
 build_openssl-1.1.1() {
-  rm -rf openssl-1.1.1f
-  download_and_unpack_file https://www.openssl.org/source/openssl-1.1.1g.tar.gz
-  cd openssl-1.1.1g
+  rm -rf openssl-1.1.1g
+  download_and_unpack_file https://www.openssl.org/source/openssl-1.1.1h.tar.gz
+  cd openssl-1.1.1h
     export CC="${cross_prefix}gcc"
     export AR="${cross_prefix}ar"
     export RANLIB="${cross_prefix}ranlib"
@@ -1159,7 +1159,7 @@ build_openssl-1.1.1() {
     do_make "build_libs"
     if [ "$1" = "dllonly" ]; then
       mkdir -p $cur_dir/redist # Strip and pack shared libraries.
-      archive="$cur_dir/redist/openssl-${arch}-v1.1.1g.7z"
+      archive="$cur_dir/redist/openssl-${arch}-v1.1.1h.7z"
       if [[ ! -f $archive ]]; then
         for sharedlib in *.dll; do
           ${cross_prefix}strip $sharedlib
