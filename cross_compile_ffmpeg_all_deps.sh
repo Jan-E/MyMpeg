@@ -959,8 +959,8 @@ build_nghttp2() {
 }
 
 build_curl() {
-  local curl_version="7.72.0"
-  local curl_previous="7.71.1"
+  local curl_version="7.73.0"
+  local curl_previous="7.72.0"
   rm -rf curl-$curl_previous
   download_and_unpack_file https://curl.haxx.se/download/curl-$curl_version.tar.gz curl-$curl_version
   cd curl-$curl_version
@@ -2256,7 +2256,7 @@ build_ffmpeg_dependencies() {
   build_libspeexdsp # Needs libogg for examples. Uses dlfcn.
   build_libspeex # Uses libspeexdsp and dlfcn.
   build_libtheora # Needs libogg >= 1.1. Needs libvorbis >= 1.0.1, sdl and libpng for test, programs and examples [disabled]. Uses dlfcn.
-  build_libsndfile "install-libgsm" # Needs libogg >= 1.1.3 and libvorbis >= 1.2.3 for external support [disabled]. Uses dlfcn. 'build_libsndfile "install-libgsm"' to install the included LibGSM 6.10.
+#  build_libsndfile "install-libgsm" # Needs libogg >= 1.1.3 and libvorbis >= 1.2.3 for external support [disabled]. Uses dlfcn. 'build_libsndfile "install-libgsm"' to install the included LibGSM 6.10.
   build_lame # Uses dlfcn.
   build_twolame # Uses libsndfile >= 1.0.0 and dlfcn.
   build_libopencore # Uses dlfcn.
