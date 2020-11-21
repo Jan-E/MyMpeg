@@ -1,0 +1,18 @@
+--- crypto/engine/eng_all.c.orig	2018-11-20 14:44:49.000000000 +0100
++++ crypto/engine/eng_all.c	2018-12-12 10:18:25.944883940 +0100
+@@ -111,13 +111,13 @@
+ #  endif
+ # endif
+ # ifndef OPENSSL_NO_GOST
+-    ENGINE_load_gost();
++    /* ENGINE_load_gost(); */
+ # endif
+ # ifndef OPENSSL_NO_GMP
+     ENGINE_load_gmp();
+ # endif
+ # if defined(OPENSSL_SYS_WIN32) && !defined(OPENSSL_NO_CAPIENG)
+-    ENGINE_load_capi();
++    /* ENGINE_load_capi(); */
+ # endif
+ #endif
+     ENGINE_register_all_complete();
