@@ -545,15 +545,15 @@ build_dlfcn() {
 }
 
 build_bzip2() {
-  download_and_unpack_file http://www.bzip.org/1.0.6/bzip2-1.0.6.tar.gz
-  cd bzip2-1.0.6
-    apply_patch file://$patch_dir/bzip2-1.0.6_brokenstuff.diff
-    if [[ ! -f $mingw_w64_x86_64_prefix/lib/libbz2.a ]]; then # Library only.
+  download_and_unpack_file https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz
+  cd bzip2-1.0.8
+    apply_patch file://$patch_dir/bzip2-1.0.8_brokenstuff.diff
+    if [[ ! -f ./libbz2.a ]] || [[ -f $mingw_w64_x86_64_prefix/lib/libbz2.a && ! $(/usr/bin/env md5sum ./libbz2.a) = $(/usr/bin/env md5sum $mingw_w64_x86_64_prefix/lib/libbz2.a) ]]; then # Not built or different build installed
       do_make "$make_prefix_options libbz2.a"
       install -m644 bzlib.h $mingw_w64_x86_64_prefix/include/bzlib.h
       install -m644 libbz2.a $mingw_w64_x86_64_prefix/lib/libbz2.a
     else
-      echo "already made bzip2-1.0.6"
+      echo "Already made bzip2-1.0.8"
     fi
   cd ..
 }
@@ -615,7 +615,7 @@ build_amd_amf_headers() {
 }
 
 build_nv_headers() {
-  do_git_checkout https://git.videolan.org/git/ffmpeg/nv-codec-headers.git
+  do_git_checkout https://github.com/FFmpeg/nv-codec-headers.git
   cd nv-codec-headers_git
     do_make_install "PREFIX=$mingw_w64_x86_64_prefix" # just copies in headers
   cd ..
@@ -695,11 +695,46 @@ build_libwebp() {
   cd ..
 }
 
+build_harfbuzz() {
+  local new_build=false
+  do_git_checkout https://github.com/harfbuzz/harfbuzz.git harfbuzz_git
+  if [ ! -f harfbuzz_git/already_done_harf ]; then # Not done or new master, so build
+    new_build=true
+  fi
+
+  # basically gleaned from https://gist.github.com/roxlu/0108d45308a0434e27d4320396399153
+  build_freetype "--without-harfbuzz" $new_build # Check for initial or new freetype or force rebuild if needed
+  local new_freetype=$?
+  if $new_build || [ $new_freetype = 0 ]; then # 0 is true
+    rm -f harfbuzz_git/already* # Force rebuilding in case only freetype has changed
+    # cmake no .pc file generated so use configure :|
+    cd harfbuzz_git
+      if [ ! -f configure ]; then
+        ./autogen.sh # :|
+      fi
+      export LDFLAGS=-lpthread # :|
+      generic_configure "--with-freetype=yes --with-fontconfig=no --with-icu=no" # no fontconfig, don't want another circular what? icu is #372
+      unset LDFLAGS
+      do_make_and_make_install
+    cd ..
+
+    build_freetype "--with-harfbuzz" true # with harfbuzz now...
+    touch harfbuzz_git/already_done_harf
+    echo "Done harfbuzz"
+  else
+    echo "Already done harfbuzz"
+  fi
+  sed -i.bak 's/-lfreetype.*/-lfreetype -lharfbuzz -lpthread/' "$PKG_CONFIG_PATH/freetype2.pc" # for some reason it lists harfbuzz as Requires.private only??
+  sed -i.bak 's/-lharfbuzz.*/-lharfbuzz -lfreetype/' "$PKG_CONFIG_PATH/harfbuzz.pc" # does anything even use this?
+  sed -i.bak 's/libfreetype.la -lbz2/libfreetype.la -lharfbuzz -lbz2/' "${mingw_w64_x86_64_prefix}/lib/libfreetype.la" # XXX what the..needed?
+  sed -i.bak 's/libfreetype.la -lbz2/libfreetype.la -lharfbuzz -lbz2/' "${mingw_w64_x86_64_prefix}/lib/libharfbuzz.la"
+}
+
 build_freetype() {
-  local freetype_version="2.10.0"
-  local freetype_previous="2.8.1"
+  local freetype_version="2.10.4"
+  local freetype_previous="2.10.0"
   rm -rf freetype-$freetype_previous
-  download_and_unpack_file https://sourceforge.net/projects/freetype/files/freetype2/$freetype_version/freetype-$freetype_version.tar.bz2
+  download_and_unpack_file https://sourceforge.net/projects/freetype/files/freetype2/$freetype_version/freetype-$freetype_version.tar.xz
   cd freetype-$freetype_version
     if [[ `uname` == CYGWIN* ]]; then
       generic_configure "--build=i686-pc-cygwin --with-bzip2" # hard to believe but needed...
@@ -1318,14 +1353,13 @@ build_libgme() {
 
 build_libbluray() {
   unset JDK_HOME # #268 was causing failure
-  do_git_checkout https://git.videolan.org/git/libbluray.git
+  do_git_checkout https://code.videolan.org/videolan/libbluray.git
   cd libbluray_git
-    sed -i.bak 's_git://git.videolan.org/libudfread.git_https://git.videolan.org/git/libudfread.git_' .gitmodules
     if [[ ! -d .git/modules ]]; then
       git submodule update --init --remote # For UDF support [default=enabled], which strangely enough is in another repository.
     else
       local local_git_version=`git --git-dir=.git/modules/contrib/libudfread rev-parse HEAD`
-      local remote_git_version=`git ls-remote -h https://git.videolan.org/git/libudfread.git | sed "s/[[:space:]].*//"`
+      local remote_git_version=`git ls-remote -h https://code.videolan.org/videolan/libudfread.git | sed "s/[[:space:]].*//"`
       if [[ "$local_git_version" != "$remote_git_version" ]]; then
         git clean -f # Throw away local changes; 'already_*' in this case.
         git submodule foreach -q 'git clean -f' # Throw away local changes; 'already_configured_*' and 'udfread.c.bak' in this case.
@@ -1360,7 +1394,7 @@ build_libbs2b() {
 build_libsoxr() {
   do_git_checkout https://git.code.sf.net/p/soxr/code soxr_git
   cd soxr_git
-    do_cmake_and_install "-DBUILD_SHARED_LIBS=0 -DHAVE_WORDS_BIGENDIAN_EXITCODE=0 -DWITH_OPENMP=0 -DBUILD_TESTS=0 -DBUILD_EXAMPLES=0"
+    do_cmake_and_install "-DHAVE_WORDS_BIGENDIAN_EXITCODE=0 -DWITH_OPENMP=0 -DBUILD_TESTS=0 -DBUILD_EXAMPLES=0"
   cd ..
 }
 
@@ -1379,7 +1413,7 @@ build_libflite() {
 }
 
 build_libsnappy() {
-  do_git_checkout https://github.com/google/snappy.git snappy_git
+  do_git_checkout https://github.com/google/snappy.git snappy_git 1.1.8 # got weird failure once
   cd snappy_git
     do_cmake_and_install "-DBUILD_SHARED_LIBS=OFF -DBUILD_BINARY=OFF -DCMAKE_BUILD_TYPE=Release -DSNAPPY_BUILD_TESTS=OFF" # extra params from deadsix27 and from new cMakeLists.txt content
     rm -f $mingw_w64_x86_64_prefix/lib/libsnappy.dll.a # unintall shared :|
@@ -1429,7 +1463,8 @@ build_librubberband() {
 build_frei0r() {
   do_git_checkout https://github.com/dyne/frei0r.git
   cd frei0r_git
-    do_cmake_and_install
+    sed -i.bak 's/-arch i386//' CMakeLists.txt # OS X https://github.com/dyne/frei0r/issues/64
+    do_cmake_and_install "-DWITHOUT_OPENCV=1" # XXX could look at this more...
 
     mkdir -p $cur_dir/redist # Strip and pack shared libraries.
     if [ $bits_target = 32 ]; then
@@ -1512,6 +1547,22 @@ build_fribidi() {
   cd ..
 }
 
+build_libsrt() {
+  # do_git_checkout https://github.com/Haivision/srt.git
+  #cd srt_git
+  #download_and_unpack_file https://codeload.github.com/Haivision/srt/tar.gz/v1.3.2 srt-1.3.2
+  download_and_unpack_file https://github.com/Haivision/srt/archive/v1.4.1.tar.gz srt-1.4.1
+  cd srt-1.4.1 
+    if [[ $compiler_flavors != "native" ]]; then
+      do_cmake "-DUSE_GNUTLS=ON -DENABLE_SHARED=OFF"
+      apply_patch file://$patch_dir/srt.app.patch -p1
+    else
+      do_cmake "-DUSE_GNUTLS=ON -DENABLE_SHARED=OFF -DENABLE_CXX11=OFF"
+    fi
+    do_make_and_make_install
+  cd ..
+}
+
 build_libass() {
   do_git_checkout_and_make_install https://github.com/libass/libass.git
 }
@@ -1529,14 +1580,11 @@ build_libxavs() {
 }
 
 build_libxvid() {
-  download_and_unpack_file http://downloads.xvid.org/downloads/xvidcore-1.3.4.tar.gz xvidcore
+  download_and_unpack_file https://downloads.xvid.com/downloads/xvidcore-1.3.7.tar.gz xvidcore
   cd xvidcore/build/generic
-    apply_patch file://$patch_dir/xvidcore-1.3.4_static-lib.diff
+    apply_patch file://$patch_dir/xvidcore-1.3.7_static-lib.patch
     do_configure "--host=$host_target --prefix=$mingw_w64_x86_64_prefix" # no static option...
-    #sed -i.bak "s/-mno-cygwin//" platform.inc # remove old compiler flag that now apparently breaks us # Not needed for static library, but neither anymore for shared library (see 'configure#L5010').
-    cpu_count=1 # possibly can't build this multi-thread ? http://betterlogic.com/roger/2014/02/xvid-build-woe/
     do_make_and_make_install
-    cpu_count=$original_cpu_count
   cd ../../..
 }
 
@@ -1797,7 +1845,7 @@ build_lua() {
 }
 
 build_libcurl() {
-  generic_download_and_make_and_install https://curl.haxx.se/download/curl-7.64.0.tar.gz
+  generic_download_and_make_and_install https://curl.haxx.se/download/curl-7.73.0.tar.gz
 }
 
 build_libhdhomerun() {
@@ -2239,7 +2287,8 @@ build_ffmpeg_dependencies() {
   #build_libjpeg_turbo # mplayer can use this, VLC qt might need it? [replaces libjpeg]
   build_libpng # Needs zlib >= 1.0.4. Uses dlfcn.
   build_libwebp # Uses dlfcn.
-  build_freetype # Uses zlib, bzip2, and libpng.
+  build_harfbuzz
+  # harf does now include build_freetype # Uses zlib, bzip2, and libpng.
   build_libxml2 # Uses zlib, liblzma, iconv and dlfcn.
   build_fontconfig # Needs freetype and libxml >= 2.6. Uses iconv and dlfcn.
   build_gmp # For rtmp support configure FFmpeg with '--enable-gmp'. Uses dlfcn.
@@ -2256,7 +2305,7 @@ build_ffmpeg_dependencies() {
   build_libspeexdsp # Needs libogg for examples. Uses dlfcn.
   build_libspeex # Uses libspeexdsp and dlfcn.
   build_libtheora # Needs libogg >= 1.1. Needs libvorbis >= 1.0.1, sdl and libpng for test, programs and examples [disabled]. Uses dlfcn.
-#  build_libsndfile "install-libgsm" # Needs libogg >= 1.1.3 and libvorbis >= 1.2.3 for external support [disabled]. Uses dlfcn. 'build_libsndfile "install-libgsm"' to install the included LibGSM 6.10.
+  build_libsndfile "install-libgsm" # Needs libogg >= 1.1.3 and libvorbis >= 1.2.3 for external support [disabled]. Uses dlfcn. 'build_libsndfile "install-libgsm"' to install the included LibGSM 6.10.
   build_lame # Uses dlfcn.
   build_twolame # Uses libsndfile >= 1.0.0 and dlfcn.
   build_libopencore # Uses dlfcn.
@@ -2267,14 +2316,14 @@ build_ffmpeg_dependencies() {
   build_libbs2b # Needs libsndfile. Uses dlfcn.
   build_libsoxr
   build_libflite
-#  build_libsnappy # Uses zlib (only for unittests [disabled]) and dlfcn.
+  build_libsnappy # Uses zlib (only for unittests [disabled]) and dlfcn.
   build_vamp_plugin # Needs libsndfile for 'vamp-simple-host.exe' [disabled].
   build_fftw # Uses dlfcn.
   build_libsamplerate # Needs libsndfile >= 1.0.6 and fftw >= 0.15.0 for tests. Uses dlfcn.
   build_librubberband # Needs libsamplerate, libsndfile, fftw and vamp_plugin. 'configure' will fail otherwise. Eventhough librubberband doesn't necessarily need them (libsndfile only for 'rubberband.exe' and vamp_plugin only for "Vamp audio analysis plugin"). How to use the bundled libraries '-DUSE_SPEEX' and '-DUSE_KISSFFT'?
   build_frei0r # Needs dlfcn.
   build_vidstab
-#  build_libmysofa # Needed for FFmpeg's SOFAlizer filter (https://ffmpeg.org/ffmpeg-filters.html#sofalizer). Uses dlfcn.
+  build_libmysofa # Needed for FFmpeg's SOFAlizer filter (https://ffmpeg.org/ffmpeg-filters.html#sofalizer). Uses dlfcn.
   build_libcaca # Uses zlib and dlfcn.
   if [[ "$non_free" = "y" ]]; then
     build_fdk-aac # Uses dlfcn.
@@ -2284,9 +2333,10 @@ build_ffmpeg_dependencies() {
     build_zvbi # Uses iconv, libpng and dlfcn.
   fi
   build_fribidi # Uses dlfcn.
-#  build_libass # Requores harfbuzz now. Needs freetype >= 9.10.3 (see https://bugs.launchpad.net/ubuntu/+source/freetype1/+bug/78573 o_O) and fribidi >= 0.19.0. Uses fontconfig >= 2.10.92, iconv and dlfcn.
+  build_libass # Requires harfbuzz now. Needs freetype >= 9.10.3 (see https://bugs.launchpad.net/ubuntu/+source/freetype1/+bug/78573 o_O) and fribidi >= 0.19.0. Uses fontconfig >= 2.10.92, iconv and dlfcn.
   build_libxavs
   build_libxvid # FFmpeg now has native support, but libxvid still provides a better image.
+#  build_libsrt # requires gnutls, mingw-std-threads
   build_libtesseract
   build_libvpx
 #  build_libx265
