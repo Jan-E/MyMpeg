@@ -702,10 +702,7 @@ build_harfbuzz() {
     new_build=true
   fi
 
-  # basically gleaned from https://gist.github.com/roxlu/0108d45308a0434e27d4320396399153
-  build_freetype "--without-harfbuzz" $new_build # Check for initial or new freetype or force rebuild if needed
-  local new_freetype=$?
-  if $new_build || [ $new_freetype = 0 ]; then # 0 is true
+  if $new_build; then # 0 is true
     rm -f harfbuzz_git/already* # Force rebuilding in case only freetype has changed
     # cmake no .pc file generated so use configure :|
     cd harfbuzz_git
@@ -713,12 +710,11 @@ build_harfbuzz() {
         ./autogen.sh # :|
       fi
       export LDFLAGS=-lpthread # :|
-      generic_configure "--with-freetype=yes --with-fontconfig=no --with-icu=no" # no fontconfig, don't want another circular what? icu is #372
+      generic_configure "--with-fontconfig=no --with-icu=no" # no fontconfig, don't want another circular what? icu is #372
       unset LDFLAGS
       do_make_and_make_install
     cd ..
 
-    build_freetype "--with-harfbuzz" true # with harfbuzz now...
     touch harfbuzz_git/already_done_harf
     echo "Done harfbuzz"
   else
@@ -736,12 +732,8 @@ build_freetype() {
   rm -rf freetype-$freetype_previous
   download_and_unpack_file https://sourceforge.net/projects/freetype/files/freetype2/$freetype_version/freetype-$freetype_version.tar.xz
   cd freetype-$freetype_version
-    if [[ `uname` == CYGWIN* ]]; then
-      generic_configure "--build=i686-pc-cygwin --with-bzip2" # hard to believe but needed...
-      # 'configure' can't detect bzip2 without '--with-bzip2', because there's no 'bzip2.pc'.
-    else
-      generic_configure "--with-bzip2"
-    fi
+    # harfbuzz autodetect :|
+    generic_configure "--with-bzip2"
     do_make_and_make_install
   cd ..
 }
@@ -2288,7 +2280,7 @@ build_ffmpeg_dependencies() {
   build_libpng # Needs zlib >= 1.0.4. Uses dlfcn.
   build_libwebp # Uses dlfcn.
   build_harfbuzz
-  # harf does now include build_freetype # Uses zlib, bzip2, and libpng.
+  build_freetype # Uses zlib, bzip2, and libpng.
   build_libxml2 # Uses zlib, liblzma, iconv and dlfcn.
   build_fontconfig # Needs freetype and libxml >= 2.6. Uses iconv and dlfcn.
   build_gmp # For rtmp support configure FFmpeg with '--enable-gmp'. Uses dlfcn.
