@@ -168,10 +168,10 @@ index 813b467..6f61bb2 100644
  
  @item
 diff --git a/libavcodec/Makefile b/libavcodec/Makefile
-index b4777be..95600fe 100644
+index a6435c9..002fe7c 100644
 --- a/libavcodec/Makefile
 +++ b/libavcodec/Makefile
-@@ -997,6 +997,7 @@ OBJS-$(CONFIG_ADPCM_IMA_QT_AT_DECODER)    += audiotoolboxdec.o
+@@ -998,6 +998,7 @@ OBJS-$(CONFIG_ADPCM_IMA_QT_AT_DECODER)    += audiotoolboxdec.o
  OBJS-$(CONFIG_ALAC_AT_DECODER)            += audiotoolboxdec.o
  OBJS-$(CONFIG_AMR_NB_AT_DECODER)          += audiotoolboxdec.o
  OBJS-$(CONFIG_EAC3_AT_DECODER)            += audiotoolboxdec.o
@@ -180,10 +180,10 @@ index b4777be..95600fe 100644
  OBJS-$(CONFIG_ILBC_AT_DECODER)            += audiotoolboxdec.o
  OBJS-$(CONFIG_MP1_AT_DECODER)             += audiotoolboxdec.o
 diff --git a/libavcodec/allcodecs.c b/libavcodec/allcodecs.c
-index 8bdc0d6..d4df0e6 100644
+index 774d567..dc2925f 100644
 --- a/libavcodec/allcodecs.c
 +++ b/libavcodec/allcodecs.c
-@@ -699,6 +699,7 @@ extern AVCodec ff_alac_at_encoder;
+@@ -700,6 +700,7 @@ extern AVCodec ff_alac_at_encoder;
  extern AVCodec ff_alac_at_decoder;
  extern AVCodec ff_amr_nb_at_decoder;
  extern AVCodec ff_eac3_at_decoder;
