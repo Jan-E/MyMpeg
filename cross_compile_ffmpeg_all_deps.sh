@@ -1157,9 +1157,9 @@ build_openssl-1.1.0() {
 }
 
 build_openssl-1.1.1() {
-  rm -rf openssl-1.1.1g
-  download_and_unpack_file https://www.openssl.org/source/openssl-1.1.1h.tar.gz
-  cd openssl-1.1.1h
+  rm -rf openssl-1.1.1h
+  download_and_unpack_file https://www.openssl.org/source/openssl-1.1.1i.tar.gz
+  cd openssl-1.1.1i
     export CC="${cross_prefix}gcc"
     export AR="${cross_prefix}ar"
     export RANLIB="${cross_prefix}ranlib"
@@ -1837,7 +1837,7 @@ build_lua() {
 }
 
 build_libcurl() {
-  generic_download_and_make_and_install https://curl.haxx.se/download/curl-7.73.0.tar.gz
+  generic_download_and_make_and_install https://curl.haxx.se/download/curl-7.74.0.tar.gz
 }
 
 build_libhdhomerun() {
