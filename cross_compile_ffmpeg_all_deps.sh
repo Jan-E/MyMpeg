@@ -991,7 +991,7 @@ build_curl() {
   rm -rf curl-$curl_previous
   download_and_unpack_file https://curl.haxx.se/download/curl-$curl_version.tar.gz curl-$curl_version
   cd curl-$curl_version
-    #apply_patch file://$patch_dir/curl_sftp_buffer.patch
+    apply_patch file://$patch_dir/curl_sftp_buffer.patch
     # use the cross compiler binaries as gcc, windres, ar and ranlib
     ln -s "${cross_prefix}gcc"     "$mingw_bin_path/gcc"
     ln -s "${cross_prefix}g++"     "$mingw_bin_path/g++"
@@ -1157,9 +1157,9 @@ build_openssl-1.1.0() {
 }
 
 build_openssl-1.1.1() {
-  rm -rf openssl-1.1.1h
-  download_and_unpack_file https://www.openssl.org/source/openssl-1.1.1i.tar.gz
-  cd openssl-1.1.1i
+  rm -rf openssl-1.1.1i
+  download_and_unpack_file https://www.openssl.org/source/openssl-1.1.1j.tar.gz
+  cd openssl-1.1.1j
     export CC="${cross_prefix}gcc"
     export AR="${cross_prefix}ar"
     export RANLIB="${cross_prefix}ranlib"

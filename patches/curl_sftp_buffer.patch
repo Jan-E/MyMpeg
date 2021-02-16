@@ -1,8 +1,8 @@
-diff --git lib/url.h lib/url.h
-index 095d63833..2573f279f 100644
---- lib/url.h
-+++ lib/url.h
-@@ -35,7 +35,7 @@
+diff --git lib/urldata.h lib/urldata.h
+index 77862f8ad..62e51eb4f 100644
+--- lib/urldata.h
++++ lib/urldata.h
+@@ -172,7 +172,7 @@ typedef CURLcode (*Curl_datastream)(struct Curl_easy *data,
     libcurl able to do significantly faster uploads in some circumstances. Even
     larger buffers can help further, but this is deemed a fair memory/speed
     compromise. */
@@ -10,3 +10,4 @@ index 095d63833..2573f279f 100644
 +#define UPLOADBUFFER_DEFAULT (512*1024)
  #define UPLOADBUFFER_MAX (2*1024*1024)
  #define UPLOADBUFFER_MIN CURL_MAX_WRITE_SIZE
+ 
