@@ -1,8 +1,8 @@
 diff --git a/libavcodec/mpegvideo_enc.c b/libavcodec/mpegvideo_enc.c
-index 79c4071..9cafdb4 100644
+index c01488f..813a316 100644
 --- a/libavcodec/mpegvideo_enc.c
 +++ b/libavcodec/mpegvideo_enc.c
-@@ -1194,7 +1194,14 @@ static int load_input_picture(MpegEncContext *s, const AVFrame *pic_arg)
+@@ -1052,7 +1052,14 @@ static int load_input_picture(MpegEncContext *s, const AVFrame *pic_arg)
                      av_log(s->avctx, AV_LOG_ERROR,
                             "Invalid pts (%"PRId64") <= last (%"PRId64")\n",
                             pts, last);

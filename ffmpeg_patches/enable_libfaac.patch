@@ -1,5 +1,5 @@
 diff --git a/configure b/configure
-index d7a3f50..c135c51 100755
+index cc1013f..1547716 100755
 --- a/configure
 +++ b/configure
 @@ -231,6 +231,7 @@ External library support:
@@ -27,7 +27,7 @@ index d7a3f50..c135c51 100755
  gsm_ms_at_decoder_deps="audiotoolbox"
  ilbc_at_decoder_deps="audiotoolbox"
  mp1_at_decoder_deps="audiotoolbox"
-@@ -6366,6 +6370,7 @@ enabled fontconfig        && enable libfontconfig
+@@ -6367,6 +6371,7 @@ enabled fontconfig        && enable libfontconfig
  enabled libfontconfig     && require_pkg_config libfontconfig fontconfig "fontconfig/fontconfig.h" FcInit
  enabled libfreetype       && require_pkg_config libfreetype freetype2 "ft2build.h FT_FREETYPE_H" FT_Init_FreeType
  enabled libfribidi        && require_pkg_config libfribidi fribidi fribidi.h fribidi_version_info
@@ -152,10 +152,10 @@ index 2ba9938..170bf21 100644
  @section libfdk_aac
  
 diff --git a/doc/muxers.texi b/doc/muxers.texi
-index 4c6eac1..919235f 100644
+index 93f7927..e800122 100644
 --- a/doc/muxers.texi
 +++ b/doc/muxers.texi
-@@ -2154,9 +2154,9 @@ ffmpeg -i in.mkv -codec copy -map 0 -f segment -segment_list out.csv -segment_fr
+@@ -2426,9 +2426,9 @@ ffmpeg -i in.mkv -codec copy -map 0 -f segment -segment_list out.csv -segment_fr
  
  @item
  Convert the @file{in.mkv} to TS segments using the @code{libx264}
@@ -168,10 +168,10 @@ index 4c6eac1..919235f 100644
  
  @item
 diff --git a/libavcodec/Makefile b/libavcodec/Makefile
-index 33a280c..146a59b 100644
+index 4a597f7..4ed988e 100644
 --- a/libavcodec/Makefile
 +++ b/libavcodec/Makefile
-@@ -1007,6 +1007,7 @@ OBJS-$(CONFIG_ADPCM_IMA_QT_AT_DECODER)    += audiotoolboxdec.o
+@@ -1006,6 +1006,7 @@ OBJS-$(CONFIG_ADPCM_IMA_QT_AT_DECODER)    += audiotoolboxdec.o
  OBJS-$(CONFIG_ALAC_AT_DECODER)            += audiotoolboxdec.o
  OBJS-$(CONFIG_AMR_NB_AT_DECODER)          += audiotoolboxdec.o
  OBJS-$(CONFIG_EAC3_AT_DECODER)            += audiotoolboxdec.o
@@ -184,10 +184,10 @@ index 2e9a358..308fa91 100644
 --- a/libavcodec/allcodecs.c
 +++ b/libavcodec/allcodecs.c
 @@ -707,6 +707,7 @@ extern AVCodec ff_alac_at_encoder;
- extern AVCodec ff_alac_at_decoder;
- extern AVCodec ff_amr_nb_at_decoder;
- extern AVCodec ff_eac3_at_decoder;
-+extern AVCodec ff_libfaac_encoder;
- extern AVCodec ff_gsm_ms_at_decoder;
- extern AVCodec ff_ilbc_at_encoder;
- extern AVCodec ff_ilbc_at_decoder;
+ extern const AVCodec ff_dst_decoder;
+ extern const AVCodec ff_eac3_encoder;
+ extern const AVCodec ff_eac3_decoder;
++extern const AVCodec ff_libfaac_encoder;
+ extern const AVCodec ff_evrc_decoder;
+ extern const AVCodec ff_fastaudio_decoder;
+ extern const AVCodec ff_ffwavesynth_decoder;
