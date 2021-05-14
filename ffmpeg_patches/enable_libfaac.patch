@@ -1,8 +1,8 @@
 diff --git a/configure b/configure
-index cc1013f..1547716 100755
+index 82367fd..81d8e57 100755
 --- a/configure
 +++ b/configure
-@@ -231,6 +231,7 @@ External library support:
+@@ -230,6 +230,7 @@ External library support:
    --enable-libdavs2        enable AVS2 decoding via libdavs2 [no]
    --enable-libdc1394       enable IIDC-1394 grabbing using libdc1394
                             and libraw1394 [no]
@@ -10,7 +10,7 @@ index cc1013f..1547716 100755
    --enable-libfdk-aac      enable AAC de/encoding via libfdk-aac [no]
    --enable-libflite        enable flite (voice synthesis) support via libflite [no]
    --enable-libfontconfig   enable libfontconfig, useful for drawtext filter [no]
-@@ -1734,6 +1735,7 @@ EXTERNAL_LIBRARY_GPL_LIST="
+@@ -1762,6 +1763,7 @@ EXTERNAL_LIBRARY_GPL_LIST="
  
  EXTERNAL_LIBRARY_NONFREE_LIST="
      decklink
@@ -18,7 +18,7 @@ index cc1013f..1547716 100755
      libfdk_aac
      openssl
      libtls
-@@ -3198,6 +3200,8 @@ avisynth_demuxer_deps="avisynth"
+@@ -3222,6 +3224,8 @@ avisynth_demuxer_deps="avisynth"
  avisynth_demuxer_select="riffdec"
  eac3_at_decoder_deps="audiotoolbox"
  eac3_at_decoder_select="ac3_parser"
@@ -27,7 +27,7 @@ index cc1013f..1547716 100755
  gsm_ms_at_decoder_deps="audiotoolbox"
  ilbc_at_decoder_deps="audiotoolbox"
  mp1_at_decoder_deps="audiotoolbox"
-@@ -6367,6 +6371,7 @@ enabled fontconfig        && enable libfontconfig
+@@ -6395,6 +6399,7 @@ enabled fontconfig        && enable libfontconfig
  enabled libfontconfig     && require_pkg_config libfontconfig fontconfig "fontconfig/fontconfig.h" FcInit
  enabled libfreetype       && require_pkg_config libfreetype freetype2 "ft2build.h FT_FREETYPE_H" FT_Init_FreeType
  enabled libfribidi        && require_pkg_config libfribidi fribidi fribidi.h fribidi_version_info
@@ -152,10 +152,10 @@ index 2ba9938..170bf21 100644
  @section libfdk_aac
  
 diff --git a/doc/muxers.texi b/doc/muxers.texi
-index 93f7927..e800122 100644
+index e1c6ad0..4fe1a1f 100644
 --- a/doc/muxers.texi
 +++ b/doc/muxers.texi
-@@ -2426,9 +2426,9 @@ ffmpeg -i in.mkv -codec copy -map 0 -f segment -segment_list out.csv -segment_fr
+@@ -2467,9 +2467,9 @@ ffmpeg -i in.mkv -codec copy -map 0 -f segment -segment_list out.csv -segment_fr
  
  @item
  Convert the @file{in.mkv} to TS segments using the @code{libx264}
@@ -168,10 +168,10 @@ index 93f7927..e800122 100644
  
  @item
 diff --git a/libavcodec/Makefile b/libavcodec/Makefile
-index 4a597f7..4ed988e 100644
+index 4fa8d7a..7fbe7e8 100644
 --- a/libavcodec/Makefile
 +++ b/libavcodec/Makefile
-@@ -1006,6 +1006,7 @@ OBJS-$(CONFIG_ADPCM_IMA_QT_AT_DECODER)    += audiotoolboxdec.o
+@@ -1000,6 +1000,7 @@ OBJS-$(CONFIG_ADPCM_IMA_QT_AT_DECODER)    += audiotoolboxdec.o
  OBJS-$(CONFIG_ALAC_AT_DECODER)            += audiotoolboxdec.o
  OBJS-$(CONFIG_AMR_NB_AT_DECODER)          += audiotoolboxdec.o
  OBJS-$(CONFIG_EAC3_AT_DECODER)            += audiotoolboxdec.o
@@ -180,10 +180,10 @@ index 4a597f7..4ed988e 100644
  OBJS-$(CONFIG_ILBC_AT_DECODER)            += audiotoolboxdec.o
  OBJS-$(CONFIG_MP1_AT_DECODER)             += audiotoolboxdec.o
 diff --git a/libavcodec/allcodecs.c b/libavcodec/allcodecs.c
-index 2e9a358..308fa91 100644
+index 623db2a..5d98720 100644
 --- a/libavcodec/allcodecs.c
 +++ b/libavcodec/allcodecs.c
-@@ -707,6 +707,7 @@ extern AVCodec ff_alac_at_encoder;
+@@ -439,6 +439,7 @@ extern const AVCodec ff_dss_sp_decoder;
  extern const AVCodec ff_dst_decoder;
  extern const AVCodec ff_eac3_encoder;
  extern const AVCodec ff_eac3_decoder;
