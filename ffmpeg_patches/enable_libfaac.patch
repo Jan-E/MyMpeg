@@ -36,10 +36,10 @@ index 82367fd..81d8e57 100755
  enabled libgme            && { check_pkg_config libgme libgme gme/gme.h gme_new_emu ||
                                 require libgme gme/gme.h gme_new_emu -lgme -lstdc++; }
 diff --git a/doc/encoders.texi b/doc/encoders.texi
-index 2ba9938..170bf21 100644
+index 4c38996..6f49902 100644
 --- a/doc/encoders.texi
 +++ b/doc/encoders.texi
-@@ -632,6 +632,111 @@ Sets the maximum delay in milliseconds. Lower delays than 20ms will very quickly
+@@ -631,6 +631,111 @@ Sets the maximum delay in milliseconds. Lower delays than 20ms will very quickly
  decrease quality.
  @end table
  
@@ -152,10 +152,10 @@ index 2ba9938..170bf21 100644
  @section libfdk_aac
  
 diff --git a/doc/muxers.texi b/doc/muxers.texi
-index e1c6ad0..4fe1a1f 100644
+index e77055e..85e70bb 100644
 --- a/doc/muxers.texi
 +++ b/doc/muxers.texi
-@@ -2467,9 +2467,9 @@ ffmpeg -i in.mkv -codec copy -map 0 -f segment -segment_list out.csv -segment_fr
+@@ -2472,9 +2472,9 @@ ffmpeg -i in.mkv -codec copy -map 0 -f segment -segment_list out.csv -segment_fr
  
  @item
  Convert the @file{in.mkv} to TS segments using the @code{libx264}
