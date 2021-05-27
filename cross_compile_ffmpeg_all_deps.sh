@@ -986,8 +986,8 @@ build_nghttp2() {
 }
 
 build_curl() {
-  local curl_version="7.76.1"
-  local curl_previous="7.76.0"
+  local curl_version="7.77.0"
+  local curl_previous="7.76.1"
   rm -rf curl-$curl_previous
   download_and_unpack_file https://curl.haxx.se/download/curl-$curl_version.tar.gz curl-$curl_version
   cd curl-$curl_version
@@ -1837,7 +1837,7 @@ build_lua() {
 }
 
 build_libcurl() {
-  generic_download_and_make_and_install https://curl.haxx.se/download/curl-7.76.1.tar.gz
+  generic_download_and_make_and_install https://curl.haxx.se/download/curl-7.77.0.tar.gz
 }
 
 build_libhdhomerun() {
