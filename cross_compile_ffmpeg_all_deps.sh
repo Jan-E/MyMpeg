@@ -1008,7 +1008,7 @@ build_curl() {
     echo CPPFLAGS="-DNGHTTP2_STATICLIB" ./configure --prefix=$mingw_w64_x86_64_prefix --host=$host_target --enable-shared=no --with-libssh2 --with-nghttp2 --with-winidn --enable-sspi --with-openssl=$mingw_w64_x86_64_prefix --with-schannel
     # link the static libnghttp2
     cp $mingw_w64_x86_64_prefix/lib/libnghttp2.a $mingw_w64_x86_64_prefix/lib/libnghttp2.dll.a
-	bash
+#	bash
     make
     strip src/curl.exe
     rm    "$mingw_bin_path/gcc"

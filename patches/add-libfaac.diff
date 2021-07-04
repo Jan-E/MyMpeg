@@ -35,6 +35,7 @@ index 00000000000..98b3ba81830
 +#include "libavutil/channel_layout.h"
 +#include "libavutil/common.h"
 +#include "avcodec.h"
++#include "encode.h"
 +#include "audio_frame_queue.h"
 +#include "internal.h"
 +
@@ -190,7 +191,7 @@ index 00000000000..98b3ba81830
 +    int num_samples  = frame ? frame->nb_samples : 0;
 +    void *samples    = frame ? frame->data[0]    : NULL;
 +
-+    if ((ret = ff_alloc_packet2(avctx, avpkt, (7 + 768) * avctx->channels, 0)) < 0)
++    if ((ret = ff_alloc_packet(avctx, avpkt, (7 + 768) * avctx->channels)) < 0)
 +        return ret;
 +
 +    bytes_written = faacEncEncode(s->faac_handle, samples,

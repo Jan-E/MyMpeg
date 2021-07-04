@@ -1,5 +1,5 @@
 diff --git a/configure b/configure
-index 82367fd..81d8e57 100755
+index b124411..12105ff 100755
 --- a/configure
 +++ b/configure
 @@ -230,6 +230,7 @@ External library support:
@@ -10,7 +10,7 @@ index 82367fd..81d8e57 100755
    --enable-libfdk-aac      enable AAC de/encoding via libfdk-aac [no]
    --enable-libflite        enable flite (voice synthesis) support via libflite [no]
    --enable-libfontconfig   enable libfontconfig, useful for drawtext filter [no]
-@@ -1762,6 +1763,7 @@ EXTERNAL_LIBRARY_GPL_LIST="
+@@ -1763,6 +1764,7 @@ EXTERNAL_LIBRARY_GPL_LIST="
  
  EXTERNAL_LIBRARY_NONFREE_LIST="
      decklink
@@ -18,7 +18,7 @@ index 82367fd..81d8e57 100755
      libfdk_aac
      openssl
      libtls
-@@ -3222,6 +3224,8 @@ avisynth_demuxer_deps="avisynth"
+@@ -3226,6 +3228,8 @@ avisynth_demuxer_deps="avisynth"
  avisynth_demuxer_select="riffdec"
  eac3_at_decoder_deps="audiotoolbox"
  eac3_at_decoder_select="ac3_parser"
@@ -27,7 +27,7 @@ index 82367fd..81d8e57 100755
  gsm_ms_at_decoder_deps="audiotoolbox"
  ilbc_at_decoder_deps="audiotoolbox"
  mp1_at_decoder_deps="audiotoolbox"
-@@ -6395,6 +6399,7 @@ enabled fontconfig        && enable libfontconfig
+@@ -6422,6 +6426,7 @@ enabled fontconfig        && enable libfontconfig
  enabled libfontconfig     && require_pkg_config libfontconfig fontconfig "fontconfig/fontconfig.h" FcInit
  enabled libfreetype       && require_pkg_config libfreetype freetype2 "ft2build.h FT_FREETYPE_H" FT_Init_FreeType
  enabled libfribidi        && require_pkg_config libfribidi fribidi fribidi.h fribidi_version_info
@@ -152,10 +152,10 @@ index 4c38996..6f49902 100644
  @section libfdk_aac
  
 diff --git a/doc/muxers.texi b/doc/muxers.texi
-index e77055e..85e70bb 100644
+index 0972bbf..2d62e17 100644
 --- a/doc/muxers.texi
 +++ b/doc/muxers.texi
-@@ -2472,9 +2472,9 @@ ffmpeg -i in.mkv -codec copy -map 0 -f segment -segment_list out.csv -segment_fr
+@@ -2476,9 +2476,9 @@ ffmpeg -i in.mkv -codec copy -map 0 -f segment -segment_list out.csv -segment_fr
  
  @item
  Convert the @file{in.mkv} to TS segments using the @code{libx264}
@@ -168,10 +168,10 @@ index e77055e..85e70bb 100644
  
  @item
 diff --git a/libavcodec/Makefile b/libavcodec/Makefile
-index 4fa8d7a..7fbe7e8 100644
+index 04f28c6..9e3bb10 100644
 --- a/libavcodec/Makefile
 +++ b/libavcodec/Makefile
-@@ -1000,6 +1000,7 @@ OBJS-$(CONFIG_ADPCM_IMA_QT_AT_DECODER)    += audiotoolboxdec.o
+@@ -1001,6 +1001,7 @@ OBJS-$(CONFIG_ADPCM_IMA_QT_AT_DECODER)    += audiotoolboxdec.o
  OBJS-$(CONFIG_ALAC_AT_DECODER)            += audiotoolboxdec.o
  OBJS-$(CONFIG_AMR_NB_AT_DECODER)          += audiotoolboxdec.o
  OBJS-$(CONFIG_EAC3_AT_DECODER)            += audiotoolboxdec.o
