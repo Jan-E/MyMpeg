@@ -2004,9 +2004,7 @@ apply_my_ffmpeg_patches() {
   apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/enable_libfaac.patch
   # back to FFmpeg's original revision
   git reset HEAD~8
-  bash
   apply_patch file://$patch_dir/add-libfaac.diff
-  bash
 }
 
 build_my_ffmpeg() {
