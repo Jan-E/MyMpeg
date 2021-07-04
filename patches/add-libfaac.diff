@@ -3,7 +3,7 @@ new file mode 100644
 index 00000000000..98b3ba81830
 --- /dev/null
 +++ libavcodec/libfaac.c
-@@ -0,0 +1,248 @@
+@@ -0,0 +1,249 @@
 +/*
 + * Interface to libfaac for aac encoding
 + * Copyright (c) 2002 Gildas Bazin <gbazin@netcourrier.com>
