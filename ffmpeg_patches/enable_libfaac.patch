@@ -1,5 +1,5 @@
 diff --git a/configure b/configure
-index b124411..12105ff 100755
+index f69e3a6..f31cf97 100755
 --- a/configure
 +++ b/configure
 @@ -230,6 +230,7 @@ External library support:
@@ -18,7 +18,7 @@ index b124411..12105ff 100755
      libfdk_aac
      openssl
      libtls
-@@ -3226,6 +3228,8 @@ avisynth_demuxer_deps="avisynth"
+@@ -3227,6 +3229,8 @@ avisynth_demuxer_deps="avisynth"
  avisynth_demuxer_select="riffdec"
  eac3_at_decoder_deps="audiotoolbox"
  eac3_at_decoder_select="ac3_parser"
@@ -27,7 +27,7 @@ index b124411..12105ff 100755
  gsm_ms_at_decoder_deps="audiotoolbox"
  ilbc_at_decoder_deps="audiotoolbox"
  mp1_at_decoder_deps="audiotoolbox"
-@@ -6422,6 +6426,7 @@ enabled fontconfig        && enable libfontconfig
+@@ -6434,6 +6438,7 @@ enabled fontconfig        && enable libfontconfig
  enabled libfontconfig     && require_pkg_config libfontconfig fontconfig "fontconfig/fontconfig.h" FcInit
  enabled libfreetype       && require_pkg_config libfreetype freetype2 "ft2build.h FT_FREETYPE_H" FT_Init_FreeType
  enabled libfribidi        && require_pkg_config libfribidi fribidi fribidi.h fribidi_version_info
@@ -36,7 +36,7 @@ index b124411..12105ff 100755
  enabled libgme            && { check_pkg_config libgme libgme gme/gme.h gme_new_emu ||
                                 require libgme gme/gme.h gme_new_emu -lgme -lstdc++; }
 diff --git a/doc/encoders.texi b/doc/encoders.texi
-index 4c38996..6f49902 100644
+index 8fccd73..71e9184 100644
 --- a/doc/encoders.texi
 +++ b/doc/encoders.texi
 @@ -631,6 +631,111 @@ Sets the maximum delay in milliseconds. Lower delays than 20ms will very quickly
@@ -168,7 +168,7 @@ index 0972bbf..2d62e17 100644
  
  @item
 diff --git a/libavcodec/Makefile b/libavcodec/Makefile
-index 04f28c6..9e3bb10 100644
+index be64c82..0bfde67 100644
 --- a/libavcodec/Makefile
 +++ b/libavcodec/Makefile
 @@ -1001,6 +1001,7 @@ OBJS-$(CONFIG_ADPCM_IMA_QT_AT_DECODER)    += audiotoolboxdec.o
