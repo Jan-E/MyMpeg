@@ -28,4 +28,5 @@ diff -ur rubberband.pc.in.bak rubberband.pc.in
 +Description: An audio time-stretching and pitch-shifting library and utility program
  Libs: -L${libdir} -lrubberband
 +Libs.private: %LIBRARY_LIBS%
- Cflags: -I${includedir} 
+ Cflags: -I${includedir}
+ 
