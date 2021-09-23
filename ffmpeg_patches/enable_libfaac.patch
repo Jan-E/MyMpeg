@@ -152,7 +152,7 @@ index 8fccd73..71e9184 100644
  @section libfdk_aac
  
 diff --git a/doc/muxers.texi b/doc/muxers.texi
-index 0972bbf..2d62e17 100644
+index 05719c1..956b169 100644
 --- a/doc/muxers.texi
 +++ b/doc/muxers.texi
 @@ -2476,9 +2476,9 @@ ffmpeg -i in.mkv -codec copy -map 0 -f segment -segment_list out.csv -segment_fr
@@ -168,7 +168,7 @@ index 0972bbf..2d62e17 100644
  
  @item
 diff --git a/libavcodec/Makefile b/libavcodec/Makefile
-index 0dc564f..840136e 100644
+index 68d808d..b575ce4 100644
 --- a/libavcodec/Makefile
 +++ b/libavcodec/Makefile
 @@ -1002,6 +1002,7 @@ OBJS-$(CONFIG_ADPCM_IMA_QT_AT_DECODER)    += audiotoolboxdec.o
