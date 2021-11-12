@@ -1,5 +1,5 @@
 diff --git a/libavfilter/af_volume.c b/libavfilter/af_volume.c
-index 2d4012b..74d6606 100644
+index 76ccddc..abe39e4 100644
 --- a/libavfilter/af_volume.c
 +++ b/libavfilter/af_volume.c
 @@ -55,6 +55,7 @@ static const char *const var_names[] = {
@@ -104,7 +104,7 @@ index af46e34..81b920a 100644
  
  void ff_volume_init_x86(VolumeContext *vol);
 diff --git a/libavfilter/f_ebur128.c b/libavfilter/f_ebur128.c
-index 2ce8a74..a6fb5fd 100644
+index 88d6a1f..93a38fe 100644
 --- a/libavfilter/f_ebur128.c
 +++ b/libavfilter/f_ebur128.c
 @@ -521,10 +521,7 @@ static av_cold int init(AVFilterContext *ctx)
