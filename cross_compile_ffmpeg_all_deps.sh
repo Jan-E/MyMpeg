@@ -624,7 +624,7 @@ build_nv_headers() {
 build_intel_quicksync_mfx() { # i.e. qsv
   do_git_checkout https://github.com/lu-zero/mfx_dispatch.git # lu-zero??
   cd mfx_dispatch_git
-    apply_patch file://$patch_dir/revert_fix_linking_for_UWP_targets.patch
+#   apply_patch file://$patch_dir/revert_fix_linking_for_UWP_targets.patch
     if [[ ! -f "compile" ]]; then
       autoreconf -fiv || exit 1
       automake --add-missing || exit 1
