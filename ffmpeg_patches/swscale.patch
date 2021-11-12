@@ -1,16 +1,19 @@
 diff --git a/libswscale/swscale.c b/libswscale/swscale.c
-index 12160a1..40de8f3 100644
+index 75cde31..15f1bdf 100644
 --- a/libswscale/swscale.c
 +++ b/libswscale/swscale.c
-@@ -829,7 +829,11 @@ int attribute_align_arg sws_scale(struct SwsContext *c,
+@@ -952,10 +952,12 @@ static int scale_internal(SwsContext *c,
+     if (frame_start && !scale_dst) {
+         if (srcSliceY != 0 && srcSliceY + srcSliceH != c->srcH) {
+             av_log(c, AV_LOG_ERROR, "Slices start in the middle!\n");
++            /* edited, removed:
+             return AVERROR(EINVAL);
++            */
++            c->sliceDir = 1;
+         }
+-
+-        c->sliceDir = (srcSliceY == 0) ? 1 : -1;
++        else c->sliceDir = (srcSliceY == 0) ? 1 : -1;
+     } else if (scale_dst)
+         c->sliceDir = 1;
  
-     if (c->sliceDir == 0 && srcSliceY != 0 && srcSliceY + srcSliceH != c->srcH) {
-         av_log(c, AV_LOG_ERROR, "Slices start in the middle!\n");
-+        /* edited, removed:
-         return 0;
-+        */
-+        /* Try to load the slices from top to bottom */
-+        c->sliceDir = 1;
-     }
-     if (c->sliceDir == 0) {
-         if (srcSliceY == 0) c->sliceDir = 1; else c->sliceDir = -1;
