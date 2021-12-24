@@ -1158,9 +1158,9 @@ build_openssl-1.1.0() {
 }
 
 build_openssl-1.1.1() {
-  rm -rf openssl-1.1.1k
-  download_and_unpack_file https://www.openssl.org/source/openssl-1.1.1l.tar.gz
-  cd openssl-1.1.1l
+  rm -rf openssl-1.1.1kl
+  download_and_unpack_file https://www.openssl.org/source/openssl-1.1.1m.tar.gz
+  cd openssl-1.1.1m
     export CC="${cross_prefix}gcc"
     export AR="${cross_prefix}ar"
     export RANLIB="${cross_prefix}ranlib"
