@@ -772,30 +772,61 @@ build_gmp() {
 }
 
 build_libnettle() {
-  download_and_unpack_file https://ftp.gnu.org/gnu/nettle/nettle-3.3.tar.gz
-  cd nettle-3.3
-    generic_configure "--disable-openssl --disable-documentation" # in case we have both gnutls and openssl, just use gnutls [except that gnutls uses this so...huh? https://github.com/rdp/ffmpeg-windows-build-helpers/issues/25#issuecomment-28158515
+  download_and_unpack_file https://ftp.gnu.org/gnu/nettle/nettle-3.6.tar.gz
+  cd nettle-3.6
+    local config_options="--disable-openssl --disable-documentation" # in case we have both gnutls and openssl, just use gnutls [except that gnutls uses this so...huh?
+    if [[ $compiler_flavors == "native" ]]; then
+      config_options+=" --libdir=${mingw_w64_x86_64_prefix}/lib" # Otherwise native builds install to /lib32 or /lib64 which gnutls doesn't find
+    fi
+    generic_configure "$config_options" # in case we have both gnutls and openssl, just use gnutls [except that gnutls uses this so...huh? https://github.com/rdp/ffmpeg-windows-build-helpers/issues/25#issuecomment-28158515
     do_make_and_make_install # What's up with "Configured with: ... --with-gmp=/cygdrive/d/ffmpeg-windows-build-helpers-master/native_build/windows/ffmpeg_local_builds/sandbox/cross_compilers/pkgs/gmp/gmp-6.1.2-i686" in 'config.log'? Isn't the 'gmp-6.1.2' above being used?
   cd ..
 }
 
-build_librtmp() {
-  #  download_and_unpack_file http://rtmpdump.mplayerhq.hu/download/rtmpdump-2.3.tgz rtmpdump-2.3 # has some odd configure failure
-  #  cd rtmpdump-2.3/librtmp
-
-  do_git_checkout git://git.ffmpeg.org/rtmpdump rtmpdump_git a1900c3
+build_librtmp_gnutls() {
+  do_git_checkout "http://repo.or.cz/r/rtmpdump.git" rtmpdump_git
   cd rtmpdump_git/librtmp
-      # patch RTMP_GetTime() to return always 0
-      bash
-      do_make_install "CRYPTO=OPENSSL OPT=-O2 CROSS_COMPILE=$cross_prefix SHARED=no prefix=$mingw_w64_x86_64_prefix"
-      sed -i 's/-lrtmp -lz/-lrtmp -lwinmm -lws2_32 -lz/' "$PKG_CONFIG_PATH/librtmp.pc"
+	git co 883c33489403ed360a01d1a47ec76d476525b49e # trunk didn't build once...
+	make install CRYPTO=GNUTLS OPT='-O2 -g' "CROSS_COMPILE=$cross_prefix" SHARED=no "prefix=$mingw_w64_x86_64_prefix" || exit 1
+	sed -i 's/-lrtmp -lz/-lrtmp -lwinmm -lz/' "$PKG_CONFIG_PATH/librtmp.pc"
+  cd ../..
+}
+
+build_librtmp() {
+  #do_git_checkout git://git.ffmpeg.org/rtmpdump rtmpdump_git
+  do_git_checkout https://github.com/JudgeZarbi/RTMPDump-OpenSSL-1.1 rtmpdump_git
+  cd rtmpdump_git/librtmp
+        # use the cross compiler binaries as gcc, windres, ar and ranlib
+        ln -s "${cross_prefix}gcc"     "$mingw_bin_path/gcc"
+        ln -s "${cross_prefix}g++"     "$mingw_bin_path/g++"
+        ln -s "${cross_prefix}windres" "$mingw_bin_path/windres"
+        ln -s "${cross_prefix}ar"      "$mingw_bin_path/ar"
+        ln -s "${cross_prefix}ranlib"  "$mingw_bin_path/ranlib"
+        ln -s "${cross_prefix}ld"  "$mingw_bin_path/ld"
+		export prefix=$mingw_w64_x86_64_prefix
+		export cross=${cross_prefix}
+        which gcc
+        gcc --version
+		# undefined reference to `__imp_timeGetTime'
+		# patch RTMP_GetTime() to return always 0
+		apply_patch file://$patch_dir/librtmp_time_return_0.patch
+		bash
+		echo do_make_install "CRYPTO=OPENSSL OPT=-O2 CROSS_COMPILE=$cross_prefix SHARED=no prefix=$mingw_w64_x86_64_prefix"
+		#bash
+		do_make_install "CRYPTO=OPENSSL OPT=-O2 CROSS_COMPILE=$cross_prefix SHARED=no prefix=$mingw_w64_x86_64_prefix"
+        rm    "$mingw_bin_path/gcc"
+        rm    "$mingw_bin_path/g++"
+        rm    "$mingw_bin_path/windres"
+        rm    "$mingw_bin_path/ar"
+        rm    "$mingw_bin_path/ranlib"
+		sed -i 's/-lrtmp -lz/-lrtmp -lwinmm -lws2_32 -lz/' "$PKG_CONFIG_PATH/librtmp.pc"
     cd ..
   cd ..
 }
 
 build_libssh2_wincng() {
-  local ssh2_version="1.9.0"
-  local ssh2_previous="1.8.2"
+  local ssh2_version="1.10.0"
+  local ssh2_previous="1.9.0"
   rm -rf libssh2-$ssh2_previous
   download_and_unpack_file https://github.com/libssh2/libssh2/releases/download/libssh2-$ssh2_version/libssh2-$ssh2_version.tar.gz libssh2-$ssh2_version
   cd libssh2-$ssh2_version
@@ -818,8 +849,8 @@ build_libssh2_wincng() {
 }
 
 build_libssh2() {
-  local ssh2_version="1.9.0"
-  local ssh2_previous="1.8.2"
+  local ssh2_version="1.10.0"
+  local ssh2_previous="1.9.0"
   rm -rf libssh2-$ssh2_previous
   download_and_unpack_file https://github.com/libssh2/libssh2/releases/download/libssh2-$ssh2_version/libssh2-$ssh2_version.tar.gz libssh2-$ssh2_version
   cd libssh2-$ssh2_version
@@ -927,9 +958,16 @@ build_libssh() {
   cd ..
 }
 
+build_libgpg-error() {
+  download_and_unpack_file https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.44.tar.bz2 libgpg-error-1.44
+  cd libgpg-error-1.44
+    generic_configure_make_install
+  cd ..
+}
+
 build_libgcrypt() {
-  download_and_unpack_file https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.3.tar.bz2 libgcrypt-1.8.3
-  cd libgcrypt-1.8.3
+  download_and_unpack_file https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.10.0.tar.bz2 libgcrypt-1.10.0
+  cd libgcrypt-1.10.0
     generic_configure_make_install
   cd ..
 }
@@ -964,8 +1002,8 @@ build_nghttp2() {
         ln -s "${cross_prefix}ar"      "$mingw_bin_path/ar"
         ln -s "${cross_prefix}ranlib"  "$mingw_bin_path/ranlib"
         ln -s "${cross_prefix}ld"  "$mingw_bin_path/ld"
-	export prefix=$mingw_w64_x86_64_prefix
-	export cross=${cross_prefix}
+		export prefix=$mingw_w64_x86_64_prefix
+		export cross=${cross_prefix}
         echo cmake . -DENABLE_STATIC_LIB=1 -DNGHTTP2_STATICLIB=1 -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_INSTALL_PREFIX=$mingw_w64_x86_64_prefix -DCMAKE_INSTALL_LIBDIR=$mingw_w64_x86_64_prefix/lib
         rm    "$mingw_bin_path/gcc"
         rm    "$mingw_bin_path/g++"
@@ -1004,11 +1042,12 @@ build_curl() {
 #    echo CPPFLAGS="-DNGHTTP2_STATICLIB" ./configure --prefix=$mingw_w64_x86_64_prefix --host=$host_target --enable-shared=no --with-libssh2 --with-nghttp2 --with-winidn --enable-sspi
 #    CPPFLAGS="-DNGHTTP2_STATICLIB" ./configure      --prefix=$mingw_w64_x86_64_prefix --host=$host_target --with-ssl=no --enable-shared=no --with-winidn --enable-sspi --with-schannel --with-libssh2 --with-nghttp2=no
 #    echo CPPFLAGS="-DNGHTTP2_STATICLIB" ./configure --prefix=$mingw_w64_x86_64_prefix --host=$host_target --with-ssl=no --enable-shared=no --with-winidn --enable-sspi --with-schannel --with-libssh2 --with-nghttp2=no
-    CPPFLAGS="-DNGHTTP2_STATICLIB" ./configure      --prefix=$mingw_w64_x86_64_prefix --host=$host_target --enable-shared=no --with-libssh2 --with-nghttp2 --with-winidn --enable-sspi --with-openssl=$mingw_w64_x86_64_prefix --with-schannel
-    echo CPPFLAGS="-DNGHTTP2_STATICLIB" ./configure --prefix=$mingw_w64_x86_64_prefix --host=$host_target --enable-shared=no --with-libssh2 --with-nghttp2 --with-winidn --enable-sspi --with-openssl=$mingw_w64_x86_64_prefix --with-schannel
+    CPPFLAGS="-DNGHTTP2_STATICLIB" ./configure      --prefix=$mingw_w64_x86_64_prefix --host=$host_target --enable-shared=no --with-libssh2 --with-nghttp2 --with-winidn --enable-sspi --with-openssl=$mingw_w64_x86_64_prefix --with-schannel --with-librtmp=$mingw_w64_x86_64_prefix
+    echo CPPFLAGS="-DNGHTTP2_STATICLIB" ./configure --prefix=$mingw_w64_x86_64_prefix --host=$host_target --enable-shared=no --with-libssh2 --with-nghttp2 --with-winidn --enable-sspi --with-openssl=$mingw_w64_x86_64_prefix --with-schannel --with-librtmp=$mingw_w64_x86_64_prefix
     # link the static libnghttp2
-    cp $mingw_w64_x86_64_prefix/lib/libnghttp2.a $mingw_w64_x86_64_prefix/lib/libnghttp2.dll.a
-#	bash
+    echo cp $mingw_w64_x86_64_prefix/lib/libnghttp2.a $mingw_w64_x86_64_prefix/lib/libnghttp2.dll.a
+	cp      $mingw_w64_x86_64_prefix/lib/libnghttp2.a $mingw_w64_x86_64_prefix/lib/libnghttp2.dll.a
+	#bash
     make
     strip src/curl.exe
     rm    "$mingw_bin_path/gcc"
@@ -1048,19 +1087,27 @@ build_curl() {
 #  Protocols:        DICT FILE FTP FTPS GOPHER HTTP HTTPS IMAP IMAPS LDAP LDAPS POP3 POP3S RTSP SCP SFTP SMB SMBS SMTP SMTPS TELNET TFTP
 #  Features:         SSL IPv6 libz AsynchDNS IDN SSPI SPNEGO Kerberos NTLM TLS-SRP HTTP2 MultiSSL HTTPS-proxy
 
+build_unistring() {
+  generic_download_and_make_and_install https://ftp.gnu.org/gnu/libunistring/libunistring-0.9.10.tar.xz
+}
+
 build_gnutls() {
-  download_and_unpack_file https://www.gnupg.org/ftp/gcrypt/gnutls/v3.5/gnutls-3.5.18.tar.xz
-  cd gnutls-3.5.18
+  download_and_unpack_file https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/gnutls-3.6.15.tar.xz
+  cd gnutls-3.6.15
     # --disable-cxx don't need the c++ version, in an effort to cut down on size... XXXX test size difference...
     # --enable-local-libopts to allow building with local autogen installed,
     # --disable-guile is so that if it finds guile installed (cygwin did/does) it won't try and link/build to it and fail...
     # libtasn1 is some dependency, appears provided is an option [see also build_libnettle]
     # pks #11 hopefully we don't need kit
-    if [[ ! -f lib/gnutls.pc.in.bak ]]; then # Somehow FFmpeg's 'configure' needs '-lcrypt32'. Otherwise you'll get "undefined reference to `_imp__Cert...'" and "ERROR: gnutls not found using pkg-config".
-      sed -i.bak "/privat/s/.*/& -lcrypt32/" lib/gnutls.pc.in
-    fi
-    generic_configure "--disable-doc --disable-tools --disable-cxx --disable-tests --disable-gtk-doc-html --disable-libdane --disable-nls --enable-local-libopts --disable-guile --with-included-libtasn1 --with-included-unistring --without-p11-kit"
+    generic_configure "--disable-doc --disable-tools --disable-cxx --disable-tests --disable-gtk-doc-html --disable-libdane --disable-nls --enable-local-libopts --disable-guile --with-included-libtasn1 --without-p11-kit"
     do_make_and_make_install
+    if [[ $compiler_flavors != "native"  ]]; then
+      # libsrt doesn't know how to use its pkg deps :| https://github.com/Haivision/srt/issues/565
+      sed -i.bak 's/-lgnutls.*/-lgnutls -lcrypt32 -lnettle -lhogweed -lgmp -lidn2 -liconv -lunistring/' "$PKG_CONFIG_PATH/gnutls.pc"
+      if [[ $OSTYPE == darwin* ]]; then
+        sed -i.bak 's/-lgnutls.*/-lgnutls -framework Security -framework Foundation/' "$PKG_CONFIG_PATH/gnutls.pc"
+      fi
+    fi
   cd ..
 }
 
@@ -1545,13 +1592,14 @@ build_libsrt() {
   #cd srt_git
   #download_and_unpack_file https://codeload.github.com/Haivision/srt/tar.gz/v1.3.2 srt-1.3.2
   download_and_unpack_file https://github.com/Haivision/srt/archive/v1.4.1.tar.gz srt-1.4.1
-  cd srt-1.4.1 
+  cd srt-1.4.1
     if [[ $compiler_flavors != "native" ]]; then
-      do_cmake "-DUSE_GNUTLS=ON -DENABLE_SHARED=OFF"
       apply_patch file://$patch_dir/srt.app.patch -p1
-    else
-      do_cmake "-DUSE_GNUTLS=ON -DENABLE_SHARED=OFF -DENABLE_CXX11=OFF"
     fi
+    # CMake Warning at CMakeLists.txt:893 (message):
+    #   On MinGW, some C++11 apps are blocked due to lacking proper C++11 headers
+    #   for <thread>.  FIX IF POSSIBLE.
+    do_cmake "-DUSE_GNUTLS=ON -DENABLE_SHARED=OFF -DENABLE_CXX11=OFF"
     do_make_and_make_install
   cd ..
 }
@@ -1612,84 +1660,70 @@ build_libaom() {
 }
 
 build_libx265() {
-  # the only one that uses mercurial, so there's some extra initial junk in this method... XXX needs some cleanup :|
-  local checkout_dir=x265
-  if [[ $high_bitdepth == "y" ]]; then
-    checkout_dir=x265_high_bitdepth_10
+  local checkout_dir=x265_all_bitdepth
+  local remote="https://bitbucket.org/multicoreware/x265_git"
+  if [[ ! -z $x265_git_checkout_version ]]; then
+    checkout_dir+="_$x265_git_checkout_version"
+    do_git_checkout "$remote" $checkout_dir "$x265_git_checkout_version"
   fi
+  if [[ $prefer_stable = "n" ]] && [[ -z $x265_git_checkout_version ]] ; then
+    do_git_checkout "$remote" $checkout_dir "origin/master"
+  fi
+  if [[ $prefer_stable = "y" ]] && [[ -z $x265_git_checkout_version ]] ; then
+    do_git_checkout "$remote" $checkout_dir "origin/stable"
+  fi
+  cd $checkout_dir
 
-  if [[ $prefer_stable = "n" ]]; then
-    local old_hg_version
-    if [[ -d $checkout_dir ]]; then
-      cd $checkout_dir
-      if [[ $git_get_latest = "y" ]]; then
-        echo "doing hg pull -u x265"
-        old_hg_version=`hg --debug id -i`
-        hg pull -u || exit 1
-        hg update || exit 1 # guess you need this too if no new changes are brought down [what the...]
-      else
-        echo "not doing hg pull x265"
-        old_hg_version=`hg --debug id -i`
-      fi
-    else
-      echo "doing hg clone x265"
-      hg clone https://bitbucket.org/multicoreware/x265 $checkout_dir || exit 1
-      cd $checkout_dir
-      old_hg_version=none-yet
-    fi
-    cd source
+  local cmake_params="-DENABLE_SHARED=0" # build x265.exe
 
-    local new_hg_version=`hg --debug id -i`
-    if [[ "$old_hg_version" != "$new_hg_version" ]]; then
-      echo "got upstream hg changes, forcing rebuild...x265"
-      rm -f already*
-    else
-      echo "still at hg $new_hg_version x265"
-    fi
-  else
-    # i.e. prefer_stable == "y" TODO clean this up these two branches are pretty similar...
-    local old_hg_version
-    if [[ -d $checkout_dir ]]; then
-      cd $checkout_dir
-      if [[ $git_get_latest = "y" ]]; then
-        echo "doing hg pull -u x265"
-        old_hg_version=`hg --debug id -i`
-        hg pull -u || exit 1
-        hg update || exit 1 # guess you need this too if no new changes are brought down [what the...]
-      else
-        echo "not doing hg pull x265"
-        old_hg_version=`hg --debug id -i`
-      fi
-    else
-      echo "doing hg clone x265"
-      hg clone https://bitbucket.org/multicoreware/x265 -r stable $checkout_dir || exit 1
-      cd $checkout_dir
-      old_hg_version=none-yet
-    fi
-    cd source
-
-    local new_hg_version=`hg --debug id -i`
-    if [[ "$old_hg_version" != "$new_hg_version" ]]; then
-      echo "got upstream hg changes, forcing rebuild...x265"
-      rm -f already*
-    else
-      echo "still at hg $new_hg_version x265"
-    fi
-  fi # dont with prefer_stable = [y|n]
-
-  local cmake_params="-DENABLE_SHARED=0 -DENABLE_CLI=1" # build x265.exe
   if [ "$bits_target" = "32" ]; then
     cmake_params+=" -DWINXP_SUPPORT=1" # enable windows xp/vista compatibility in x86 build
-    cmake_params="$cmake_params -DENABLE_ASSEMBLY=OFF" # apparently required or build fails
   fi
-  if [[ $high_bitdepth == "y" ]]; then
-    cmake_params+=" -DHIGH_BIT_DEPTH=1" # Enable 10 bits (main10) and 12 bits (???) per pixels profiles.
-  fi
+  mkdir -p 8bit 10bit 12bit
 
-  do_cmake "$cmake_params"
+  # Build 12bit (main12)
+  cd 12bit
+  local cmake_12bit_params="$cmake_params -DENABLE_CLI=0 -DHIGH_BIT_DEPTH=1 -DMAIN12=1 -DEXPORT_C_API=0"
+  if [ "$bits_target" = "32" ]; then
+    cmake_12bit_params="$cmake_12bit_params -DENABLE_ASSEMBLY=OFF" # apparently required or build fails
+  fi
+  do_cmake_from_build_dir ../source "$cmake_12bit_params"
   do_make
-  echo force reinstall in case bit depth changed at all :|
-  rm already_ran_make_install*
+  cp libx265.a ../8bit/libx265_main12.a
+
+  # Build 10bit (main10)
+  cd ../10bit
+  local cmake_10bit_params="$cmake_params -DENABLE_CLI=0 -DHIGH_BIT_DEPTH=1 -DENABLE_HDR10_PLUS=1 -DEXPORT_C_API=0"
+  if [ "$bits_target" = "32" ]; then
+    cmake_10bit_params="$cmake_10bit_params -DENABLE_ASSEMBLY=OFF" # apparently required or build fails
+  fi
+  do_cmake_from_build_dir ../source "$cmake_10bit_params"
+  do_make
+  cp libx265.a ../8bit/libx265_main10.a
+
+  # Build 8 bit (main) with linked 10 and 12 bit then install
+  cd ../8bit
+  cmake_params="$cmake_params -DENABLE_CLI=1 -DEXTRA_LINK_FLAGS=-L. -DLINKED_10BIT=1 -DLINKED_12BIT=1"
+  if [[ $compiler_flavors == "native" && $OSTYPE != darwin* ]]; then
+    cmake_params+=" -DENABLE_SHARED=0 -DEXTRA_LIB='$(pwd)/libx265_main10.a;$(pwd)/libx265_main12.a;-ldl'" # Native multi-lib CLI builds are slightly broken right now; other option is to -DENABLE_CLI=0, but this seems to work (https://bitbucket.org/multicoreware/x265/issues/520)
+  else
+    cmake_params+=" -DEXTRA_LIB='$(pwd)/libx265_main10.a;$(pwd)/libx265_main12.a'"
+  fi
+  do_cmake_from_build_dir ../source "$cmake_params"
+  do_make
+  mv libx265.a libx265_main.a
+  if [[ $compiler_flavors == "native" && $OSTYPE == darwin* ]]; then
+    libtool -static -o libx265.a libx265_main.a libx265_main10.a libx265_main12.a 2>/dev/null
+  else
+    ${cross_prefix}ar -M <<EOF
+CREATE libx265.a
+ADDLIB libx265_main.a
+ADDLIB libx265_main10.a
+ADDLIB libx265_main12.a
+SAVE
+END
+EOF
+  fi
   do_make_install
   cd ../..
 }
@@ -2286,7 +2320,8 @@ build_ffmpeg_dependencies() {
   build_fontconfig # Needs freetype and libxml >= 2.6. Uses iconv and dlfcn.
   build_gmp # For rtmp support configure FFmpeg with '--enable-gmp'. Uses dlfcn.
   build_libnettle # Needs gmp >= 3.0. Uses dlfcn.
-  build_gnutls # Needs nettle >= 3.1, hogweed (nettle) >= 3.1. Uses zlib and dlfcn.
+  build_unistring 
+  build_gnutls # Needs nettle >= 3.1, hogweed (nettle) >= 3.4, unistring Uses zlib and dlfcn.
   #if [[ "$non_free" = "y" ]]; then
   #  build_openssl-1.0.2 # Nonfree alternative to GnuTLS. 'build_openssl-1.0.2 "dllonly"' to build shared libraries only.
   #  build_openssl-1.1.0 # Nonfree alternative to GnuTLS. Can't be used with LibRTMP. 'build_openssl-1.1.0 "dllonly"' to build shared libraries only.
@@ -2329,17 +2364,19 @@ build_ffmpeg_dependencies() {
   build_libass # Requires harfbuzz now. Needs freetype >= 9.10.3 (see https://bugs.launchpad.net/ubuntu/+source/freetype1/+bug/78573 o_O) and fribidi >= 0.19.0. Uses fontconfig >= 2.10.92, iconv and dlfcn.
   build_libxavs
   build_libxvid # FFmpeg now has native support, but libxvid still provides a better image.
-#  build_libsrt # requires gnutls, mingw-std-threads
+  build_libsrt # requires gnutls, mingw-std-threads
   build_libtesseract
   build_libvpx
-#  build_libx265
+  build_libx265
   build_libopenh264
   build_libaom
-#  build_librtmp
+  build_librtmp
+#  build_librtmp_gnutls
   build_libssh2
 #  build_libssh2_wincng
   build_libssh
-#  build_libgcrypt
+  build_libgpg-error
+  build_libgcrypt
   build_nghttp2
   build_curl
   build_libx264 # at bottom as it might build a ffmpeg which needs all the above deps...

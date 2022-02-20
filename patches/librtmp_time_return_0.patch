@@ -1,0 +1,20 @@
+diff --git a/librtmp/rtmp.c b/librtmp/rtmp.c
+index a2863b0..fc6af09 100644
+--- a/librtmp/rtmp.c
++++ b/librtmp/rtmp.c
+@@ -155,15 +155,7 @@ static int clk_tck;
+ uint32_t
+ RTMP_GetTime()
+ {
+-#ifdef _DEBUG
+   return 0;
+-#elif defined(_WIN32)
+-  return timeGetTime();
+-#else
+-  struct tms t;
+-  if (!clk_tck) clk_tck = sysconf(_SC_CLK_TCK);
+-  return times(&t) * 1000 / clk_tck;
+-#endif
+ }
+ 
+ void

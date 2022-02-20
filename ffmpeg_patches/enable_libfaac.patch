@@ -1,5 +1,5 @@
 diff --git a/configure b/configure
-index 23ef2ab..3b5c74a 100755
+index 1225faf..3a26788 100755
 --- a/configure
 +++ b/configure
 @@ -230,6 +230,7 @@ External library support:
@@ -18,7 +18,7 @@ index 23ef2ab..3b5c74a 100755
      libfdk_aac
      libtls
  "
-@@ -3278,6 +3280,8 @@ avisynth_demuxer_deps="avisynth"
+@@ -3284,6 +3286,8 @@ avisynth_demuxer_deps="avisynth"
  avisynth_demuxer_select="riffdec"
  eac3_at_decoder_deps="audiotoolbox"
  eac3_at_decoder_select="ac3_parser"
@@ -27,7 +27,7 @@ index 23ef2ab..3b5c74a 100755
  gsm_ms_at_decoder_deps="audiotoolbox"
  ilbc_at_decoder_deps="audiotoolbox"
  mp1_at_decoder_deps="audiotoolbox"
-@@ -6518,6 +6522,7 @@ enabled libdav1d          && require_pkg_config libdav1d "dav1d >= 0.5.0" "dav1d
+@@ -6527,6 +6531,7 @@ enabled libdav1d          && require_pkg_config libdav1d "dav1d >= 0.5.0" "dav1d
  enabled libdavs2          && require_pkg_config libdavs2 "davs2 >= 1.6.0" davs2.h davs2_decoder_open
  enabled libdc1394         && require_pkg_config libdc1394 libdc1394-2 dc1394/dc1394.h dc1394_new
  enabled libdrm            && require_pkg_config libdrm libdrm xf86drm.h drmGetVersion
@@ -36,7 +36,7 @@ index 23ef2ab..3b5c74a 100755
                                 { require libfdk_aac fdk-aac/aacenc_lib.h aacEncOpen -lfdk-aac &&
                                   warn "using libfdk without pkg-config"; } }
 diff --git a/doc/encoders.texi b/doc/encoders.texi
-index 8a7589c..1f272b8 100644
+index e3b61de..a26160e 100644
 --- a/doc/encoders.texi
 +++ b/doc/encoders.texi
 @@ -631,6 +631,111 @@ Sets the maximum delay in milliseconds. Lower delays than 20ms will very quickly
@@ -168,10 +168,10 @@ index 1ea98a6..40af165 100644
  
  @item
 diff --git a/libavcodec/Makefile b/libavcodec/Makefile
-index 9577062..acf8ff0 100644
+index cfc70a3..b635ff6 100644
 --- a/libavcodec/Makefile
 +++ b/libavcodec/Makefile
-@@ -1007,6 +1007,7 @@ OBJS-$(CONFIG_ADPCM_IMA_QT_AT_DECODER)    += audiotoolboxdec.o
+@@ -1024,6 +1024,7 @@ OBJS-$(CONFIG_ADPCM_IMA_QT_AT_DECODER)    += audiotoolboxdec.o
  OBJS-$(CONFIG_ALAC_AT_DECODER)            += audiotoolboxdec.o
  OBJS-$(CONFIG_AMR_NB_AT_DECODER)          += audiotoolboxdec.o
  OBJS-$(CONFIG_EAC3_AT_DECODER)            += audiotoolboxdec.o
