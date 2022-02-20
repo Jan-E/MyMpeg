@@ -810,7 +810,7 @@ build_librtmp() {
 		# undefined reference to `__imp_timeGetTime'
 		# patch RTMP_GetTime() to return always 0
 		apply_patch file://$patch_dir/librtmp_time_return_0.patch
-		bash
+		#bash
 		echo do_make_install "CRYPTO=OPENSSL OPT=-O2 CROSS_COMPILE=$cross_prefix SHARED=no prefix=$mingw_w64_x86_64_prefix"
 		#bash
 		do_make_install "CRYPTO=OPENSSL OPT=-O2 CROSS_COMPILE=$cross_prefix SHARED=no prefix=$mingw_w64_x86_64_prefix"

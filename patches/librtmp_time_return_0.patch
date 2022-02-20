@@ -1,7 +1,7 @@
 diff --git a/librtmp/rtmp.c b/librtmp/rtmp.c
 index a2863b0..fc6af09 100644
---- a/librtmp/rtmp.c
-+++ b/librtmp/rtmp.c
+--- ./rtmp.c
++++ ./rtmp.c
 @@ -155,15 +155,7 @@ static int clk_tck;
  uint32_t
  RTMP_GetTime()
