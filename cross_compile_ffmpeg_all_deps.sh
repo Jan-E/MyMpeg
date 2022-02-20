@@ -2378,8 +2378,8 @@ build_ffmpeg_dependencies() {
   build_libgpg-error
   build_libgcrypt
   build_nghttp2
+  build_libx264 # at bottom as it might build a ffmpeg which needs the above deps...
   build_curl
-  build_libx264 # at bottom as it might build a ffmpeg which needs all the above deps...
 }
 
 build_apps() {
