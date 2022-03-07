@@ -1,8 +1,8 @@
 diff --git a/libswscale/swscale.c b/libswscale/swscale.c
-index feef348..28936fb 100644
+index 3ed547d..b2d6539 100644
 --- a/libswscale/swscale.c
 +++ b/libswscale/swscale.c
-@@ -952,10 +952,12 @@ static int scale_internal(SwsContext *c,
+@@ -948,10 +948,12 @@ static int scale_internal(SwsContext *c,
      if (frame_start && !scale_dst) {
          if (srcSliceY != 0 && srcSliceY + srcSliceH != c->srcH) {
              av_log(c, AV_LOG_ERROR, "Slices start in the middle!\n");

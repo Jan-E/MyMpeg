@@ -83,7 +83,7 @@ index 76ccddc..abe39e4 100644
          vol->var_values[VAR_STARTPTS] = TS2D(buf->pts);
          vol->var_values[VAR_STARTT  ] = TS2T(buf->pts, inlink->time_base);
 diff --git a/libavfilter/af_volume.h b/libavfilter/af_volume.h
-index af46e34..81b920a 100644
+index c979029..b8c35dd 100644
 --- a/libavfilter/af_volume.h
 +++ b/libavfilter/af_volume.h
 @@ -54,6 +54,7 @@ enum VolumeVarName {
@@ -104,10 +104,10 @@ index af46e34..81b920a 100644
  
  void ff_volume_init_x86(VolumeContext *vol);
 diff --git a/libavfilter/f_ebur128.c b/libavfilter/f_ebur128.c
-index 88d6a1f..93a38fe 100644
+index 1149b2a..90cf156 100644
 --- a/libavfilter/f_ebur128.c
 +++ b/libavfilter/f_ebur128.c
-@@ -521,10 +521,7 @@ static av_cold int init(AVFilterContext *ctx)
+@@ -536,10 +536,7 @@ static av_cold int init(AVFilterContext *ctx)
  
      if (ebur128->loglevel != AV_LOG_INFO &&
          ebur128->loglevel != AV_LOG_VERBOSE) {
