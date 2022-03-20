@@ -1,5 +1,5 @@
 diff --git a/configure b/configure
-index 650b52f..126549d 100755
+index c43d1bb..179efae 100755
 --- a/configure
 +++ b/configure
 @@ -229,6 +229,7 @@ External library support:
@@ -10,7 +10,7 @@ index 650b52f..126549d 100755
    --enable-libfdk-aac      enable AAC de/encoding via libfdk-aac [no]
    --enable-libflite        enable flite (voice synthesis) support via libflite [no]
    --enable-libfontconfig   enable libfontconfig, useful for drawtext filter [no]
-@@ -1783,6 +1784,7 @@ EXTERNAL_LIBRARY_GPL_LIST="
+@@ -1784,6 +1785,7 @@ EXTERNAL_LIBRARY_GPL_LIST="
  
  EXTERNAL_LIBRARY_NONFREE_LIST="
      decklink
@@ -18,7 +18,7 @@ index 650b52f..126549d 100755
      libfdk_aac
      libtls
  "
-@@ -3275,6 +3277,8 @@ avisynth_demuxer_deps="avisynth"
+@@ -3280,6 +3282,8 @@ avisynth_demuxer_deps="avisynth"
  avisynth_demuxer_select="riffdec"
  eac3_at_decoder_deps="audiotoolbox"
  eac3_at_decoder_select="ac3_parser"
@@ -27,7 +27,7 @@ index 650b52f..126549d 100755
  gsm_ms_at_decoder_deps="audiotoolbox"
  ilbc_at_decoder_deps="audiotoolbox"
  mp1_at_decoder_deps="audiotoolbox"
-@@ -6514,6 +6518,7 @@ enabled libdav1d          && require_pkg_config libdav1d "dav1d >= 0.5.0" "dav1d
+@@ -6520,6 +6524,7 @@ enabled libdav1d          && require_pkg_config libdav1d "dav1d >= 0.5.0" "dav1d
  enabled libdavs2          && require_pkg_config libdavs2 "davs2 >= 1.6.0" davs2.h davs2_decoder_open
  enabled libdc1394         && require_pkg_config libdc1394 libdc1394-2 dc1394/dc1394.h dc1394_new
  enabled libdrm            && require_pkg_config libdrm libdrm xf86drm.h drmGetVersion
@@ -168,10 +168,10 @@ index 1af603b..a874832 100644
  
  @item
 diff --git a/libavcodec/Makefile b/libavcodec/Makefile
-index bfc31ba..a81778a 100644
+index dc6dc8a..4d8a2eba 100644
 --- a/libavcodec/Makefile
 +++ b/libavcodec/Makefile
-@@ -1023,6 +1023,7 @@ OBJS-$(CONFIG_ADPCM_IMA_QT_AT_DECODER)    += audiotoolboxdec.o
+@@ -1028,6 +1028,7 @@ OBJS-$(CONFIG_ADPCM_IMA_QT_AT_DECODER)    += audiotoolboxdec.o
  OBJS-$(CONFIG_ALAC_AT_DECODER)            += audiotoolboxdec.o
  OBJS-$(CONFIG_AMR_NB_AT_DECODER)          += audiotoolboxdec.o
  OBJS-$(CONFIG_EAC3_AT_DECODER)            += audiotoolboxdec.o
@@ -180,10 +180,10 @@ index bfc31ba..a81778a 100644
  OBJS-$(CONFIG_ILBC_AT_DECODER)            += audiotoolboxdec.o
  OBJS-$(CONFIG_MP1_AT_DECODER)             += audiotoolboxdec.o
 diff --git a/libavcodec/allcodecs.c b/libavcodec/allcodecs.c
-index 1be67e3..8f78beb 100644
+index 74049af..7057948 100644
 --- a/libavcodec/allcodecs.c
 +++ b/libavcodec/allcodecs.c
-@@ -447,6 +447,7 @@ extern const AVCodec ff_dss_sp_decoder;
+@@ -450,6 +450,7 @@ extern const AVCodec ff_dss_sp_decoder;
  extern const AVCodec ff_dst_decoder;
  extern const AVCodec ff_eac3_encoder;
  extern const AVCodec ff_eac3_decoder;

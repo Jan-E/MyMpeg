@@ -1,5 +1,5 @@
 diff --git a/libavfilter/af_volume.c b/libavfilter/af_volume.c
-index 76ccddc..abe39e4 100644
+index 4c9b96f..355e29e 100644
 --- a/libavfilter/af_volume.c
 +++ b/libavfilter/af_volume.c
 @@ -55,6 +55,7 @@ static const char *const var_names[] = {
@@ -50,7 +50,7 @@ index 76ccddc..abe39e4 100644
 +    vol->var_values[VAR_META] =
      vol->var_values[VAR_VOLUME] = NAN;
  
-     vol->var_values[VAR_NB_CHANNELS] = inlink->channels;
+     vol->var_values[VAR_NB_CHANNELS] = inlink->ch_layout.nb_channels;
 @@ -371,6 +381,30 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
          av_frame_remove_side_data(buf, AV_FRAME_DATA_REPLAYGAIN);
      }
@@ -104,7 +104,7 @@ index c979029..b8c35dd 100644
  
  void ff_volume_init_x86(VolumeContext *vol);
 diff --git a/libavfilter/f_ebur128.c b/libavfilter/f_ebur128.c
-index 1149b2a..90cf156 100644
+index 1b1bcf1..2274e91 100644
 --- a/libavfilter/f_ebur128.c
 +++ b/libavfilter/f_ebur128.c
 @@ -536,10 +536,7 @@ static av_cold int init(AVFilterContext *ctx)
