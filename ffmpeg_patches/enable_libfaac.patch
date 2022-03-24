@@ -183,11 +183,11 @@ diff --git a/libavcodec/allcodecs.c b/libavcodec/allcodecs.c
 index 74049af..7057948 100644
 --- a/libavcodec/allcodecs.c
 +++ b/libavcodec/allcodecs.c
-@@ -450,6 +450,7 @@ extern const AVCodec ff_dss_sp_decoder;
- extern const AVCodec ff_dst_decoder;
- extern const AVCodec ff_eac3_encoder;
- extern const AVCodec ff_eac3_decoder;
-+extern const AVCodec ff_libfaac_encoder;
- extern const AVCodec ff_evrc_decoder;
- extern const AVCodec ff_fastaudio_decoder;
- extern const AVCodec ff_ffwavesynth_decoder;
+@@ -450,6 +450,7 @@ extern const FFCodec ff_dss_sp_decoder;
+ extern const FFCodec ff_dst_decoder;
+ extern const FFCodec ff_eac3_encoder;
+ extern const FFCodec ff_eac3_decoder;
++extern const FFCodec ff_libfaac_encoder;
+ extern const FFCodec ff_evrc_decoder;
+ extern const FFCodec ff_fastaudio_decoder;
+ extern const FFCodec ff_ffwavesynth_decoder;
