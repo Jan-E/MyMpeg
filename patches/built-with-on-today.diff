@@ -1,8 +1,8 @@
-diff --git fftools/cmdutils.c fftools/cmdutils.c
-index b8de319..a0837f4 100644
---- fftools/cmdutils.c
-+++ fftools/cmdutils.c
-@@ -1141,12 +1141,16 @@ static void print_program_info(int flags, int level)
+diff --git fftools/opt_common.c fftools/opt_common.c
+index 5ba6a0d..1932cad 100644
+--- fftools/opt_common.c
++++ fftools/opt_common.c
+@@ -195,12 +195,16 @@ static void print_program_info(int flags, int level)
  {
      const char *indent = flags & INDENT? "  " : "";
  
