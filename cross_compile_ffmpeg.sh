@@ -2060,7 +2060,7 @@ build_my_ffmpeg() {
   build_options="--arch=$arch --target-os=mingw32 --cross-prefix=$cross_prefix --pkg-config=pkg-config --pkg-config-flags=--static"
   config_options="$build_options --disable-w32threads --disable-doc --prefix=$mingw_w64_x86_64_prefix $extra_configure_opts" # other possibilities: --enable-w32threads --enable-libflite
   if [[ "$non_free" = "y" ]]; then
-    config_options="$config_options --enable-nonfree --enable-libfaac --enable-libfdk-aac" # faac deemed too poor quality
+    config_options="$config_options --enable-nonfree --enable-libfdk-aac" # faac deemed too poor quality
   else
     config_options="$config_options"
   fi
