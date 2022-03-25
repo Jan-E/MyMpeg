@@ -2001,10 +2001,11 @@ apply_my_ffmpeg_patches() {
   apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/mpegvideo_enc.patch
   apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/swscale.patch
   apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_new.patch
-  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/enable_libfaac.patch
+#  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/enable_libfaac.patch
   # back to FFmpeg's original revision
   git reset HEAD~8
-  apply_patch file://$patch_dir/add-libfaac.diff
+#  apply_patch file://$patch_dir/add-libfaac.diff
+  touch add-libfaac.diff.done
 }
 
 build_my_ffmpeg() {
@@ -2077,7 +2078,7 @@ build_my_ffmpeg() {
       fi
       config_options="$config_options --disable-w32threads"
     fi
-    config_options="$config_options --enable-gpl --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va $arch_opts --enable-libx264 --disable-doc --enable-nonfree --enable-libfaac --enable-libfdk-aac"
+    config_options="$config_options --enable-gpl --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va $arch_opts --enable-libx264 --disable-doc --enable-nonfree --enable-libfdk-aac"
   fi
 
   # minimal build for php_av.dll
@@ -2325,7 +2326,7 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win32" ]]; then
   mkdir -p win32
   cd win32
     build_pthreads
-    build_libfaac
+#    build_libfaac
 #    build_ffmpeg_dependencies
 #    build_apps
     build_my_ffmpeg    
@@ -2347,7 +2348,7 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win64" ]]; then
   mkdir -p win64
   cd win64
     build_pthreads
-    build_libfaac
+#    build_libfaac
 #    build_ffmpeg_dependencies
 #    build_apps
     build_my_ffmpeg
