@@ -977,9 +977,9 @@ build_nghttp2() {
   cd nghttp2
     local touch_name=$(get_small_touchfile_name already_ran_cmake)
     # if [ ! -f lib/libnghttp2.a ]; then
-      if [[ ! -f configure ]]; then
-        autoreconf -fiv
-      fi
+    #  if [[ ! -f configure ]]; then
+    #   autoreconf -fiv
+    #  fi
       ./configure
       cd lib
 	rm CMakeCache.txt
@@ -1205,10 +1205,9 @@ build_openssl-1.1.0() {
 }
 
 build_openssl-1.1.1() {
-  rm -rf openssl-1.1.1l
-  rm -rf openssl-1.1.1m
-  download_and_unpack_file https://www.openssl.org/source/openssl-1.1.1n.tar.gz
-  cd openssl-1.1.1n
+  rm -rf openssl-1.1.1n
+  download_and_unpack_file https://www.openssl.org/source/openssl-1.1.1o.tar.gz
+  cd openssl-1.1.1o
     export CC="${cross_prefix}gcc"
     export AR="${cross_prefix}ar"
     export RANLIB="${cross_prefix}ranlib"

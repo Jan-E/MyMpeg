@@ -104,7 +104,7 @@ index c979029..b8c35dd 100644
  
  void ff_volume_init_x86(VolumeContext *vol);
 diff --git a/libavfilter/f_ebur128.c b/libavfilter/f_ebur128.c
-index a036aa0..9c2e5b5 100644
+index 195c9a8..34228d0 100644
 --- a/libavfilter/f_ebur128.c
 +++ b/libavfilter/f_ebur128.c
 @@ -536,10 +536,7 @@ static av_cold int init(AVFilterContext *ctx)
