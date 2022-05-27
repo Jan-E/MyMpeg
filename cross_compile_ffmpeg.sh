@@ -2020,7 +2020,7 @@ build_my_ffmpeg() {
     local arch_opts="--disable-libmfx"
   else
     local arch=x86_64
-    local arch_opts="--enable-libmfx"
+    local arch_opts="--disable-libmfx" # --enable-libmfx broken 2022-05-27
   fi
 
   local extra_configure_opts="--enable-gpl --enable-version3 --enable-bzlib --enable-fontconfig --enable-frei0r --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwebp --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va $arch_opts --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DLIBTWOLAME_STATIC --extra-cflags=-DMODPLUG_STATIC --extra-cflags=-DCACA_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng --extra-libs=-lm"
