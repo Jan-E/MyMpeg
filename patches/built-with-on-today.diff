@@ -1,10 +1,12 @@
 diff --git fftools/opt_common.c fftools/opt_common.c
-index 5ba6a0d..1932cad 100644
+index ae5e28a..ce9e0f0 100644
 --- fftools/opt_common.c
 +++ fftools/opt_common.c
-@@ -195,12 +195,16 @@ static void print_program_info(int flags, int level)
- {
-     const char *indent = flags & INDENT? "  " : "";
+@@ -203,8 +203,36 @@ static void print_program_info(int flags, int level)
+         av_log(NULL, level, " Copyright (c) %d-%d the FFmpeg developers",
+                program_birth_year, CONFIG_THIS_YEAR);
+     av_log(NULL, level, "\n");
+-    av_log(NULL, level, "%sbuilt with %s\n", indent, CC_IDENT);
  
 +#define BUILDTM_YEAR (\
 +    __DATE__[7] == '?' ? 1900 \
@@ -33,14 +35,8 @@ index 5ba6a0d..1932cad 100644
 +
 +#define BUILDTM_YMD BUILDTM_YEAR BUILDTM_MONTH BUILDTM_DAY
 +
-+const char *today = BUILDTM_YMD;
-+
-     av_log(NULL, level, "%s version " FFMPEG_VERSION, program_name);
-     if (flags & SHOW_COPYRIGHT)
-         av_log(NULL, level, " Copyright (c) %d-%d the FFmpeg developers",
-                program_birth_year, CONFIG_THIS_YEAR);
-     av_log(NULL, level, "\n");
--    av_log(NULL, level, "%sbuilt with %s\n", indent, CC_IDENT);
++    const char *today = BUILDTM_YMD;
 +    av_log(NULL, level, "%sbuilt with '%s' on %s\n", indent, CC_IDENT, today);
      av_log(NULL, level, "%sconfiguration: " FFMPEG_CONFIGURATION "\n", indent);
  }
+ 
