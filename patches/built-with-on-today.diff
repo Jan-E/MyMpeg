@@ -33,10 +33,10 @@ index ae5e28a..ce9e0f0 100644
 +    : ((__DATE__[4] == ' ' ? 0 : \
 +    ((__DATE__[4] - '0') * 10)) + __DATE__[5] - '0'))
 +
-+#define BUILDTM_YMD BUILDTM_YEAR BUILDTM_MONTH BUILDTM_DAY
-+
-+    const char *today = BUILDTM_YMD;
-+    av_log(NULL, level, "%sbuilt with '%s' on %s\n", indent, CC_IDENT, today);
++    const char *year = BUILDTM_YEAR;
++    const char *month = BUILDTM_MONTH;
++    const char *day = BUILDTM_DAY;
++    av_log(NULL, level, "%sbuilt with '%s' on %s-%s-%s\n", indent, CC_IDENT, year, month, day);
      av_log(NULL, level, "%sconfiguration: " FFMPEG_CONFIGURATION "\n", indent);
  }
  

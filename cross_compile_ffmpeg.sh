@@ -2050,9 +2050,8 @@ build_my_ffmpeg() {
     apply_my_ffmpeg_patches
   fi
   apply_patch file://$patch_dir/frei0r_load-shared-libraries-dynamically.diff
-bash
   apply_patch file://$patch_dir/built-with-on-today.diff
-bash
+
   if [ "$bits_target" = "32" ]; then
     local arch=x86
   else
