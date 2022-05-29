@@ -1661,6 +1661,24 @@ build_libaom() {
   cd ../..
 }
 
+build_dav1d() {
+  do_git_checkout https://code.videolan.org/videolan/dav1d.git libdav1d
+  cd libdav1d
+    if [[ $bits_target == 32 || $bits_target == 64 ]]; then # XXX why 64???
+      apply_patch file://$patch_dir/david_no_asm.patch -p1 # XXX report
+    fi
+    cpu_count=1 # XXX report :|
+    local meson_options="--prefix=${mingw_w64_x86_64_prefix} --libdir=${mingw_w64_x86_64_prefix}/lib --buildtype=release --default-library=static . build"
+    if [[ $compiler_flavors != "native" ]]; then
+      meson_options+=" --cross-file=${top_dir}/meson-cross.mingw.txt"
+    fi
+    do_meson "$meson_options"
+    do_ninja_and_ninja_install
+    cp build/src/libdav1d.a $mingw_w64_x86_64_prefix/lib || exit 1 # avoid 'run ranlib' weird failure, possibly older meson's https://github.com/mesonbuild/meson/issues/4138 :|
+    cpu_count=$original_cpu_count
+  cd ..
+}
+
 build_libx265() {
   local checkout_dir=x265_all_bitdepth
   local remote="https://bitbucket.org/multicoreware/x265_git"
@@ -2157,7 +2175,7 @@ build_ffmpeg() {
       init_options+=" --disable-schannel"
       # Fix WinXP incompatibility by disabling Microsoft's Secure Channel, because Windows XP doesn't support TLS 1.1 and 1.2, but with GnuTLS or OpenSSL it does.  XP compat!
     fi
-    config_options="$init_options --enable-libcaca --enable-gray --enable-libtesseract --enable-fontconfig --enable-gmp --enable-gnutls --enable-libass --enable-libbluray --enable-libbs2b --enable-libflite --enable-libfreetype --enable-libfribidi --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopus --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libzimg --enable-libzvbi --enable-libmysofa --enable-libaom --enable-libopenjpeg  --enable-libopenh264"
+    config_options="$init_options --enable-libcaca --enable-gray --enable-libtesseract --enable-fontconfig --enable-gmp --enable-gnutls --enable-libass --enable-libbluray --enable-libbs2b --enable-libflite --enable-libfreetype --enable-libfribidi --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopus --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libzimg --enable-libzvbi --enable-libmysofa --enable-libaom --anable-dav1d --enable-libopenjpeg  --enable-libopenh264"
     if [[ $compiler_flavors != "native" ]]; then
       config_options+=" --enable-nvenc --enable-nvdec" # don't work OS X 
     fi
@@ -2372,6 +2390,7 @@ build_ffmpeg_dependencies() {
   build_libx265
   build_libopenh264
   build_libaom
+  build_dav1d
   build_librtmp
 #  build_librtmp_gnutls
   build_libssh2
