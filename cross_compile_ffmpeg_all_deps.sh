@@ -428,6 +428,70 @@ do_cmake_and_install() {
   do_make_and_make_install
 }
 
+do_meson() {
+    local configure_options="$1 --unity=off"
+    local configure_name="$2"
+    local configure_env="$3"
+    local configure_noclean=""
+    if [[ "$configure_name" = "" ]]; then
+        configure_name="meson"
+    fi
+    local cur_dir2=$(pwd)
+    local english_name=$(basename $cur_dir2)
+    local touch_name=$(get_small_touchfile_name already_built_meson "$configure_options $configure_name $LDFLAGS $CFLAGS")
+    if [ ! -f "$touch_name" ]; then
+        if [ "$configure_noclean" != "noclean" ]; then
+            make clean # just in case
+        fi
+        rm -f already_* # reset
+        echo "Using meson: $english_name ($PWD) as $ PATH=$PATH ${configure_env} $configure_name $configure_options"
+        #env
+        "$configure_name" $configure_options || exit 1
+        touch -- "$touch_name"
+        make clean # just in case
+    else
+        echo "Already used meson $(basename $cur_dir2)"
+    fi
+}
+
+generic_meson() {
+    local extra_configure_options="$1"
+    mkdir -pv build
+    do_meson "--prefix=${mingw_w64_x86_64_prefix} --libdir=${mingw_w64_x86_64_prefix}/lib --buildtype=release --default-library=static --cross-file=${top_dir}/meson-cross.mingw.txt $extra_configure_options . build"
+}
+
+generic_meson_ninja_install() {
+    generic_meson "$1"
+    do_ninja_and_ninja_install
+}
+
+do_ninja_and_ninja_install() {
+    local extra_ninja_options="$1"
+    do_ninja "$extra_ninja_options"
+    local touch_name=$(get_small_touchfile_name already_ran_make_install "$extra_ninja_options")
+    if [ ! -f $touch_name ]; then
+        echo "ninja installing $(pwd) as $PATH=$PATH ninja -C build install $extra_make_options"
+        ninja -C build install || exit 1
+        touch $touch_name || exit 1
+    fi
+}
+
+do_ninja() {
+  local extra_make_options=" -j $cpu_count"
+  local cur_dir2=$(pwd)
+  local touch_name=$(get_small_touchfile_name already_ran_make "${extra_make_options}")
+
+  if [ ! -f $touch_name ]; then
+    echo
+    echo "ninja-ing $cur_dir2 as $ PATH=$PATH ninja -C build "${extra_make_options}"
+    echo
+    ninja -C build "${extra_make_options} || exit 1
+    touch $touch_name || exit 1 # only touch if the build was OK
+  else
+    echo "already did ninja $(basename "$cur_dir2")"
+  fi
+}
+
 apply_patch() {
   local url=$1 # if you want it to use a local file instead of a url one [i.e. local file with local modifications] specify it like file://localhost/full/path/to/filename.patch
   local patch_type=$2
