@@ -492,6 +492,60 @@ do_ninja() {
   fi
 }
 
+build_meson_cross() {
+  local cpu_family="x86_64"
+  if [ $bits_target = 32 ]; then
+    cpu_family="x86"
+  fi
+  rm -fv meson-cross.mingw.txt
+  cat >> meson-cross.mingw.txt << EOF
+[binaries]
+c = '${cross_prefix}gcc'
+cpp = '${cross_prefix}g++'
+ld = '${cross_prefix}ld'
+ar = '${cross_prefix}ar'
+strip = '${cross_prefix}strip'
+pkgconfig = '${cross_prefix}pkg-config'
+nm = '${cross_prefix}nm'
+windres = '${cross_prefix}windres'
+
+[host_machine]
+system = 'windows'
+cpu_family = '$cpu_family'
+cpu = '$cpu_family'
+endian = 'little'
+EOF
+  mv -v meson-cross.mingw.txt ../..
+}
+
+get_local_meson_cross_with_propeties() {
+  local local_dir="$1"
+  local c_args=
+  local cpp_args=
+  local link_args=
+  if [[ -z $local_dir ]]; then
+    local_dir="."
+  fi
+  cp ${top_dir}/meson-cross.mingw.txt "$local_dir"
+  if [[ -n "$CFLAGS" ]]; then
+    c_args="'$(echo ${CFLAGS} | sed "s/ /\',\'/g")'"
+  fi
+  if [[ -n "$CXXFLAGS" ]]; then
+    cpp_args="'$(echo ${CXXFLAGS} | sed "s/ /\',\'/g")'"
+  fi
+  if [[ -n "$LDFLAGS" ]]; then
+    link_args="'$(echo ${LDFLAGS} | sed "s/ /\',\'/g")'"
+  fi
+  cat >> meson-cross.mingw.txt << EOF
+
+[properties]
+c_args = [$c_args]
+c_link_args = [$link_args]
+cpp_args = [$cpp_args]
+cpp_link_args = [$link_args]
+EOF
+}
+
 apply_patch() {
   local url=$1 # if you want it to use a local file instead of a url one [i.e. local file with local modifications] specify it like file://localhost/full/path/to/filename.patch
   local patch_type=$2
@@ -1734,6 +1788,7 @@ build_dav1d() {
     cpu_count=1 # XXX report :|
     local meson_options="--prefix=${mingw_w64_x86_64_prefix} --libdir=${mingw_w64_x86_64_prefix}/lib --buildtype=release --default-library=static . build"
     if [[ $compiler_flavors != "native" ]]; then
+      get_local_meson_cross_with_propeties # Need to add flags to meson properties; otherwise ran into some issues
       meson_options+=" --cross-file=${top_dir}/meson-cross.mingw.txt"
     fi
     do_meson "$meson_options"
@@ -2383,6 +2438,7 @@ build_ffmpeg_dependencies() {
   build_dlfcn
   build_bzip2 # Bzlib (bzip2) in FFmpeg is autodetected.
   build_liblzma # Lzma in FFmpeg is autodetected. Uses dlfcn.
+  build_meson_cross
   build_zlib # Zlib in FFmpeg is autodetected.
   build_iconv # Iconv in FFmpeg is autodetected. Uses dlfcn.
   build_sdl2 # Sdl2 in FFmpeg is autodetected. Needed to build FFPlay. Uses iconv and dlfcn.
@@ -2496,6 +2552,7 @@ build_apps() {
 }
 
 # set some parameters initial values
+top_dir="$(pwd)"
 cur_dir="$(pwd)/sandbox"
 patch_dir="$(pwd)/patches"
 cpu_count="$(grep -c processor /proc/cpuinfo 2>/dev/null)" # linux cpu count
