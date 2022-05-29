@@ -572,7 +572,7 @@ build_liblzma() {
 
 build_zlib() {
   rm -rf zlib-1.2.11
-  download_and_unpack_file https://github.com/madler/zlib/archive/v1.2.11.tar.gz zlib-1.2.12
+  download_and_unpack_file https://github.com/madler/zlib/archive/v1.2.12.tar.gz zlib-1.2.12
   cd zlib-1.2.12
     do_configure "--prefix=$mingw_w64_x86_64_prefix --static"
     do_make_and_make_install "$make_prefix_options ARFLAGS=rcs" # ARFLAGS Avoid failure in OS X
@@ -1685,8 +1685,7 @@ build_ffmpeg() {
     postpend_configure_opts="--enable-static --disable-shared --prefix=$mingw_w64_x86_64_prefix"
   fi
 
-  #do_git_checkout https://github.com/FFmpeg/FFmpeg.git $output_dir $ffmpeg_git_checkout_version
-  download_and_unpack_file http://ffmpeg.org/releases/ffmpeg-4.2.7.tar.gz $output_dir
+  do_git_checkout https://github.com/FFmpeg/FFmpeg.git $output_dir $ffmpeg_git_checkout_version
   cd $output_dir
     if [[ ! -f 'add-libfaac.diff.done' ]]; then
       apply_my_ffmpeg_patches
@@ -2022,7 +2021,7 @@ build_my_ffmpeg() {
     local arch_opts="--disable-libmfx"
   else
     local arch=x86_64
-    local arch_opts="--enable-libmfx" # --enable-libmfx broken 2022-05-27
+    local arch_opts="--disable-libmfx" # --enable-libmfx broken 2022-05-27
   fi
 
   local extra_configure_opts="--enable-gpl --enable-version3 --enable-bzlib --enable-fontconfig --enable-frei0r --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwebp --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va $arch_opts --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DLIBTWOLAME_STATIC --extra-cflags=-DMODPLUG_STATIC --extra-cflags=-DCACA_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng --extra-libs=-lm"

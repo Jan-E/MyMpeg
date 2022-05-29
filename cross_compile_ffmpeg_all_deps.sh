@@ -567,9 +567,9 @@ build_liblzma() {
 }
 
 build_zlib() {
-
-  download_and_unpack_file https://github.com/madler/zlib/archive/v1.2.11.tar.gz zlib-1.2.11
-  cd zlib-1.2.11
+  rm -rf zlib-1.2.11
+  download_and_unpack_file https://github.com/madler/zlib/archive/v1.2.12.tar.gz zlib-1.2.12
+  cd zlib-1.2.12
     do_configure "--prefix=$mingw_w64_x86_64_prefix --static"
     do_make_and_make_install "$make_prefix_options ARFLAGS=rcs" # ARFLAGS Avoid failure in OS X
   cd ..
