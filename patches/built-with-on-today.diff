@@ -1,8 +1,18 @@
 diff --git fftools/opt_common.c fftools/opt_common.c
-index ae5e28a..ce9e0f0 100644
+index ae5e28a..609dee8 100644
 --- fftools/opt_common.c
 +++ fftools/opt_common.c
-@@ -203,8 +203,36 @@ static void print_program_info(int flags, int level)
+@@ -196,6 +196,9 @@ static void print_all_libs_info(int flags, int level)
+ 
+ static void print_program_info(int flags, int level)
+ {
++    int year;
++    int month;
++    int day;
+     const char *indent = flags & INDENT? "  " : "";
+ 
+     av_log(NULL, level, "%s version " FFMPEG_VERSION, program_name);
+@@ -203,8 +206,36 @@ static void print_program_info(int flags, int level)
          av_log(NULL, level, " Copyright (c) %d-%d the FFmpeg developers",
                 program_birth_year, CONFIG_THIS_YEAR);
      av_log(NULL, level, "\n");
@@ -33,10 +43,10 @@ index ae5e28a..ce9e0f0 100644
 +    : ((__DATE__[4] == ' ' ? 0 : \
 +    ((__DATE__[4] - '0') * 10)) + __DATE__[5] - '0'))
 +
-+    const char *year = BUILDTM_YEAR;
-+    const char *month = BUILDTM_MONTH;
-+    const char *day = BUILDTM_DAY;
-+    av_log(NULL, level, "%sbuilt with '%s' on %s-%s-%s\n", indent, CC_IDENT, year, month, day);
++    year = BUILDTM_YEAR;
++    month = BUILDTM_MONTH;
++    day = BUILDTM_DAY;
++    av_log(NULL, level, "%sbuilt with '%s' on %d-%02d-%02d\n", indent, CC_IDENT, year, month, day);
      av_log(NULL, level, "%sconfiguration: " FFMPEG_CONFIGURATION "\n", indent);
  }
  
