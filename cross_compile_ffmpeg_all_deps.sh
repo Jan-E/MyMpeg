@@ -567,6 +567,7 @@ build_liblzma() {
 }
 
 build_zlib() {
+
   download_and_unpack_file https://github.com/madler/zlib/archive/v1.2.11.tar.gz zlib-1.2.11
   cd zlib-1.2.11
     do_configure "--prefix=$mingw_w64_x86_64_prefix --static"
@@ -575,10 +576,11 @@ build_zlib() {
 }
 
 build_iconv() {
-  download_and_unpack_file https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.15.tar.gz
-  cd libiconv-1.15
-    generic_configure "--disable-nls"
-    do_make "install-lib" # No need for 'do_make_install', because 'install-lib' already has install-instructions.
+  rm -rf zlib-1.2.11
+  download_and_unpack_file https://github.com/madler/zlib/archive/v1.2.11.tar.gz zlib-1.2.12
+  cd zlib-1.2.12
+    do_configure "--prefix=$mingw_w64_x86_64_prefix --static"
+    do_make_and_make_install "$make_prefix_options ARFLAGS=rcs" # ARFLAGS Avoid failure in OS X
   cd ..
 }
 
