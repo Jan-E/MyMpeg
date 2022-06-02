@@ -9,6 +9,14 @@ diff -u -r configure configure
    --enable-libfdk-aac      enable AAC de/encoding via libfdk-aac [no]
    --enable-libflite        enable flite (voice synthesis) support via libflite [no]
    --enable-libfontconfig   enable libfontconfig, useful for drawtext filter [no]
+@@ -1492,6 +1492,7 @@
+     libcelt
+     libdc1394
+     libebur128
++    libfaac
+     libfdk_aac
+     libflite
+     libfontconfig
 @@ -2758,6 +2758,8 @@
  amr_nb_at_decoder_deps="audiotoolbox"
  eac3_at_decoder_deps="audiotoolbox"
@@ -28,7 +36,7 @@ diff -u -r configure configure
  
 --- configure	2022-04-04 16:40:22.000000000 +0200
 +++ configure	2022-05-29 21:39:57.106596123 +0200
-@@ -5698,6 +5698,7 @@
+@@ -5699,6 +5699,7 @@
                                 die "ERROR: libcelt must be installed and version must be >= 0.11.0."; }
  enabled libcaca           && require_pkg_config caca caca.h caca_create_canvas
  enabled libebur128        && require ebur128 ebur128.h ebur128_relative_threshold -lebur128
