@@ -35,6 +35,11 @@ index 00000000000..98b3ba81830
 +#include "libavutil/channel_layout.h"
 +#include "libavutil/common.h"
 +#include "avcodec.h"
++#if defined __has_include
++#  if __has_include ("encode.h")
++#    include "encode.h"
++#  endif
++#endif
 +#include "encode.h"
 +#include "audio_frame_queue.h"
 +#include "internal.h"
