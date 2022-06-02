@@ -1,0 +1,40 @@
+--- cmdutils.c.orig	2022-05-14 23:21:50.000000000 +0200
++++ cmdutils.c	2022-06-02 16:27:25.468562200 +0200
+@@ -1111,7 +1111,36 @@
+         av_log(NULL, level, " Copyright (c) %d-%d the FFmpeg developers",
+                program_birth_year, CONFIG_THIS_YEAR);
+     av_log(NULL, level, "\n");
+-    av_log(NULL, level, "%sbuilt with %s\n", indent, CC_IDENT);
++	 
++#define BUILDTM_YEAR (\
++    __DATE__[7] == '?' ? 1900 \
++    : (((__DATE__[7] - '0') * 1000 ) \
++    + (__DATE__[8] - '0') * 100 \
++    + (__DATE__[9] - '0') * 10 \
++    + __DATE__[10] - '0'))
++
++#define BUILDTM_MONTH (\
++    __DATE__ [2] == '?' ? 1 \
++    : __DATE__ [2] == 'n' ? (__DATE__ [1] == 'a' ? 1 : 6) \
++    : __DATE__ [2] == 'b' ? 2 \
++    : __DATE__ [2] == 'r' ? (__DATE__ [0] == 'M' ? 3 : 4) \
++    : __DATE__ [2] == 'y' ? 5 \
++    : __DATE__ [2] == 'l' ? 7 \
++    : __DATE__ [2] == 'g' ? 8 \
++    : __DATE__ [2] == 'p' ? 9 \
++    : __DATE__ [2] == 't' ? 10 \
++    : __DATE__ [2] == 'v' ? 11 \
++    : 12)
++
++#define BUILDTM_DAY (\
++    __DATE__[4] == '?' ? 1 \
++    : ((__DATE__[4] == ' ' ? 0 : \
++    ((__DATE__[4] - '0') * 10)) + __DATE__[5] - '0'))
++
++    year = BUILDTM_YEAR;
++    month = BUILDTM_MONTH;
++    day = BUILDTM_DAY;
++    av_log(NULL, level, "%sbuilt with '%s' on %d-%02d-%02d\n", indent, CC_IDENT, year, month, day);
+ 
+     av_log(NULL, level, "%sconfiguration: " FFMPEG_CONFIGURATION "\n", indent);
+ }

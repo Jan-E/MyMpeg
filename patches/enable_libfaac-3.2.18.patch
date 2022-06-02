@@ -1,0 +1,60 @@
+diff -u -r configure configure
+--- configure	2022-04-04 16:40:22.000000000 +0200
++++ configure	2022-05-29 21:39:57.106596123 +0200
+@@ -224,6 +224,7 @@
+                            and libraw1394 [no]
+   --enable-libebur128      enable libebur128 for EBU R128 measurement,
+                            needed for loudnorm filter [no]
++  --enable-libfaac         enable AAC encoding via libfaac [no]
+   --enable-libfdk-aac      enable AAC de/encoding via libfdk-aac [no]
+   --enable-libflite        enable flite (voice synthesis) support via libflite [no]
+   --enable-libfontconfig   enable libfontconfig, useful for drawtext filter [no]
+@@ -2758,6 +2758,8 @@
+ amr_nb_at_decoder_deps="audiotoolbox"
+ eac3_at_decoder_deps="audiotoolbox"
+ eac3_at_decoder_select="ac3_parser"
++libfaac_encoder_deps="libfaac"
++libfaac_encoder_select="audio_frame_queue"
+ gsm_ms_at_decoder_deps="audiotoolbox"
+ ilbc_at_decoder_deps="audiotoolbox"
+ mp1_at_decoder_deps="audiotoolbox"
+@@ -5086,6 +5086,7 @@
+ die_license_disabled nonfree cuda
+ die_license_disabled nonfree cuvid
+ die_license_disabled nonfree libnpp
++enabled gpl && die_license_disabled_gpl nonfree libfaac
+ enabled gpl && die_license_disabled_gpl nonfree libfdk_aac
+ enabled gpl && die_license_disabled_gpl nonfree openssl
+ 
+--- configure	2022-04-04 16:40:22.000000000 +0200
++++ configure	2022-05-29 21:39:57.106596123 +0200
+@@ -5698,6 +5698,7 @@
+                                die "ERROR: libcelt must be installed and version must be >= 0.11.0."; }
+ enabled libcaca           && require_pkg_config caca caca.h caca_create_canvas
+ enabled libebur128        && require ebur128 ebur128.h ebur128_relative_threshold -lebur128
++enabled libfaac           && require libfaac faac.h faacEncGetVersion -lfaac
+ enabled libfdk_aac        && { use_pkg_config fdk-aac "fdk-aac/aacenc_lib.h" aacEncOpen ||
+                                { require libfdk_aac fdk-aac/aacenc_lib.h aacEncOpen -lfdk-aac &&
+                                  warn "using libfdk without pkg-config"; } }
+diff -u -r libavcodec/Makefile libavcodec/Makefile
+--- libavcodec/Makefile	2022-01-14 19:45:39.000000000 +0100
++++ libavcodec/Makefile	2022-05-29 21:39:57.106596123 +0200
+@@ -850,6 +850,7 @@
+ OBJS-$(CONFIG_ALAC_AT_DECODER)            += audiotoolboxdec.o
+ OBJS-$(CONFIG_AMR_NB_AT_DECODER)          += audiotoolboxdec.o
+ OBJS-$(CONFIG_EAC3_AT_DECODER)            += audiotoolboxdec.o
++OBJS-$(CONFIG_LIBFAAC_ENCODER)            += libfaac.o
+ OBJS-$(CONFIG_GSM_MS_AT_DECODER)          += audiotoolboxdec.o
+ OBJS-$(CONFIG_ILBC_AT_DECODER)            += audiotoolboxdec.o
+ OBJS-$(CONFIG_MP1_AT_DECODER)             += audiotoolboxdec.o mpegaudiodata.o mpegaudiodecheader.o
+diff -u -r libavcodec/allcodecs.c libavcodec/allcodecs.c
+--- libavcodec/allcodecs.c	2022-01-14 19:45:39.000000000 +0100
++++ libavcodec/allcodecs.c	2022-05-29 21:40:26.406594836 +0200
+@@ -598,6 +598,7 @@
+     REGISTER_DECODER(QDM2_AT,           qdm2_at);
+     REGISTER_DECODER(LIBCELT,           libcelt);
+     REGISTER_ENCDEC (LIBFDK_AAC,        libfdk_aac);
++    REGISTER_ENCDEC (LIBFAAC,           libfaac);
+     REGISTER_ENCDEC (LIBGSM,            libgsm);
+     REGISTER_ENCDEC (LIBGSM_MS,         libgsm_ms);
+     REGISTER_ENCDEC (LIBILBC,           libilbc);
