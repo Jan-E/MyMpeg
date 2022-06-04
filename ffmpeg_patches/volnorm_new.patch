@@ -16,7 +16,7 @@ index 4c9b96f..355e29e 100644
              OFFSET(volume_expr), AV_OPT_TYPE_STRING, { .str = "1.0" }, .flags = A|F|T },
 +    { "metadata", "set the metadata key for loudness normalization", OFFSET(metadata), AV_OPT_TYPE_STRING, { .str = NULL }, .flags = A|F },
 +    { "normvol", "set volume normalization level",
-+            OFFSET(normvol), AV_OPT_TYPE_DOUBLE, { .dbl = -23.0 }, INT_MIN, INT_MAX, A|F },
++            OFFSET(normvol), AV_OPT_TYPE_DOUBLE, { .dbl = -18.0 }, INT_MIN, INT_MAX, A|F },
      { "precision", "select mathematical precision",
              OFFSET(precision), AV_OPT_TYPE_INT, { .i64 = PRECISION_FLOAT }, PRECISION_FIXED, PRECISION_DOUBLE, A|F, "precision" },
          { "fixed",  "select 8-bit fixed-point",     0, AV_OPT_TYPE_CONST, { .i64 = PRECISION_FIXED  }, INT_MIN, INT_MAX, A|F, "precision" },
