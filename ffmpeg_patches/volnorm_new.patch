@@ -65,7 +65,7 @@ index 4c9b96f..355e29e 100644
 +        e = av_dict_get(buf->metadata, vol->metadata, NULL, 0);
 +        if (e) {
 +            loudness = av_strtod(e->value, NULL);
-+            if (loudness > -69) {
++            if ((loudness > -69 && loudness < vol->normvol) || loudness > -14) {
 +                vol->var_values[VAR_META] = loudness;
 +                /* set only if eval is not used and eval_mode == default */
 +                if (vol->eval_mode == EVAL_MODE_ONCE) {
