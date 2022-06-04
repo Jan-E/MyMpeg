@@ -49,7 +49,7 @@ check_missing_packages () {
     VENDOR="redhat"
   fi
   # zeranoe's build scripts use wget, though we don't here...
-  local check_packages=('curl' 'pkg-config' 'make' 'git' 'svn' 'gcc' 'autoconf' 'automake' 'yasm' 'cvs' 'flex' 'bison' 'makeinfo' 'g++' 'ed' 'hg' 'pax' 'unzip' 'patch' 'wget' 'xz' 'nasm' 'gperf' 'autogen' 'bzip2')  
+  local check_packages=('curl' 'pkg-config' 'make' 'git' 'svn' 'gcc' 'autoconf' 'automake' 'yasm' 'cvs' 'flex' 'bison' 'makeinfo' 'g++' 'ed' 'hg' 'pax' 'unzip' 'patch' 'wget' 'xz' 'nasm' 'gperf' 'autogen' 'bzip2')
   # autoconf-archive is just for leptonica FWIW
   # I'm not actually sure if VENDOR being set to centos is a thing or not. On all the centos boxes I can test on it's not been set at all.
   # that being said, if it where set I would imagine it would be set to centos... And this contition will satisfy the "Is not initially set"
@@ -97,7 +97,7 @@ check_missing_packages () {
         break
       else
         echo "your ${cmake_binary} version is too old ${cmake_version} wanted ${REQUIRED_CMAKE_VERSION}"
-      fi 
+      fi
     fi
   done
 
@@ -303,8 +303,8 @@ do_git_checkout() {
     fi
   else
     echo "doing git checkout $desired_branch"
-    git checkout -f "$desired_branch" || exit 1
-    git merge "$desired_branch" || exit 1 # get incoming changes to a branch
+    git checkout -f "$desired_branch" || bash
+    git merge "$desired_branch" || bash
   fi
 
   new_git_version=`git rev-parse HEAD`
@@ -432,11 +432,30 @@ do_cmake_and_install() {
   do_make_and_make_install
 }
 
-apply_patch() {
+apply_local_patch_no_fail() {
   local url=$1 # if you want it to use a local file instead of a url one [i.e. local file with local modifications] specify it like file://localhost/full/path/to/filename.patch
   local patch_type=$2
   if [[ -z $patch_type ]]; then
     patch_type="-p0" # some are -p1 unfortunately, git's default
+  fi
+  local patch_name=$(basename $url)
+  local patch_done_name="$patch_name.done"
+  if [[ ! -e $patch_done_name ]]; then
+    cp /mnt/winshare/MyMpeg/patches/$patch_name .
+    echo "applying patch $patch_name"
+    patch $patch_type < "$patch_name"
+    touch $patch_done_name
+    rm -f already_ran* # if it's a new patch, reset everything too, in case it's really really really new
+  else
+    echo "patch $patch_name already applied"
+  fi
+}
+
+apply_patch() {
+  local url=$1 # if you want it to use a local file instead of a url one [i.e. local file with local modifications] specify it like file://localhost/full/path/to/filename.patch
+  local patch_type=$2
+  if [[ -z $patch_type ]]; then
+    patch_type="-p0"
   fi
   local patch_name=$(basename $url)
   local patch_done_name="$patch_name.done"
@@ -449,8 +468,8 @@ apply_patch() {
     patch $patch_type < "$patch_name" || exit 1
     touch $patch_done_name || exit 1
     rm -f already_ran* # if it's a new patch, reset everything too, in case it's really really really new
-  else
-    echo "patch $patch_name already applied"
+  #else
+    #echo "patch $patch_name already applied"
   fi
 }
 
@@ -612,7 +631,7 @@ build_amd_amf_headers() {
       if [ ! -d "$mingw_w64_x86_64_prefix/include/AMF" ]; then
         mkdir -p "$mingw_w64_x86_64_prefix/include/AMF"
       fi
-      cp -av "amf/public/include/." "$mingw_w64_x86_64_prefix/include/AMF" 
+      cp -av "amf/public/include/." "$mingw_w64_x86_64_prefix/include/AMF"
       touch "already_installed"
     fi
     rm -rf Thirdparty
@@ -639,7 +658,7 @@ build_intel_quicksync_mfx() { # i.e. qsv
 
 build_libleptonica() {
   build_libjpeg_turbo
-  do_git_checkout https://github.com/DanBloomberg/leptonica.git 
+  do_git_checkout https://github.com/DanBloomberg/leptonica.git
   cd leptonica_git
     generic_configure "--without-libopenjpeg" # never could quite figure out how to get it to work with jp2 stuffs...I think OPJ_STATIC or something, see issue for tesseract
     do_make_and_make_install
@@ -650,7 +669,7 @@ build_libtiff() {
   build_libjpeg_turbo # auto uses it?
   generic_download_and_make_and_install http://download.osgeo.org/libtiff/tiff-4.0.9.tar.gz
   sed -i.bak 's/-ltiff.*$/-ltiff -llzma -ljpeg -lz/' $PKG_CONFIG_PATH/libtiff-4.pc # static deps
-} 
+}
 
 build_libtesseract() {
   build_libleptonica
@@ -670,7 +689,7 @@ build_libzimg() {
 }
 
 build_libopenjpeg() {
-  do_git_checkout https://github.com/uclouvain/openjpeg.git # basically v2.3+ 
+  do_git_checkout https://github.com/uclouvain/openjpeg.git # basically v2.3+
   cd openjpeg_git
     do_cmake_and_install "-DBUILD_SHARED_LIBS=0 -DBUILD_CODEC=0"
   cd ..
@@ -939,7 +958,7 @@ build_twolame() {
   do_git_checkout https://github.com/njh/twolame.git
   cd twolame_git
     if [[ ! -f Makefile.am.bak ]]; then # Library only, front end refuses to build for some reason with git master
-      sed -i.bak "/^SUBDIRS/s/ frontend.*//" Makefile.am || exit 1 
+      sed -i.bak "/^SUBDIRS/s/ frontend.*//" Makefile.am || exit 1
     fi
     cpu_count=1 # maybe can't handle it http://betterlogic.com/roger/2017/07/mp3lame-woe/ comments
     generic_configure_make_install
@@ -1707,9 +1726,9 @@ build_ffmpeg() {
       init_options+=" --disable-schannel"
       # Fix WinXP incompatibility by disabling Microsoft's Secure Channel, because Windows XP doesn't support TLS 1.1 and 1.2, but with GnuTLS or OpenSSL it does.  XP compat!
     fi
-    config_options="$init_options --enable-libcaca --enable-gray --enable-libtesseract --enable-fontconfig --enable-gmp --enable-gnutls --enable-libass --enable-libbluray --enable-libbs2b --enable-libflite --enable-libfreetype --enable-libfribidi --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopus --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libzimg --enable-libzvbi --enable-libmysofa --enable-libaom --enable-libopenjpeg  --enable-libopenh264"
+    config_options="$init_options --enable-libcaca --enable-gray --enable-libtesseract --enable-fontconfig --enable-gmp --enable-gnutls --enable-libass --enable-libbluray --enable-libbs2b --enable-libflite --enable-libfreetype --enable-libfribidi --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopus --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libzimg --enable-libzvbi --enable-libmysofa --enable-libaom --enable-libopenjpeg --enable-libopenh264"
     if [[ $compiler_flavors != "native" ]]; then
-      config_options+=" --enable-nvenc --enable-nvdec" # don't work OS X 
+      config_options+=" --enable-nvenc --enable-nvdec" # don't work OS X
     fi
 
     config_options+=" --extra-cflags=-DLIBTWOLAME_STATIC --extra-cflags=-DMODPLUG_STATIC --extra-cflags=-DCACA_STATIC" # if we ever do a git pull then it nukes changes, which overrides manual changes to configure, so just use these for now :|
@@ -1723,18 +1742,18 @@ build_ffmpeg() {
       config_options+=" --enable-libmfx"
     fi
     if [[ $enable_gpl == 'y' ]]; then
-      config_options+=" --enable-gpl --enable-frei0r --enable-filter=frei0r --enable-librubberband --enable-libvidstab --enable-libx264 --enable-libx265 --enable-libxvid"
+      config_options+=" --enable-gpl --enable-frei0r --enable-filter=frei0r --enable-librubberband --enable-libvidstab --enable-libx264 --enable-libx265 --enable-libaom --enable-libxvid"
       if [[ $compiler_flavors != "native" ]]; then
-        config_options+=" --enable-libxavs" # don't compile OS X 
+        config_options+=" --enable-libxavs" # don't compile OS X
       fi
     fi
     local licensed_gpl=n # lgpl build with libx264 included for those with "commercial" license :)
     if [[ $licensed_gpl == 'y' ]]; then
       apply_patch file://$patch_dir/x264_non_gpl.diff -p1
       config_options+=" --enable-libx264"
-    fi 
+    fi
     # other possibilities:
-    #   --enable-w32threads # [worse UDP than pthreads, so not using that]
+    # --enable-w32threads # [worse UDP than pthreads, so not using that]
     config_options+=" --enable-avresample" # guess this is some kind of libav specific thing (the FFmpeg fork) but L-Smash needs it so why not always build it :)
 
     for i in $CFLAGS; do
@@ -1846,7 +1865,7 @@ find_all_build_exes() {
 }
 
 build_ffmpeg_dependencies() {
-  echo "Building ffmpeg dependency libraries..." 
+  echo "Building ffmpeg dependency libraries..."
   build_pthreads
   build_dlfcn
   build_bzip2 # Bzlib (bzip2) in FFmpeg is autodetected.
@@ -2024,7 +2043,7 @@ build_my_ffmpeg() {
     local arch_opts="--disable-libmfx" # --enable-libmfx broken 2022-05-27
   fi
 
-  local extra_configure_opts="--enable-gpl --enable-version3 --enable-bzlib --enable-fontconfig --enable-frei0r --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwebp --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va $arch_opts --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DLIBTWOLAME_STATIC --extra-cflags=-DMODPLUG_STATIC --extra-cflags=-DCACA_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng --extra-libs=-lm"
+  local extra_configure_opts="--enable-gpl --enable-version3 --enable-bzlib --enable-fontconfig --enable-frei0r --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libx264 --enable-libx265 --enable-libaom --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va $arch_opts --enable-libxavs --enable-libxvid --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DLIBTWOLAME_STATIC --extra-cflags=-DMODPLUG_STATIC --extra-cflags=-DCACA_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng --extra-libs=-lm"
 
   # can't mix and match --enable-static --enable-shared unfortunately, or the final executable seems to just use shared if the're both present
   if [[ $shared = "shared" ]] || [[ $shared = "minimal" ]] ; then
@@ -2048,6 +2067,8 @@ build_my_ffmpeg() {
 
   if [[ ! -f 'add-libfaac.diff.done' ]]; then
     apply_my_ffmpeg_patches
+	#patch -p1</mnt/winshare/MyMpeg/ffmpeg_patches/enable_libfaac.patch
+	#patch -p0</mnt/winshare/MyMpeg/patches/add-libfaac-5.0.1.patch
   fi
   apply_patch file://$patch_dir/frei0r_load-shared-libraries-dynamically.diff
   apply_patch file://$patch_dir/built-with-on-today.diff
@@ -2079,10 +2100,10 @@ build_my_ffmpeg() {
       fi
       config_options="$config_options --disable-w32threads"
     fi
-    config_options="$config_options --enable-gpl --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va $arch_opts --enable-libx264 --disable-doc --enable-nonfree --enable-libfdk-aac"
+    config_options="$config_options --enable-gpl --enable-libx264 --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va $arch_opts --disable-doc --enable-nonfree --enable-libfdk-aac"
   fi
 
-  # minimal build for php_av.dll
+  # minimal build for php_ffmpeg.dll
   if [[ $shared = "minimal" ]]; then
     config_options="$build_options --enable-shared --disable-static --disable-w32threads --enable-gpl --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va $arch_opts --disable-doc"
     # avoid installing this to system
@@ -2098,7 +2119,7 @@ build_my_ffmpeg() {
   else
     config_options="$config_options --enable-runtime-cpudetect"
   fi
-  
+
   if [[ "$bits_target" = "32" ]]; then
     config_options="$config_options"
   else
@@ -2150,11 +2171,132 @@ apply_my_ffmpeg_patches_no_git() {
   apply_ffmpeg_patch_no_git https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/mpegvideo_enc.patch
   apply_ffmpeg_patch_no_git https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/swscale.patch
   apply_ffmpeg_patch_no_git https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_new.patch
-  apply_ffmpeg_patch_no_git https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/enable_libfaac.patch
+#  apply_ffmpeg_patch_no_git https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/enable_libfaac.patch
+#  apply_patch file://$patch_dir/add-libfaac.diff
   touch add-libfaac.diff.done
 }
 
-build_my_ffmpeg_501() {
+build_my_ffmpeg_4.4() {
+  local type="ffmpeg"
+  local git_url="https://github.com/FFmpeg/FFmpeg.git"
+  local git_tree="release/4.4"
+  local shared=$build_ffmpeg_shared
+  local output_dir="ffmpeg_git"
+
+  if [ "$bits_target" = "32" ]; then
+    local arch=x86
+    local arch_opts="--disable-libmfx"
+  else
+    local arch=x86_64
+    local arch_opts="--enable-libmfx"
+  fi
+
+  local extra_configure_opts="--enable-gpl --enable-version3 --enable-bzlib --enable-fontconfig --enable-frei0r --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libdav1d --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libx264 --enable-libx265 --enable-libaom --enable-dxva2 --enable-d3d11va $arch_opts --enable-libxavs --enable-libxvid --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DLIBTWOLAME_STATIC --extra-cflags=-DMODPLUG_STATIC --extra-cflags=-DCACA_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng --extra-libs=-lm"
+
+  # can't mix and match --enable-static --enable-shared unfortunately, or the final executable seems to just use shared if the're both present
+  if [[ $shared = "shared" ]] || [[ $shared = "minimal" ]] ; then
+    output_dir=ffmpeg_shared
+    rm -rf ${output_dir}
+    do_git_checkout $git_url ${output_dir} $git_tree
+
+    final_install_dir=`pwd`/${output_dir}.installed
+    rm -rf $final_install_dir
+    extra_configure_opts="--enable-shared --disable-static $extra_configure_opts"
+    # avoid installing this to system
+    extra_configure_opts="$extra_configure_opts --prefix=$final_install_dir"
+  else
+    output_dir="ffmpeg"
+    rm -rf ${output_dir}
+    do_git_checkout $git_url ${output_dir} $git_tree
+
+    output_dir="ffmpeg"
+    extra_configure_opts="--enable-static --disable-shared $extra_configure_opts"
+  fi
+  cd ${output_dir}
+  if [[ ! -f 'add-libfaac.diff.done' ]]; then
+    patch -p1</mnt/winshare/MyMpeg/patches/volnorm-4.4.patch
+	patch -p1</mnt/winshare/MyMpeg/patches/add_libfaac-4.4.patch
+	patch -p1</mnt/winshare/MyMpeg/patches/enable_libfaac-4.4.patch
+#	apply_patch file://$patch_dir/add-libfaac-4.diff
+#	apply_patch file://$patch_dir/enable_libfaac-4.4.patch
+    touch add-libfaac.diff.done
+  fi
+
+  apply_patch file://$patch_dir/frei0r_load-shared-libraries-dynamically.diff
+  patch -p0</mnt/winshare/MyMpeg/patches/built-with-on-today-4.4.diff
+
+  if [ "$bits_target" = "32" ]; then
+    local arch=x86
+  else
+    local arch=x86_64
+  fi
+
+  build_options="--arch=$arch --target-os=mingw32 --cross-prefix=$cross_prefix --pkg-config=pkg-config --pkg-config-flags=--static"
+  config_options="$build_options --disable-w32threads --disable-doc --prefix=$mingw_w64_x86_64_prefix $extra_configure_opts" # other possibilities: --enable-w32threads --enable-libflite
+  if [[ "$non_free" = "y" ]]; then
+    config_options="$config_options --enable-nonfree --enable-libfaac" # faac deemed too poor quality
+  else
+    config_options="$config_options"
+  fi
+
+  # minimal static build plus x264 & libfaac
+  if [[ $shared = "ministat" ]] || [[ $shared = "ministat_w32threads" ]]; then
+    config_options="$build_options --enable-static --disable-shared"
+    if [[ $shared = "ministat_w32threads" ]]; then
+      config_options="$config_options --disable-pthreads --enable-w32threads"
+    else
+      if [[ -f "$mingw_w64_x86_64_prefix/include/pthread.h" ]] && [[ -f "$mingw_w64_x86_64_prefix/lib/libpthread.a" ]]; then
+        config_options="$config_options --enable-pthreads"
+      else
+        config_options="$config_options --disable-pthreads"
+      fi
+      config_options="$config_options --disable-w32threads"
+    fi
+    config_options="$config_options --enable-gpl --enable-libx264 --enable-dxva2 --enable-d3d11va $arch_opts --disable-doc --enable-nonfree --enable-libfaac"
+  fi
+
+  # minimal build for php_ffmpeg.dll
+  if [[ $shared = "minimal" ]]; then
+    config_options="$build_options --enable-shared --disable-static --disable-w32threads --enable-gpl --enable-dxva2 --enable-d3d11va $arch_opts --disable-doc"
+    # avoid installing this to system
+    cd ..
+    final_install_dir=`pwd`/${output_dir}.installed
+    cd ${output_dir}
+    config_options="$config_options --prefix=$final_install_dir"
+  fi
+
+  config_options="$config_options --enable-runtime-cpudetect"
+
+  if [[ "$bits_target" = "32" ]]; then
+    config_options="$config_options"
+  else
+    config_options="$config_options"
+  fi
+
+  sed -i -e 's/require_pkg_config libmodplug libmodplug\/modplug\.h ModPlug_Load/require libmodplug libmodplug\/modplug\.h ModPlug_Load -lmodplug/' configure
+  do_configure "$config_options"
+  if [ "$bits_target" = "32" ]; then
+    ## #define HAVE_BCRYPT 0
+    sed -i -e 's/#define HAVE_BCRYPT 1/#define HAVE_BCRYPT 0/' config.h
+    sed -i -e 's/-lbcrypt//' ffbuild/config.sh
+    sed -i -e 's/-lbcrypt//' ffbuild/config.mak
+    sed -i -e 's/-lbcrypt//' $mingw_w64_x86_64_prefix/lib/pkgconfig/libavutil.pc
+    sed -i -e 's/-lbcrypt//' libavutil/libavutil.pc # might not exist yet, but better safe than sorry
+  fi
+
+  rm -f */*.a */*.dll *.exe # just in case some dependency library has changed, force it to re-link even if the ffmpeg source hasn't changed...
+  rm already_ran_make*
+  echo "doing ffmpeg make $(pwd)"
+  do_make
+  if [[ $shared = "shared" ]] || [[ $shared = "minimal" ]]; then
+    do_make_install # install ffmpeg to get libavcodec libraries to be used as dependencies for other things, like vlc [XXX make this a config option?]
+  fi
+  echo "Done! You will find $bits_target bit $shared binaries in $(pwd)/{ffmpeg,ffprobe,ffplay}*.exe"
+  ls -la *.exe
+  cd ..
+}
+
+build_my_ffmpeg_5.0.1() {
   local type="ffmpeg"
   local shared=$build_ffmpeg_shared
   local output_dir="ffmpeg_git"
@@ -2168,7 +2310,7 @@ build_my_ffmpeg_501() {
     local arch_opts="--enable-libmfx" # --enable-libmfx broken 2022-05-27
   fi
 
-  local extra_configure_opts="--enable-gpl --enable-version3 --enable-bzlib --enable-fontconfig --enable-frei0r --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libdav1d --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwebp --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va $arch_opts --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DLIBTWOLAME_STATIC --extra-cflags=-DMODPLUG_STATIC --extra-cflags=-DCACA_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng --extra-libs=-lm"
+  local extra_configure_opts="--enable-gpl --enable-version3 --enable-bzlib --enable-fontconfig --enable-frei0r --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libdav1d --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libx264 --enable-libx265 --enable-libaom --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va $arch_opts --enable-libxavs --enable-libxvid --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DLIBTWOLAME_STATIC --extra-cflags=-DMODPLUG_STATIC --extra-cflags=-DCACA_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng --extra-libs=-lm"
 
   # can't mix and match --enable-static --enable-shared unfortunately, or the final executable seems to just use shared if the're both present
   if [[ $shared = "shared" ]] || [[ $shared = "minimal" ]] ; then
@@ -2196,6 +2338,8 @@ build_my_ffmpeg_501() {
   cd ${output_dir}
   if [[ ! -f 'add-libfaac.diff.done' ]]; then
     apply_my_ffmpeg_patches_no_git
+	patch -p1</mnt/winshare/MyMpeg/ffmpeg_patches/enable_libfaac-5.0.1.patch
+	patch -p0</mnt/winshare/MyMpeg/patches/add-libfaac-5.0.1.patch
   fi
   apply_patch file://$patch_dir/frei0r_load-shared-libraries-dynamically.diff
   apply_patch file://$patch_dir/built-with-on-today-5.0.1.diff
@@ -2209,12 +2353,12 @@ build_my_ffmpeg_501() {
   build_options="--arch=$arch --target-os=mingw32 --cross-prefix=$cross_prefix --pkg-config=pkg-config --pkg-config-flags=--static"
   config_options="$build_options --disable-w32threads --disable-doc --prefix=$mingw_w64_x86_64_prefix $extra_configure_opts" # other possibilities: --enable-w32threads --enable-libflite
   if [[ "$non_free" = "y" ]]; then
-    config_options="$config_options --enable-nonfree --enable-libfdk-aac --enable-libfaac" # faac deemed too poor quality
+    config_options="$config_options --enable-nonfree --enable-libaac" # faac deemed too poor quality
   else
     config_options="$config_options"
   fi
 
-  # minimal static build plus x264 & fdk-aac
+  # minimal static build plus x264
   if [[ $shared = "ministat" ]] || [[ $shared = "ministat_w32threads" ]]; then
     config_options="$build_options --enable-static --disable-shared"
     if [[ $shared = "ministat_w32threads" ]]; then
@@ -2227,10 +2371,10 @@ build_my_ffmpeg_501() {
       fi
       config_options="$config_options --disable-w32threads"
     fi
-    config_options="$config_options --enable-gpl --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va $arch_opts --enable-libx264 --disable-doc --enable-nonfree --enable-libfdk-aac --enable-libfaac"
+    config_options="$config_options --enable-gpl --enable-libx264 --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va $arch_opts --disable-doc --enable-nonfree --enable-libfaac"
   fi
 
-  # minimal build for php_av.dll
+  # minimal build for php_ffmpeg.dll
   if [[ $shared = "minimal" ]]; then
     config_options="$build_options --enable-shared --disable-static --disable-w32threads --enable-gpl --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va $arch_opts --disable-doc"
     # avoid installing this to system
@@ -2241,7 +2385,129 @@ build_my_ffmpeg_501() {
   fi
 
   config_options="$config_options --enable-runtime-cpudetect"
-  
+
+  if [[ "$bits_target" = "32" ]]; then
+    config_options="$config_options"
+  else
+    config_options="$config_options"
+  fi
+
+  sed -i -e 's/require_pkg_config libmodplug libmodplug\/modplug\.h ModPlug_Load/require libmodplug libmodplug\/modplug\.h ModPlug_Load -lmodplug/' configure
+  do_configure "$config_options"
+  if [ "$bits_target" = "32" ]; then
+    ## #define HAVE_BCRYPT 0
+    sed -i -e 's/#define HAVE_BCRYPT 1/#define HAVE_BCRYPT 0/' config.h
+    sed -i -e 's/-lbcrypt//' ffbuild/config.sh
+    sed -i -e 's/-lbcrypt//' ffbuild/config.mak
+    sed -i -e 's/-lbcrypt//' $mingw_w64_x86_64_prefix/lib/pkgconfig/libavutil.pc
+    sed -i -e 's/-lbcrypt//' libavutil/libavutil.pc # might not exist yet, but better safe than sorry
+  fi
+
+  rm -f */*.a */*.dll *.exe # just in case some dependency library has changed, force it to re-link even if the ffmpeg source hasn't changed...
+  rm already_ran_make*
+  echo "doing ffmpeg make $(pwd)"
+  do_make
+  if [[ $shared = "shared" ]] || [[ $shared = "minimal" ]]; then
+    do_make_install # install ffmpeg to get libavcodec libraries to be used as dependencies for other things, like vlc [XXX make this a config option?]
+  fi
+  echo "Done! You will find $bits_target bit $shared binaries in $(pwd)/{ffmpeg,ffprobe,ffplay}*.exe"
+  ls -la *.exe
+  cd ..
+}
+
+build_my_ffmpeg_3.2.18() {
+  local type="ffmpeg"
+  local shared=$build_ffmpeg_shared
+  local output_dir="ffmpeg_git"
+  local download_url="http://ffmpeg.org/releases/ffmpeg-3.2.18.tar.bz2"
+
+  if [ "$bits_target" = "32" ]; then
+    local arch=x86
+    local arch_opts="--disable-libmfx"
+  else
+    local arch=x86_64
+    local arch_opts="--enable-libmfx"
+  fi
+
+  local extra_configure_opts="--enable-gpl --enable-version3 --enable-bzlib --enable-fontconfig --enable-frei0r --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopus --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libx264 --enable-libx265 --enable-dxva2 --enable-d3d11va $arch_opts --enable-libxavs --enable-libxvid --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DLIBTWOLAME_STATIC --extra-cflags=-DMODPLUG_STATIC --extra-cflags=-DCACA_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng --extra-libs=-lm"
+
+  # can't mix and match --enable-static --enable-shared unfortunately, or the final executable seems to just use shared if the're both present
+  if [[ $shared = "shared" ]] || [[ $shared = "minimal" ]] ; then
+    output_dir=ffmpeg_shared
+    rm -rf ${output_dir}
+    download_and_unpack_file $download_url
+    output_dir=ffmpeg_shared
+	mkdir ${output_dir}
+	cp -pR ffmpeg-3.2.18/* ${output_dir}/ && rm -rf ffmpeg-3.2.18
+
+    final_install_dir=`pwd`/${output_dir}.installed
+    rm -rf $final_install_dir
+    extra_configure_opts="--enable-shared --disable-static $extra_configure_opts"
+    # avoid installing this to system
+    extra_configure_opts="$extra_configure_opts --prefix=$final_install_dir"
+  else
+    output_dir="ffmpeg"
+    rm -rf ${output_dir}
+    download_and_unpack_file $download_url
+    output_dir="ffmpeg"
+	mkdir ${output_dir}
+	cp -pR ffmpeg-3.2.18/* ${output_dir}/ && rm -rf ffmpeg-3.2.18
+    extra_configure_opts="--enable-static --disable-shared $extra_configure_opts"
+  fi
+  cd ${output_dir}
+  if [[ ! -f 'add-libfaac.diff.done' ]]; then
+    apply_patch file://$patch_dir/volnorm-3.2.18.patch
+	patch -p0</mnt/winshare/MyMpeg/patches/enable_libfaac-3.2.18.patch
+	patch -p0</mnt/winshare/MyMpeg/patches/add-libfaac-3.2.18.diff
+    touch add-libfaac.diff.done
+	#bash
+  fi
+
+  apply_patch file://$patch_dir/frei0r_load-shared-libraries-dynamically.diff
+  apply_patch file://$patch_dir/built-with-on-today-3.2.18.diff
+
+  if [ "$bits_target" = "32" ]; then
+    local arch=x86
+  else
+    local arch=x86_64
+  fi
+
+  build_options="--arch=$arch --target-os=mingw32 --cross-prefix=$cross_prefix --pkg-config=pkg-config --pkg-config-flags=--static"
+  config_options="$build_options --disable-w32threads --disable-doc --prefix=$mingw_w64_x86_64_prefix $extra_configure_opts" # other possibilities: --enable-w32threads --enable-libflite
+  if [[ "$non_free" = "y" ]]; then
+    config_options="$config_options --enable-nonfree --enable-libfaac" # faac deemed too poor quality
+  else
+    config_options="$config_options"
+  fi
+
+  # minimal static build plus x264 & libfaac
+  if [[ $shared = "ministat" ]] || [[ $shared = "ministat_w32threads" ]]; then
+    config_options="$build_options --enable-static --disable-shared"
+    if [[ $shared = "ministat_w32threads" ]]; then
+      config_options="$config_options --disable-pthreads --enable-w32threads"
+    else
+      if [[ -f "$mingw_w64_x86_64_prefix/include/pthread.h" ]] && [[ -f "$mingw_w64_x86_64_prefix/lib/libpthread.a" ]]; then
+        config_options="$config_options --enable-pthreads"
+      else
+        config_options="$config_options --disable-pthreads"
+      fi
+      config_options="$config_options --disable-w32threads"
+    fi
+    config_options="$config_options --enable-gpl --enable-libx264 --enable-dxva2 --enable-d3d11va $arch_opts --disable-doc --enable-nonfree --enable-libfaac"
+  fi
+
+  # minimal build for php_ffmpeg.dll
+  if [[ $shared = "minimal" ]]; then
+    config_options="$build_options --enable-shared --disable-static --disable-w32threads --enable-gpl --enable-dxva2 --enable-d3d11va $arch_opts --disable-doc"
+    # avoid installing this to system
+    cd ..
+    final_install_dir=`pwd`/${output_dir}.installed
+    cd ${output_dir}
+    config_options="$config_options --prefix=$final_install_dir"
+  fi
+
+  config_options="$config_options --enable-runtime-cpudetect"
+
   if [[ "$bits_target" = "32" ]]; then
     config_options="$config_options"
   else
@@ -2414,9 +2680,9 @@ while true; do
     --build-dvbtee=* ) build_dvbtee="${1#*=}"; shift ;;
     --disable-nonfree=* ) disable_nonfree="${1#*=}"; shift ;;
     # this doesn't actually "build all", like doesn't build 10 high-bit LGPL ffmpeg, but it does exercise the "non default" type build options...
-    -a         ) compiler_flavors="multi"; build_mplayer=y; build_libmxf=y; build_mp4box=y; build_vlc=y; build_lsw=y; 
+    -a         ) compiler_flavors="multi"; build_mplayer=y; build_libmxf=y; build_mp4box=y; build_vlc=y; build_lsw=y;
                  high_bitdepth=y; build_ffmpeg_static=y; build_ffmpeg_shared=y; build_lws=y;
-                 disable_nonfree=n; git_get_latest=y; sandbox_ok=y; build_amd_amf=y; build_intel_qsv=y; 
+                 disable_nonfree=n; git_get_latest=y; sandbox_ok=y; build_amd_amf=y; build_intel_qsv=y;
                  build_dvbtee=y; build_x264_with_libav=y; shift ;;
     -d         ) gcc_cpu_count=$cpu_count; disable_nonfree="y"; sandbox_ok="y"; compiler_flavors="win32"; git_get_latest="n"; shift ;;
     --compiler-flavors=* ) compiler_flavors="${1#*=}"; shift ;;
@@ -2473,8 +2739,10 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win32" ]]; then
 #    build_libfaac
 #    build_ffmpeg_dependencies
 #    build_apps
-    build_my_ffmpeg
-#    build_my_ffmpeg_501    
+#    build_my_ffmpeg
+#    build_my_ffmpeg_5.0.1
+    build_my_ffmpeg_4.4
+#    build_my_ffmpeg_3.2.18
   cd ..
 fi
 
@@ -2496,8 +2764,10 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win64" ]]; then
 #    build_libfaac
 #    build_ffmpeg_dependencies
 #    build_apps
-    build_my_ffmpeg
-#    build_my_ffmpeg_501    
+#    build_my_ffmpeg
+#    build_my_ffmpeg_5.0.1
+    build_my_ffmpeg_4.4
+#    build_my_ffmpeg_3.2.18
   cd ..
 fi
 

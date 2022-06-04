@@ -34,8 +34,6 @@ diff -u -r configure configure
  enabled gpl && die_license_disabled_gpl nonfree libfdk_aac
  enabled gpl && die_license_disabled_gpl nonfree openssl
  
---- configure	2022-04-04 16:40:22.000000000 +0200
-+++ configure	2022-05-29 21:39:57.106596123 +0200
 @@ -5699,6 +5699,7 @@
                                 die "ERROR: libcelt must be installed and version must be >= 0.11.0."; }
  enabled libcaca           && require_pkg_config caca caca.h caca_create_canvas
@@ -62,7 +60,7 @@ diff -u -r libavcodec/allcodecs.c libavcodec/allcodecs.c
      REGISTER_DECODER(QDM2_AT,           qdm2_at);
      REGISTER_DECODER(LIBCELT,           libcelt);
      REGISTER_ENCDEC (LIBFDK_AAC,        libfdk_aac);
-+    REGISTER_ENCDEC (LIBFAAC,           libfaac);
++    REGISTER_ENCODER(LIBFAAC,           libfaac);
      REGISTER_ENCDEC (LIBGSM,            libgsm);
      REGISTER_ENCDEC (LIBGSM_MS,         libgsm_ms);
      REGISTER_ENCDEC (LIBILBC,           libilbc);

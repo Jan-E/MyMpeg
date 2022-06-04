@@ -2,8 +2,8 @@ diff --git libavcodec/libfaac.c libavcodec/libfaac.c
 new file mode 100644
 index 00000000000..98b3ba81830
 --- /dev/null
-+++ libavcodec/libfaac.c
-@@ -0,0 +1,249 @@
++++ b/libavcodec/libfaac.c
+@@ -0,0 +1,253 @@
 +/*
 + * Interface to libfaac for aac encoding
 + * Copyright (c) 2002 Gildas Bazin <gbazin@netcourrier.com>
@@ -195,7 +195,7 @@ index 00000000000..98b3ba81830
 +    int num_samples  = frame ? frame->nb_samples : 0;
 +    void *samples    = frame ? frame->data[0]    : NULL;
 +
-+    if ((ret = ff_alloc_packet(avctx, avpkt, (7 + 768) * avctx->channels)) < 0)
++    if ((ret = av_new_packet(avpkt, (7 + 768) * avctx->channels)) < 0)
 +        return ret;
 +
 +    bytes_written = faacEncEncode(s->faac_handle, samples,
@@ -242,11 +242,6 @@ index 00000000000..98b3ba81830
 +    0
 +};
 +
-+static const AVCodecDefault Faac_encode_defaults[] = {
-+    { "b", "0" },
-+    { NULL }
-+};
-+
 +const AVCodec ff_libfaac_encoder = {
 +    .name           = "libfaac",
 +    .long_name      = NULL_IF_CONFIG_SMALL("libfaac AAC (Advanced Audio Coding)"),
@@ -256,7 +251,6 @@ index 00000000000..98b3ba81830
 +    .init           = Faac_encode_init,
 +    .encode2        = Faac_encode_frame,
 +    .close          = Faac_encode_close,
-+    .defaults       = Faac_encode_defaults,
 +    .capabilities   = AV_CODEC_CAP_SMALL_LAST_FRAME | AV_CODEC_CAP_DELAY,
 +    .sample_fmts    = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S16,
 +                                                     AV_SAMPLE_FMT_NONE },

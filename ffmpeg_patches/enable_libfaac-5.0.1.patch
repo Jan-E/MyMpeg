@@ -1,9 +1,7 @@
-diff --git a/configure b/configure
-diff --git a/configure b/configure
-index 5a16761..0309ec2 100755
---- a/configure
-+++ b/configure
-@@ -230,6 +230,7 @@ External library support:
+diff -u -r ffmpeg-5.0.1-orig/configure ffmpeg-5.0.1/configure
+--- ffmpeg-5.0.1-orig/configure	2022-04-04 16:40:22.000000000 +0200
++++ ffmpeg-5.0.1/configure	2022-05-29 21:39:57.106596123 +0200
+@@ -230,6 +230,7 @@
    --enable-libdavs2        enable AVS2 decoding via libdavs2 [no]
    --enable-libdc1394       enable IIDC-1394 grabbing using libdc1394
                             and libraw1394 [no]
@@ -11,7 +9,7 @@ index 5a16761..0309ec2 100755
    --enable-libfdk-aac      enable AAC de/encoding via libfdk-aac [no]
    --enable-libflite        enable flite (voice synthesis) support via libflite [no]
    --enable-libfontconfig   enable libfontconfig, useful for drawtext filter [no]
-@@ -1786,6 +1787,7 @@ EXTERNAL_LIBRARY_GPL_LIST="
+@@ -1783,6 +1784,7 @@
  
  EXTERNAL_LIBRARY_NONFREE_LIST="
      decklink
@@ -19,7 +17,7 @@ index 5a16761..0309ec2 100755
      libfdk_aac
      libtls
  "
-@@ -3285,6 +3287,8 @@ avisynth_demuxer_deps="avisynth"
+@@ -3282,6 +3284,8 @@
  avisynth_demuxer_select="riffdec"
  eac3_at_decoder_deps="audiotoolbox"
  eac3_at_decoder_select="ac3_parser"
@@ -28,19 +26,18 @@ index 5a16761..0309ec2 100755
  gsm_ms_at_decoder_deps="audiotoolbox"
  ilbc_at_decoder_deps="audiotoolbox"
  mp1_at_decoder_deps="audiotoolbox"
-@@ -6533,6 +6537,7 @@ enabled libdav1d          && require_pkg_config libdav1d "dav1d >= 0.5.0" "dav1d
+@@ -6532,6 +6536,7 @@
  enabled libdavs2          && require_pkg_config libdavs2 "davs2 >= 1.6.0" davs2.h davs2_decoder_open
  enabled libdc1394         && require_pkg_config libdc1394 libdc1394-2 dc1394/dc1394.h dc1394_new
  enabled libdrm            && require_pkg_config libdrm libdrm xf86drm.h drmGetVersion
-+enabled libfaac           && require_headers faac.h
++enabled libfaac           && require libfaac faac.h faacEncGetVersion -lfaac
  enabled libfdk_aac        && { check_pkg_config libfdk_aac fdk-aac "fdk-aac/aacenc_lib.h" aacEncOpen ||
                                 { require libfdk_aac fdk-aac/aacenc_lib.h aacEncOpen -lfdk-aac &&
                                   warn "using libfdk without pkg-config"; } }
-diff --git a/doc/encoders.texi b/doc/encoders.texi
-index 9796a60..1d6fa15 100644
---- a/doc/encoders.texi
-+++ b/doc/encoders.texi
-@@ -631,6 +631,111 @@ Sets the maximum delay in milliseconds. Lower delays than 20ms will very quickly
+diff -u -r ffmpeg-5.0.1-orig/doc/encoders.texi ffmpeg-5.0.1/doc/encoders.texi
+--- ffmpeg-5.0.1-orig/doc/encoders.texi	2022-01-14 19:45:39.000000000 +0100
++++ ffmpeg-5.0.1/doc/encoders.texi	2022-05-29 21:39:57.106596123 +0200
+@@ -631,6 +631,111 @@
  decrease quality.
  @end table
  
@@ -152,11 +149,10 @@ index 9796a60..1d6fa15 100644
  @anchor{libfdk-aac-enc}
  @section libfdk_aac
  
-diff --git a/doc/muxers.texi b/doc/muxers.texi
-index b6cafaa..02009be 100644
---- a/doc/muxers.texi
-+++ b/doc/muxers.texi
-@@ -2511,9 +2511,9 @@ ffmpeg -i in.mkv -codec copy -map 0 -f segment -segment_list out.csv -segment_fr
+diff -u -r ffmpeg-5.0.1-orig/doc/muxers.texi ffmpeg-5.0.1/doc/muxers.texi
+--- ffmpeg-5.0.1-orig/doc/muxers.texi	2022-01-14 19:45:39.000000000 +0100
++++ ffmpeg-5.0.1/doc/muxers.texi	2022-05-29 21:39:57.106596123 +0200
+@@ -2486,9 +2486,9 @@
  
  @item
  Convert the @file{in.mkv} to TS segments using the @code{libx264}
@@ -168,27 +164,25 @@ index b6cafaa..02009be 100644
  @end example
  
  @item
-diff --git a/libavcodec/Makefile b/libavcodec/Makefile
-index 38425d2..e14ec68 100644
---- a/libavcodec/Makefile
-+++ b/libavcodec/Makefile
-@@ -1057,6 +1057,7 @@ OBJS-$(CONFIG_LIBDAV1D_DECODER)           += libdav1d.o
- OBJS-$(CONFIG_LIBDAVS2_DECODER)           += libdavs2.o
- OBJS-$(CONFIG_LIBFDK_AAC_DECODER)         += libfdk-aacdec.o
- OBJS-$(CONFIG_LIBFDK_AAC_ENCODER)         += libfdk-aacenc.o
-+OBJS-$(CONFIG_LIBFAAC_ENCODER)            += libfaac.o
- OBJS-$(CONFIG_LIBGSM_DECODER)             += libgsmdec.o
- OBJS-$(CONFIG_LIBGSM_ENCODER)             += libgsmenc.o
- OBJS-$(CONFIG_LIBGSM_MS_DECODER)          += libgsmdec.o
-diff --git a/libavcodec/allcodecs.c b/libavcodec/allcodecs.c
-index c47133a..971c9cc 100644
---- a/libavcodec/allcodecs.c
-+++ b/libavcodec/allcodecs.c
-@@ -745,6 +745,7 @@ extern const FFCodec ff_libdav1d_decoder;
- extern const FFCodec ff_libdavs2_decoder;
- extern const FFCodec ff_libfdk_aac_encoder;
- extern const FFCodec ff_libfdk_aac_decoder;
+diff -u -r ffmpeg-5.0.1-orig/libavcodec/allcodecs.c ffmpeg-5.0.1/libavcodec/allcodecs.c
+--- ffmpeg-5.0.1-orig/libavcodec/allcodecs.c	2022-01-14 19:45:39.000000000 +0100
++++ ffmpeg-5.0.1/libavcodec/allcodecs.c	2022-05-29 21:40:26.406594836 +0200
+@@ -447,6 +447,7 @@
+ extern const AVCodec ff_dst_decoder;
+ extern const AVCodec ff_eac3_encoder;
+ extern const AVCodec ff_eac3_decoder;
 +extern const AVCodec ff_libfaac_encoder;
- extern const FFCodec ff_libgsm_encoder;
- extern const FFCodec ff_libgsm_decoder;
- extern const FFCodec ff_libgsm_ms_encoder;
+ extern const AVCodec ff_evrc_decoder;
+ extern const AVCodec ff_fastaudio_decoder;
+ extern const AVCodec ff_ffwavesynth_decoder;
+diff -u -r ffmpeg-5.0.1-orig/libavcodec/Makefile ffmpeg-5.0.1/libavcodec/Makefile
+--- ffmpeg-5.0.1-orig/libavcodec/Makefile	2022-01-14 19:45:39.000000000 +0100
++++ ffmpeg-5.0.1/libavcodec/Makefile	2022-05-29 21:39:57.106596123 +0200
+@@ -1023,6 +1023,7 @@
+ OBJS-$(CONFIG_ALAC_AT_DECODER)            += audiotoolboxdec.o
+ OBJS-$(CONFIG_AMR_NB_AT_DECODER)          += audiotoolboxdec.o
+ OBJS-$(CONFIG_EAC3_AT_DECODER)            += audiotoolboxdec.o
++OBJS-$(CONFIG_LIBFAAC_ENCODER)            += libfaac.o
+ OBJS-$(CONFIG_GSM_MS_AT_DECODER)          += audiotoolboxdec.o
+ OBJS-$(CONFIG_ILBC_AT_DECODER)            += audiotoolboxdec.o
+ OBJS-$(CONFIG_MP1_AT_DECODER)             += audiotoolboxdec.o
