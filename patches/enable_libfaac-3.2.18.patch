@@ -34,7 +34,7 @@ diff -u -r configure configure
  enabled gpl && die_license_disabled_gpl nonfree libfdk_aac
  enabled gpl && die_license_disabled_gpl nonfree openssl
  
-@@ -5699,6 +5699,7 @@
+@@ -5694,6 +5694,7 @@
                                 die "ERROR: libcelt must be installed and version must be >= 0.11.0."; }
  enabled libcaca           && require_pkg_config caca caca.h caca_create_canvas
  enabled libebur128        && require ebur128 ebur128.h ebur128_relative_threshold -lebur128
