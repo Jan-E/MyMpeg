@@ -2067,8 +2067,9 @@ build_my_ffmpeg() {
 
   if [[ ! -f 'add-libfaac.diff.done' ]]; then
     apply_my_ffmpeg_patches
-	#patch -p1</mnt/winshare/MyMpeg/ffmpeg_patches/enable_libfaac.patch
-	#patch -p0</mnt/winshare/MyMpeg/patches/add-libfaac-5.0.1.patch
+    #patch -p1</mnt/winshare/MyMpeg/ffmpeg_patches/enable_libfaac.patch
+    #patch -p0</mnt/winshare/MyMpeg/patches/add-libfaac.diff
+    #cp -p ~/libfaac.c libavcodec 
   fi
   apply_patch file://$patch_dir/frei0r_load-shared-libraries-dynamically.diff
   apply_patch file://$patch_dir/built-with-on-today.diff
@@ -2087,7 +2088,7 @@ build_my_ffmpeg() {
     config_options="$config_options"
   fi
 
-  # minimal static build plus x264 & fdk-aac
+  # minimal static build plus x264
   if [[ $shared = "ministat" ]] || [[ $shared = "ministat_w32threads" ]]; then
     config_options="$build_options --enable-static --disable-shared"
     if [[ $shared = "ministat_w32threads" ]]; then
@@ -2100,7 +2101,7 @@ build_my_ffmpeg() {
       fi
       config_options="$config_options --disable-w32threads"
     fi
-    config_options="$config_options --enable-gpl --enable-libx264 --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va $arch_opts --disable-doc --enable-nonfree --enable-libfdk-aac"
+    config_options="$config_options --enable-gpl --enable-libx264 --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va $arch_opts --disable-doc"
   fi
 
   # minimal build for php_ffmpeg.dll

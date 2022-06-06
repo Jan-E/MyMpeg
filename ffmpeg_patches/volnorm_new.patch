@@ -1,5 +1,5 @@
 diff --git a/libavfilter/af_volume.c b/libavfilter/af_volume.c
-index 4c9b96f..355e29e 100644
+index 4c9b96f..dca2ea1 100644
 --- a/libavfilter/af_volume.c
 +++ b/libavfilter/af_volume.c
 @@ -55,6 +55,7 @@ static const char *const var_names[] = {
