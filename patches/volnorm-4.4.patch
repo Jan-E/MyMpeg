@@ -51,7 +51,7 @@ index 5fc00d8..6373121 100644
      vol->var_values[VAR_VOLUME] = NAN;
  
      vol->var_values[VAR_NB_CHANNELS] = inlink->channels;
-@@ -384,6 +394,30 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
+@@ -384,6 +394,34 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
          av_frame_remove_side_data(buf, AV_FRAME_DATA_REPLAYGAIN);
      }
  
@@ -70,6 +70,10 @@ index 5fc00d8..6373121 100644
 +                /* set only if eval is not used and eval_mode == default */
 +                if (vol->eval_mode == EVAL_MODE_ONCE) {
 +                    new_volume = fmax(-mx, fmin(mx, (vol->normvol - loudness)));
++                    if (loudness > vol->normvol) {
++                        new_volume = fmax(-mx, fmin(mx, (-14 - loudness)));
++                        if (loudness < -14) new_volume = fmax(-mx, fmin(mx, 0));
++                    }
 +                    pow_volume = pow(10, new_volume / 20);
 +                    av_log(ctx, AV_LOG_VERBOSE, "loudness=%f => %f => volume=%f\n",
 +                        loudness, new_volume, pow_volume);

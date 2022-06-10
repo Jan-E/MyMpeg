@@ -12,7 +12,7 @@ diff -ur libavfilter/vf_frei0r.c.bak libavfilter/vf_frei0r.c
  typedef f0r_instance_t (*f0r_construct_f)(unsigned int width, unsigned int height);
  typedef void (*f0r_destruct_f)(f0r_instance_t instance);
  typedef void (*f0r_deinit_f)(void);
-@@ -235,11 +239,31 @@
+@@ -240,11 +244,31 @@
          if (ret < 0)
              return ret;
      }
