@@ -23,7 +23,7 @@ index 4c9b96f..355e29e 100644
 @@ -254,6 +258,12 @@ static av_cold void volume_init(VolumeContext *vol)
          ff_volume_init_x86(vol);
  }
-
+ 
 +static void set_fixed_volume(VolumeContext *vol, double volume)
 +{
 +    vol->volume_i = (int)(volume * 256 + 0.5);
@@ -35,7 +35,7 @@ index 4c9b96f..355e29e 100644
      VolumeContext *vol = ctx->priv;
 @@ -275,8 +285,7 @@ static int set_volume(AVFilterContext *ctx)
             precision_str[vol->precision]);
-
+ 
      if (vol->precision == PRECISION_FIXED) {
 -        vol->volume_i = (int)(vol->volume * 256 + 0.5);
 -        vol->volume   = vol->volume_i / 256.0;
@@ -49,12 +49,12 @@ index 4c9b96f..355e29e 100644
      vol->var_values[VAR_T] =
 +    vol->var_values[VAR_META] =
      vol->var_values[VAR_VOLUME] = NAN;
-
+ 
      vol->var_values[VAR_NB_CHANNELS] = inlink->channels;
 @@ -387,6 +394,34 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
          av_frame_remove_side_data(buf, AV_FRAME_DATA_REPLAYGAIN);
      }
-
+ 
 +    vol->var_values[VAR_META] = NAN;
 +    if (vol->metadata) {
 +        double loudness, new_volume, pow_volume, timestamp, mx;
@@ -105,14 +105,14 @@ index c979029..b8c35dd 100644
 +    char *metadata;
 +    double normvol;
  } VolumeContext;
-
+ 
  void ff_volume_init_x86(VolumeContext *vol);
 diff --git libavfilter/f_ebur128.c b/libavfilter/f_ebur128.c
 index 195c9a8..34228d0 100644
 --- libavfilter/f_ebur128.c
 +++ b/libavfilter/f_ebur128.c
 @@ -461,10 +461,7 @@ static av_cold int init(AVFilterContext *ctx)
-
+ 
      if (ebur128->loglevel != AV_LOG_INFO &&
          ebur128->loglevel != AV_LOG_VERBOSE) {
 -        if (ebur128->do_video || ebur128->metadata)
@@ -120,5 +120,5 @@ index 195c9a8..34228d0 100644
 -        else
 -            ebur128->loglevel = AV_LOG_INFO;
      }
-
+ 
      if (!CONFIG_SWRESAMPLE && (ebur128->peak_mode & PEAK_MODE_TRUE_PEAKS)) {
