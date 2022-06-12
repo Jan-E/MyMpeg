@@ -1,0 +1,33 @@
+diff --git a/libavfilter/f_ebur128.c b/libavfilter/f_ebur128.c
+index 34228d0..048f1fb 100644
+--- a/libavfilter/f_ebur128.c
++++ b/libavfilter/f_ebur128.c
+@@ -1021,7 +1021,7 @@ static av_cold void uninit(AVFilterContext *ctx)
+         ebur128->lra_high -= ebur128->pan_law;
+     }
+ 
+-    av_log(ctx, AV_LOG_INFO, "Summary:\n\n"
++    if (ebur128->do_video) av_log(ctx, AV_LOG_VERBOSE, "Summary:\n\n"
+            "  Integrated loudness:\n"
+            "    I:         %5.1f LUFS\n"
+            "    Threshold: %5.1f LUFS\n\n"
+@@ -1034,6 +1034,19 @@ static av_cold void uninit(AVFilterContext *ctx)
+            ebur128->loudness_range,      ebur128->i3000.rel_threshold,
+            ebur128->lra_low, ebur128->lra_high);
+ 
++    else if (ebur128->loglevel >= AV_LOG_INFO) printf("Summary:\n\n"
++           "  Integrated loudness:\n"
++           "    I:         %5.1f LUFS\n"
++           "    Threshold: %5.1f LUFS\n\n"
++           "  Loudness range:\n"
++           "    LRA:       %5.1f LU\n"
++           "    Threshold: %5.1f LUFS\n"
++           "    LRA low:   %5.1f LUFS\n"
++           "    LRA high:  %5.1f LUFS\n",
++           ebur128->integrated_loudness, ebur128->i400.rel_threshold,
++           ebur128->loudness_range,      ebur128->i3000.rel_threshold,
++           ebur128->lra_low, ebur128->lra_high);
++
+ #define PRINT_PEAK_SUMMARY(str, sp, ptype) do {                  \
+     int ch;                                                      \
+     double maxpeak;                                              \
