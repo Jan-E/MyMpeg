@@ -1,5 +1,5 @@
 diff --git a/libavfilter/af_volume.c b/libavfilter/af_volume.c
-index 4c9b96f..11b3545 100644
+index f6e183d..2026811 100644
 --- a/libavfilter/af_volume.c
 +++ b/libavfilter/af_volume.c
 @@ -55,6 +55,7 @@ static const char *const var_names[] = {
@@ -20,8 +20,8 @@ index 4c9b96f..11b3545 100644
      { "precision", "select mathematical precision",
              OFFSET(precision), AV_OPT_TYPE_INT, { .i64 = PRECISION_FLOAT }, PRECISION_FIXED, PRECISION_DOUBLE, A|F, "precision" },
          { "fixed",  "select 8-bit fixed-point",     0, AV_OPT_TYPE_CONST, { .i64 = PRECISION_FIXED  }, INT_MIN, INT_MAX, A|F, "precision" },
-@@ -242,6 +246,12 @@ static av_cold void volume_init(VolumeContext *vol)
-         ff_volume_init_x86(vol);
+@@ -243,6 +247,12 @@ static av_cold void volume_init(VolumeContext *vol)
+ #endif
  }
  
 +static void set_fixed_volume(VolumeContext *vol, double volume)
@@ -33,7 +33,7 @@ index 4c9b96f..11b3545 100644
  static int set_volume(AVFilterContext *ctx)
  {
      VolumeContext *vol = ctx->priv;
-@@ -263,8 +273,7 @@ static int set_volume(AVFilterContext *ctx)
+@@ -264,8 +274,7 @@ static int set_volume(AVFilterContext *ctx)
             precision_str[vol->precision]);
  
      if (vol->precision == PRECISION_FIXED) {
@@ -43,7 +43,7 @@ index 4c9b96f..11b3545 100644
          av_log(ctx, AV_LOG_VERBOSE, "volume_i:%d/255 ", vol->volume_i);
      }
      av_log(ctx, AV_LOG_VERBOSE, "volume:%f volume_dB:%f\n",
-@@ -292,6 +301,7 @@ static int config_output(AVFilterLink *outlink)
+@@ -293,6 +302,7 @@ static int config_output(AVFilterLink *outlink)
      vol->var_values[VAR_STARTPTS] =
      vol->var_values[VAR_STARTT] =
      vol->var_values[VAR_T] =
@@ -51,7 +51,7 @@ index 4c9b96f..11b3545 100644
      vol->var_values[VAR_VOLUME] = NAN;
  
      vol->var_values[VAR_NB_CHANNELS] = inlink->ch_layout.nb_channels;
-@@ -371,6 +381,34 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
+@@ -372,6 +382,34 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
          av_frame_remove_side_data(buf, AV_FRAME_DATA_REPLAYGAIN);
      }
  

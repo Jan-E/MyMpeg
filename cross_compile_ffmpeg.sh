@@ -1706,7 +1706,7 @@ build_ffmpeg() {
 
   do_git_checkout https://github.com/FFmpeg/FFmpeg.git $output_dir $ffmpeg_git_checkout_version
   cd $output_dir
-    if [[ ! -f 'add-libfaac.diff.done' ]]; then
+    if [[ ! -f 'my-ffmpeg-patches.done' ]]; then
       apply_my_ffmpeg_patches
     fi
     apply_patch file://$patch_dir/frei0r_load-shared-libraries-dynamically.diff
@@ -2021,11 +2021,10 @@ apply_my_ffmpeg_patches() {
   apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/mpegvideo_enc.patch
   apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/swscale.patch
   apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_new.patch
-#  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/enable_libfaac.patch
+  apply_ffmpeg_patch https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_summary_stdout.patch
   # back to FFmpeg's original revision
   git reset HEAD~8
-#  apply_patch file://$patch_dir/add-libfaac.diff
-  touch add-libfaac.diff.done
+  touch my-ffmpeg-patches.done
 }
 
 build_my_ffmpeg() {
@@ -2065,7 +2064,7 @@ build_my_ffmpeg() {
   fi
   cd ${output_dir}
 
-  if [[ ! -f 'add-libfaac.diff.done' ]]; then
+  if [[ ! -f 'my-ffmpeg-patches.done' ]]; then
     apply_my_ffmpeg_patches
     #patch -p1</mnt/winshare/MyMpeg/ffmpeg_patches/enable_libfaac.patch
     #patch -p0</mnt/winshare/MyMpeg/patches/add-libfaac.diff
@@ -2172,9 +2171,8 @@ apply_my_ffmpeg_patches_no_git() {
   apply_ffmpeg_patch_no_git https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/mpegvideo_enc.patch
   apply_ffmpeg_patch_no_git https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/swscale.patch
   apply_ffmpeg_patch_no_git https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_new.patch
-#  apply_ffmpeg_patch_no_git https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/enable_libfaac.patch
-#  apply_patch file://$patch_dir/add-libfaac.diff
-  touch add-libfaac.diff.done
+  apply_ffmpeg_patch_no_git https://raw.githubusercontent.com/Jan-E/mympeg/master/ffmpeg_patches/volnorm_summary_stdout.patch
+  touch my-ffmpeg-patches.done
 }
 
 build_my_ffmpeg_4.4() {
@@ -2214,13 +2212,12 @@ build_my_ffmpeg_4.4() {
     extra_configure_opts="--enable-static --disable-shared $extra_configure_opts"
   fi
   cd ${output_dir}
-  if [[ ! -f 'add-libfaac.diff.done' ]]; then
+  if [[ ! -f 'my-ffmpeg-patches.done' ]]; then
     patch -p1</mnt/winshare/MyMpeg/patches/volnorm-4.4.patch
+    patch -p1</mnt/winshare/MyMpeg/patches/volnorm-summary-stdout-4.4.patch
 	patch -p1</mnt/winshare/MyMpeg/patches/add_libfaac-4.4.patch
 	patch -p1</mnt/winshare/MyMpeg/patches/enable_libfaac-4.4.patch
-#	apply_patch file://$patch_dir/add-libfaac-4.diff
-#	apply_patch file://$patch_dir/enable_libfaac-4.4.patch
-    touch add-libfaac.diff.done
+    touch my-ffmpeg-patches.done
   fi
 
   apply_patch file://$patch_dir/frei0r_load-shared-libraries-dynamically.diff
@@ -2337,7 +2334,7 @@ build_my_ffmpeg_5.0.1() {
     extra_configure_opts="--enable-static --disable-shared $extra_configure_opts"
   fi
   cd ${output_dir}
-  if [[ ! -f 'add-libfaac.diff.done' ]]; then
+  if [[ ! -f 'my-ffmpeg-patches.done' ]]; then
     apply_my_ffmpeg_patches_no_git
 	patch -p1</mnt/winshare/MyMpeg/ffmpeg_patches/enable_libfaac-5.0.1.patch
 	patch -p0</mnt/winshare/MyMpeg/patches/add-libfaac-5.0.1.patch
@@ -2456,11 +2453,12 @@ build_my_ffmpeg_3.2.18() {
     extra_configure_opts="--enable-static --disable-shared $extra_configure_opts"
   fi
   cd ${output_dir}
-  if [[ ! -f 'add-libfaac.diff.done' ]]; then
+  if [[ ! -f 'my-ffmpeg-patches.done' ]]; then
     apply_patch file://$patch_dir/volnorm-3.2.18.patch
+    patch -p1</mnt/winshare/MyMpeg/patches/volnorm-summary-stdout-3.2.18.patch
 	patch -p0</mnt/winshare/MyMpeg/patches/enable_libfaac-3.2.18.patch
 	patch -p0</mnt/winshare/MyMpeg/patches/add-libfaac-3.2.18.diff
-    touch add-libfaac.diff.done
+    touch my-ffmpeg-patches.done
 	#bash
   fi
 
@@ -2743,7 +2741,7 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win32" ]]; then
     build_my_ffmpeg
 #    build_my_ffmpeg_5.0.1
 #    build_my_ffmpeg_4.4
-#    build_my_ffmpeg_3.2.18
+#   build_my_ffmpeg_3.2.18
   cd ..
 fi
 
