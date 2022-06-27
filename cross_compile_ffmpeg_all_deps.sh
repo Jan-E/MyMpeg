@@ -1144,8 +1144,8 @@ build_nghttp2() {
 }
 
 build_curl() {
-  local curl_version="7.83.1"
-  local curl_previous="7.83.0"
+  local curl_version="7.84.0"
+  local curl_previous="7.83.1"
   rm -rf curl-$curl_previous
   download_and_unpack_file https://curl.haxx.se/download/curl-$curl_version.tar.gz curl-$curl_version
   cd curl-$curl_version
@@ -1325,9 +1325,9 @@ build_openssl-1.1.0() {
 }
 
 build_openssl-1.1.1() {
-  rm -rf openssl-1.1.1n
-  download_and_unpack_file https://www.openssl.org/source/openssl-1.1.1o.tar.gz
-  cd openssl-1.1.1o
+  rm -rf openssl-1.1.1o
+  download_and_unpack_file https://www.openssl.org/source/openssl-1.1.1p.tar.gz
+  cd openssl-1.1.1p
     export CC="${cross_prefix}gcc"
     export AR="${cross_prefix}ar"
     export RANLIB="${cross_prefix}ranlib"
@@ -2508,7 +2508,7 @@ build_ffmpeg_dependencies() {
   build_libgcrypt
   build_nghttp2
   build_libx264 # at bottom as it might build a ffmpeg which needs the above deps...
-#  build_curl
+  build_curl
 }
 
 build_apps() {
