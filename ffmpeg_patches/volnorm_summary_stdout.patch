@@ -1,8 +1,8 @@
 diff --git a/libavfilter/f_ebur128.c b/libavfilter/f_ebur128.c
-index 34228d0..8c79e6a 100644
+index ae66d8f..52ad64f 100644
 --- a/libavfilter/f_ebur128.c
 +++ b/libavfilter/f_ebur128.c
-@@ -1021,7 +1021,7 @@ static av_cold void uninit(AVFilterContext *ctx)
+@@ -1025,7 +1025,7 @@ static av_cold void uninit(AVFilterContext *ctx)
          ebur128->lra_high -= ebur128->pan_law;
      }
  
@@ -11,7 +11,7 @@ index 34228d0..8c79e6a 100644
             "  Integrated loudness:\n"
             "    I:         %5.1f LUFS\n"
             "    Threshold: %5.1f LUFS\n\n"
-@@ -1034,6 +1034,19 @@ static av_cold void uninit(AVFilterContext *ctx)
+@@ -1038,6 +1038,19 @@ static av_cold void uninit(AVFilterContext *ctx)
             ebur128->loudness_range,      ebur128->i3000.rel_threshold,
             ebur128->lra_low, ebur128->lra_high);
  
