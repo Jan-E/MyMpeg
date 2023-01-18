@@ -2740,9 +2740,9 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win32" ]]; then
 #    build_libfaac
 #    build_ffmpeg_dependencies
 #    build_apps
-#    build_my_ffmpeg
+    build_my_ffmpeg
 #    build_my_ffmpeg_5.0.1
-    build_my_ffmpeg_4.4
+#    build_my_ffmpeg_4.4
 #    build_my_ffmpeg_3.2.18
   cd ..
 fi
@@ -2765,9 +2765,9 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win64" ]]; then
 #    build_libfaac
 #    build_ffmpeg_dependencies
 #    build_apps
-#    build_my_ffmpeg
+    build_my_ffmpeg
 #    build_my_ffmpeg_5.0.1
-    build_my_ffmpeg_4.4
+#    build_my_ffmpeg_4.4
 #    build_my_ffmpeg_3.2.18
   cd ..
 fi

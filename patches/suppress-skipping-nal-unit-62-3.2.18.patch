@@ -8,3 +8,35 @@
          break;
      default:
          av_log(s->avctx, AV_LOG_INFO,
+--- "a/libavcodec/hevc.h.orig"	2022-05-14 23:21:50.000000000 +0200
++++ "a/libavcodec/hevc.h"	2023-01-18 11:27:06.456257700 +0100
+@@ -117,6 +117,29 @@
+     NAL_FD_NUT     = 38,
+     NAL_SEI_PREFIX = 39,
+     NAL_SEI_SUFFIX = 40,
++    NAL_RSV_NVCL41     = 41,
++    NAL_RSV_NVCL42     = 42,
++    NAL_RSV_NVCL43     = 43,
++    NAL_RSV_NVCL44     = 44,
++    NAL_RSV_NVCL45     = 45,
++    NAL_RSV_NVCL46     = 46,
++    NAL_RSV_NVCL47     = 47,
++    NAL_UNSPEC48       = 48,
++    NAL_UNSPEC49       = 49,
++    NAL_UNSPEC50       = 50,
++    NAL_UNSPEC51       = 51,
++    NAL_UNSPEC52       = 52,
++    NAL_UNSPEC53       = 53,
++    NAL_UNSPEC54       = 54,
++    NAL_UNSPEC55       = 55,
++    NAL_UNSPEC56       = 56,
++    NAL_UNSPEC57       = 57,
++    NAL_UNSPEC58       = 58,
++    NAL_UNSPEC59       = 59,
++    NAL_UNSPEC60       = 60,
++    NAL_UNSPEC61       = 61,
++    NAL_UNSPEC62       = 62,
++    NAL_UNSPEC63       = 63,
+ };
+ 
+ enum RPSType {
