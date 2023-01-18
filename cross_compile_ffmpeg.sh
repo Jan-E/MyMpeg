@@ -2456,6 +2456,7 @@ build_my_ffmpeg_3.2.18() {
   cd ${output_dir}
   if [[ ! -f 'my-ffmpeg-patches.done' ]]; then
     apply_patch file://$patch_dir/volnorm-3.2.18.patch
+    patch -p1</mnt/winshare/MyMpeg/patches/suppress-skipping-nal-unit-62-3.2.18.patch
     patch -p1</mnt/winshare/MyMpeg/patches/volnorm-summary-stdout-3.2.18.patch
 	patch -p0</mnt/winshare/MyMpeg/patches/enable_libfaac-3.2.18.patch
 	patch -p0</mnt/winshare/MyMpeg/patches/add-libfaac-3.2.18.diff
