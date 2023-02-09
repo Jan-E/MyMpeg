@@ -2066,6 +2066,7 @@ build_my_ffmpeg() {
 
   if [[ ! -f 'my-ffmpeg-patches.done' ]]; then
     apply_my_ffmpeg_patches
+    patch -p1</mnt/winshare/MyMpeg/patches/suppress-skipping-nal-unit-63.patch
     #patch -p1</mnt/winshare/MyMpeg/ffmpeg_patches/enable_libfaac.patch
     #patch -p0</mnt/winshare/MyMpeg/patches/add-libfaac.diff
     #cp -p ~/libfaac.c libavcodec 
@@ -2213,7 +2214,7 @@ build_my_ffmpeg_4.4() {
   fi
   cd ${output_dir}
   if [[ ! -f 'my-ffmpeg-patches.done' ]]; then
-    patch -p1</mnt/winshare/MyMpeg/patches/suppress-skipping-nal-unit-62.patch
+    patch -p1</mnt/winshare/MyMpeg/patches/suppress-skipping-nal-unit-62-4.4.patch
     patch -p1</mnt/winshare/MyMpeg/patches/volnorm-4.4.patch
     patch -p1</mnt/winshare/MyMpeg/patches/volnorm-summary-stdout-4.4.patch
 	patch -p1</mnt/winshare/MyMpeg/patches/add_libfaac-4.4.patch
@@ -2337,6 +2338,7 @@ build_my_ffmpeg_5.0.1() {
   cd ${output_dir}
   if [[ ! -f 'my-ffmpeg-patches.done' ]]; then
     apply_my_ffmpeg_patches_no_git
+    patch -p1</mnt/winshare/MyMpeg/patches/suppress-skipping-nal-unit-63-5.0.1.patch
 	patch -p1</mnt/winshare/MyMpeg/ffmpeg_patches/enable_libfaac-5.0.1.patch
 	patch -p0</mnt/winshare/MyMpeg/patches/add-libfaac-5.0.1.patch
   fi
