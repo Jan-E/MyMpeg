@@ -1,0 +1,12 @@
+diff --git a/libavcodec/hevcdec.c b/libavcodec/hevcdec.c
+index 567e8d8..5c2ff4c 100644
+--- a/libavcodec/hevcdec.c
++++ b/libavcodec/hevcdec.c
+@@ -3134,6 +3134,7 @@ static int decode_nal_unit(HEVCContext *s, const H2645NAL *nal)
+     case HEVC_NAL_AUD:
+     case HEVC_NAL_FD_NUT:
+     case HEVC_NAL_UNSPEC62:
++    case HEVC_NAL_UNSPEC63:
+         break;
+     default:
+         av_log(s->avctx, AV_LOG_INFO,
