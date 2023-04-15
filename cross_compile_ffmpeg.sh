@@ -2301,11 +2301,15 @@ build_my_ffmpeg_6.0() {
 }
 
 build_my_ffmpeg_4.4() {
+#  local type="ffmpeg"
+#  local git_url="https://github.com/FFmpeg/FFmpeg.git"
+#  local git_tree="release/4.4"
+#  local shared=$build_ffmpeg_shared
+#  local output_dir="ffmpeg_git"
   local type="ffmpeg"
-  local git_url="https://github.com/FFmpeg/FFmpeg.git"
-  local git_tree="release/4.4"
   local shared=$build_ffmpeg_shared
   local output_dir="ffmpeg_git"
+  local download_url="https://ffmpeg.org/releases/ffmpeg-4.4.4.tar.bz2"
 
   if [ "$bits_target" = "32" ]; then
     local arch=x86
@@ -2321,7 +2325,11 @@ build_my_ffmpeg_4.4() {
   if [[ $shared = "shared" ]] || [[ $shared = "minimal" ]] ; then
     output_dir=ffmpeg_shared
     rm -rf ${output_dir}
-    do_git_checkout $git_url ${output_dir} $git_tree
+	mkdir ${output_dir}
+#    do_git_checkout $git_url ${output_dir} $git_tree
+    download_and_unpack_file $download_url
+    output_dir="ffmpeg"
+	cp -pR ffmpeg-4.4.4/* ${output_dir}/ && rm -rf ffmpeg-4.4.4
 
     final_install_dir=`pwd`/${output_dir}.installed
     rm -rf $final_install_dir
@@ -2331,9 +2339,11 @@ build_my_ffmpeg_4.4() {
   else
     output_dir="ffmpeg"
     rm -rf ${output_dir}
-    do_git_checkout $git_url ${output_dir} $git_tree
-
+	mkdir ${output_dir}
+#    do_git_checkout $git_url ${output_dir} $git_tree
+    download_and_unpack_file $download_url
     output_dir="ffmpeg"
+	cp -pR ffmpeg-4.4.4/* ${output_dir}/ && rm -rf ffmpeg-4.4.4
     extra_configure_opts="--enable-static --disable-shared $extra_configure_opts"
   fi
   cd ${output_dir}
@@ -2868,8 +2878,8 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win32" ]]; then
 #    build_apps
 #    build_my_ffmpeg
 #    build_my_ffmpeg_5.0.1
-    build_my_ffmpeg_6.0
-#    build_my_ffmpeg_4.4
+#    build_my_ffmpeg_6.0
+    build_my_ffmpeg_4.4
 #    build_my_ffmpeg_3.2.18
   cd ..
 fi
@@ -2894,8 +2904,8 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win64" ]]; then
 #    build_apps
 #    build_my_ffmpeg
 #    build_my_ffmpeg_5.0.1
-    build_my_ffmpeg_6.0
-#    build_my_ffmpeg_4.4
+#    build_my_ffmpeg_6.0
+    build_my_ffmpeg_4.4
 #    build_my_ffmpeg_3.2.18
   cd ..
 fi

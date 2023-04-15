@@ -1,8 +1,8 @@
 diff --git a/libavfilter/af_volume.c b/libavfilter/af_volume.c
-index f6e183d..2026811 100644
+index 9265299..4ab4742 100644
 --- a/libavfilter/af_volume.c
 +++ b/libavfilter/af_volume.c
-@@ -55,6 +55,7 @@ static const char *const var_names[] = {
+@@ -57,6 +57,7 @@ static const char *const var_names[] = {
      "startt",              ///< time at start of stream
      "t",                   ///< time in the file of the frame
      "tb",                  ///< timebase
@@ -10,7 +10,7 @@ index f6e183d..2026811 100644
      "volume",              ///< last set value
      NULL
  };
-@@ -67,6 +68,9 @@ static const char *const var_names[] = {
+@@ -69,6 +70,9 @@ static const char *const var_names[] = {
  static const AVOption volume_options[] = {
      { "volume", "set volume adjustment expression",
              OFFSET(volume_expr), AV_OPT_TYPE_STRING, { .str = "1.0" }, .flags = A|F|T },
@@ -20,7 +20,7 @@ index f6e183d..2026811 100644
      { "precision", "select mathematical precision",
              OFFSET(precision), AV_OPT_TYPE_INT, { .i64 = PRECISION_FLOAT }, PRECISION_FIXED, PRECISION_DOUBLE, A|F, "precision" },
          { "fixed",  "select 8-bit fixed-point",     0, AV_OPT_TYPE_CONST, { .i64 = PRECISION_FIXED  }, INT_MIN, INT_MAX, A|F, "precision" },
-@@ -243,6 +247,12 @@ static av_cold void volume_init(VolumeContext *vol)
+@@ -245,6 +249,12 @@ static av_cold void volume_init(VolumeContext *vol)
  #endif
  }
  
@@ -33,7 +33,7 @@ index f6e183d..2026811 100644
  static int set_volume(AVFilterContext *ctx)
  {
      VolumeContext *vol = ctx->priv;
-@@ -264,8 +274,7 @@ static int set_volume(AVFilterContext *ctx)
+@@ -266,8 +276,7 @@ static int set_volume(AVFilterContext *ctx)
             precision_str[vol->precision]);
  
      if (vol->precision == PRECISION_FIXED) {
@@ -43,7 +43,7 @@ index f6e183d..2026811 100644
          av_log(ctx, AV_LOG_VERBOSE, "volume_i:%d/255 ", vol->volume_i);
      }
      av_log(ctx, AV_LOG_VERBOSE, "volume:%f volume_dB:%f\n",
-@@ -293,6 +302,7 @@ static int config_output(AVFilterLink *outlink)
+@@ -297,6 +306,7 @@ static int config_output(AVFilterLink *outlink)
      vol->var_values[VAR_STARTPTS] =
      vol->var_values[VAR_STARTT] =
      vol->var_values[VAR_T] =
@@ -51,7 +51,7 @@ index f6e183d..2026811 100644
      vol->var_values[VAR_VOLUME] = NAN;
  
      vol->var_values[VAR_NB_CHANNELS] = inlink->ch_layout.nb_channels;
-@@ -372,6 +382,34 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
+@@ -375,6 +385,34 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
          av_frame_remove_side_data(buf, AV_FRAME_DATA_REPLAYGAIN);
      }
  
