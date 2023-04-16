@@ -2328,7 +2328,7 @@ build_my_ffmpeg_4.4() {
 	mkdir ${output_dir}
 #    do_git_checkout $git_url ${output_dir} $git_tree
     download_and_unpack_file $download_url
-    output_dir="ffmpeg"
+    output_dir=ffmpeg_shared
 	cp -pR ffmpeg-4.4.4/* ${output_dir}/ && rm -rf ffmpeg-4.4.4
 
     final_install_dir=`pwd`/${output_dir}.installed
