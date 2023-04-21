@@ -2550,11 +2550,12 @@ build_my_ffmpeg_5.0.1() {
   cd ..
 }
 
-build_my_ffmpeg_3.2.18() {
+build_my_ffmpeg_3.2() {
   local type="ffmpeg"
+  local ffmpeg3v="3.2.19"
   local shared=$build_ffmpeg_shared
   local output_dir="ffmpeg_git"
-  local download_url="http://ffmpeg.org/releases/ffmpeg-3.2.18.tar.bz2"
+  local download_url="http://ffmpeg.org/releases/ffmpeg-$ffmpeg3v.tar.bz2"
 
   if [ "$bits_target" = "32" ]; then
     local arch=x86
@@ -2573,7 +2574,7 @@ build_my_ffmpeg_3.2.18() {
     download_and_unpack_file $download_url
     output_dir=ffmpeg_shared
 	mkdir ${output_dir}
-	cp -pR ffmpeg-3.2.18/* ${output_dir}/ && rm -rf ffmpeg-3.2.18
+	cp -pR ffmpeg-$ffmpeg3v/* ${output_dir}/ && rm -rf ffmpeg-$ffmpeg3v
 
     final_install_dir=`pwd`/${output_dir}.installed
     rm -rf $final_install_dir
@@ -2586,22 +2587,22 @@ build_my_ffmpeg_3.2.18() {
     download_and_unpack_file $download_url
     output_dir="ffmpeg"
 	mkdir ${output_dir}
-	cp -pR ffmpeg-3.2.18/* ${output_dir}/ && rm -rf ffmpeg-3.2.18
+	cp -pR ffmpeg-$ffmpeg3v/* ${output_dir}/ && rm -rf ffmpeg-$ffmpeg3v
     extra_configure_opts="--enable-static --disable-shared $extra_configure_opts"
   fi
   cd ${output_dir}
   if [[ ! -f 'my-ffmpeg-patches.done' ]]; then
-    apply_patch file://$patch_dir/volnorm-3.2.18.patch
-    patch -p1</mnt/winshare/MyMpeg/patches/suppress-skipping-nal-unit-62-3.2.18.patch
-    patch -p1</mnt/winshare/MyMpeg/patches/volnorm-summary-stdout-3.2.18.patch
-	patch -p0</mnt/winshare/MyMpeg/patches/enable_libfaac-3.2.18.patch
-	patch -p0</mnt/winshare/MyMpeg/patches/add-libfaac-3.2.18.diff
+    apply_patch file://$patch_dir/volnorm-3.2.patch
+    patch -p1</mnt/winshare/MyMpeg/patches/suppress-skipping-nal-unit-62-3.2.patch
+    patch -p1</mnt/winshare/MyMpeg/patches/volnorm-summary-stdout-3.2.patch
+	patch -p0</mnt/winshare/MyMpeg/patches/enable_libfaac-3.2.patch
+	patch -p0</mnt/winshare/MyMpeg/patches/add-libfaac-3.2.diff
     touch my-ffmpeg-patches.done
 	#bash
   fi
 
   apply_patch file://$patch_dir/frei0r_load-shared-libraries-dynamically.diff
-  apply_patch file://$patch_dir/built-with-on-today-3.2.18.diff
+  apply_patch file://$patch_dir/built-with-on-today-3.2.diff
 
   if [ "$bits_target" = "32" ]; then
     local arch=x86
@@ -2879,8 +2880,8 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win32" ]]; then
 #    build_my_ffmpeg
 #    build_my_ffmpeg_5.0.1
 #    build_my_ffmpeg_6.0
-    build_my_ffmpeg_4.4
-#    build_my_ffmpeg_3.2.18
+#    build_my_ffmpeg_4.4
+    build_my_ffmpeg_3.2
   cd ..
 fi
 
@@ -2905,8 +2906,8 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win64" ]]; then
 #    build_my_ffmpeg
 #    build_my_ffmpeg_5.0.1
 #    build_my_ffmpeg_6.0
-    build_my_ffmpeg_4.4
-#    build_my_ffmpeg_3.2.18
+#    build_my_ffmpeg_4.4
+    build_my_ffmpeg_3.2
   cd ..
 fi
 

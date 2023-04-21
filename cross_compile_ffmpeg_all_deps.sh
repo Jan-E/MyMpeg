@@ -2489,7 +2489,7 @@ build_ffmpeg_dependencies() {
     build_zvbi # Uses iconv, libpng and dlfcn.
   fi
   build_fribidi # Uses dlfcn.
-  build_libass # Requires harfbuzz now. Needs freetype >= 9.10.3 (see https://bugs.launchpad.net/ubuntu/+source/freetype1/+bug/78573 o_O) and fribidi >= 0.19.0. Uses fontconfig >= 2.10.92, iconv and dlfcn.
+#   build_libass # Requires harfbuzz now. Needs freetype >= 9.10.3 (see https://bugs.launchpad.net/ubuntu/+source/freetype1/+bug/78573 o_O) and fribidi >= 0.19.0. Uses fontconfig >= 2.10.92, iconv and dlfcn.
   build_libxavs
   build_libxvid # FFmpeg now has native support, but libxvid still provides a better image.
   build_libsrt # requires gnutls, mingw-std-threads
