@@ -1144,7 +1144,7 @@ build_nghttp2() {
 }
 
 build_curl() {
-  local curl_version="8.1.1"
+  local curl_version="8.1.2"
   local curl_previous="8.1.0"
   rm -rf curl-$curl_previous
   download_and_unpack_file https://curl.haxx.se/download/curl-$curl_version.tar.gz curl-$curl_version
