@@ -945,8 +945,8 @@ build_librtmp() {
 }
 
 build_libssh2_wincng() {
-  local ssh2_version="1.10.0"
-  local ssh2_previous="1.9.0"
+  local ssh2_version="1.11.0"
+  local ssh2_previous="1.10.0"
   rm -rf libssh2-$ssh2_previous
   download_and_unpack_file https://github.com/libssh2/libssh2/releases/download/libssh2-$ssh2_version/libssh2-$ssh2_version.tar.gz libssh2-$ssh2_version
   cd libssh2-$ssh2_version
@@ -1325,9 +1325,9 @@ build_openssl-1.1.0() {
 }
 
 build_openssl-1.1.1() {
-  rm -rf openssl-1.1.1s
-  download_and_unpack_file https://www.openssl.org/source/openssl-1.1.1t.tar.gz
-  cd openssl-1.1.1t
+  rm -rf openssl-1.1.1t
+  download_and_unpack_file https://www.openssl.org/source/openssl-1.1.1u.tar.gz
+  cd openssl-1.1.1u
     export CC="${cross_prefix}gcc"
     export AR="${cross_prefix}ar"
     export RANLIB="${cross_prefix}ranlib"
