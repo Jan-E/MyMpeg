@@ -108,10 +108,10 @@ index c979029..b8c35dd 100644
  
  void ff_volume_init_x86(VolumeContext *vol);
 diff --git a/libavfilter/f_ebur128.c b/libavfilter/f_ebur128.c
-index 38e7e0b..4bf2a9f 100644
+index 49f68c0..7d2df6a 100644
 --- a/libavfilter/f_ebur128.c
 +++ b/libavfilter/f_ebur128.c
-@@ -539,10 +539,7 @@ static av_cold int init(AVFilterContext *ctx)
+@@ -549,10 +549,7 @@ static av_cold int init(AVFilterContext *ctx)
      if (ebur128->loglevel != AV_LOG_INFO &&
          ebur128->loglevel != AV_LOG_QUIET &&
          ebur128->loglevel != AV_LOG_VERBOSE) {
