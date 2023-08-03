@@ -1325,9 +1325,9 @@ build_openssl-1.1.0() {
 }
 
 build_openssl-1.1.1() {
-  rm -rf openssl-1.1.1t
-  download_and_unpack_file https://www.openssl.org/source/openssl-1.1.1u.tar.gz
-  cd openssl-1.1.1u
+  rm -rf openssl-1.1.1u
+  download_and_unpack_file https://www.openssl.org/source/openssl-1.1.1v.tar.gz
+  cd openssl-1.1.1v
     export CC="${cross_prefix}gcc"
     export AR="${cross_prefix}ar"
     export RANLIB="${cross_prefix}ranlib"
@@ -2477,7 +2477,7 @@ build_ffmpeg_dependencies() {
   build_fftw # Uses dlfcn.
   build_libsamplerate # Needs libsndfile >= 1.0.6 and fftw >= 0.15.0 for tests. Uses dlfcn.
   build_librubberband # Needs libsamplerate, libsndfile, fftw and vamp_plugin. 'configure' will fail otherwise. Eventhough librubberband doesn't necessarily need them (libsndfile only for 'rubberband.exe' and vamp_plugin only for "Vamp audio analysis plugin"). How to use the bundled libraries '-DUSE_SPEEX' and '-DUSE_KISSFFT'?
-  build_frei0r # Needs dlfcn.
+#  build_frei0r # Needs dlfcn.
   build_vidstab
   build_libmysofa # Needed for FFmpeg's SOFAlizer filter (https://ffmpeg.org/ffmpeg-filters.html#sofalizer). Uses dlfcn.
   build_libcaca # Uses zlib and dlfcn.

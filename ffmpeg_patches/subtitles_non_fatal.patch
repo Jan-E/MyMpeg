@@ -1,8 +1,8 @@
 diff --git a/libavcodec/decode.c b/libavcodec/decode.c
-index f0e6acc..9135ce5 100644
+index 53c90cd..01a1e45 100644
 --- a/libavcodec/decode.c
 +++ b/libavcodec/decode.c
-@@ -1009,9 +1009,6 @@ int avcodec_decode_subtitle2(AVCodecContext *avctx, AVSubtitle *sub,
+@@ -1020,9 +1020,6 @@ int avcodec_decode_subtitle2(AVCodecContext *avctx, AVSubtitle *sub,
                  av_log(avctx, AV_LOG_ERROR,
                         "Invalid UTF-8 in decoded subtitles text; "
                         "maybe missing -sub_charenc option\n");
