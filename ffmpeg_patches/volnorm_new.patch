@@ -1,5 +1,5 @@
 diff --git a/libavfilter/af_volume.c b/libavfilter/af_volume.c
-index 9265299..4ab4742 100644
+index b41c15e..790e780 100644
 --- a/libavfilter/af_volume.c
 +++ b/libavfilter/af_volume.c
 @@ -57,6 +57,7 @@ static const char *const var_names[] = {
@@ -87,10 +87,10 @@ index 9265299..4ab4742 100644
          vol->var_values[VAR_STARTPTS] = TS2D(buf->pts);
          vol->var_values[VAR_STARTT  ] = TS2T(buf->pts, inlink->time_base);
 diff --git a/libavfilter/af_volume.h b/libavfilter/af_volume.h
-index c979029..b8c35dd 100644
+index c3756ee..956ac31 100644
 --- a/libavfilter/af_volume.h
 +++ b/libavfilter/af_volume.h
-@@ -54,6 +54,7 @@ enum VolumeVarName {
+@@ -56,6 +56,7 @@ enum VolumeVarName {
      VAR_STARTT,
      VAR_T,
      VAR_TB,
@@ -98,7 +98,7 @@ index c979029..b8c35dd 100644
      VAR_VOLUME,
      VAR_VARS_NB
  };
-@@ -86,6 +87,8 @@ typedef struct VolumeContext {
+@@ -88,6 +89,8 @@ typedef struct VolumeContext {
      void (*scale_samples)(uint8_t *dst, const uint8_t *src, int nb_samples,
                            int volume);
      int samples_align;
@@ -108,10 +108,10 @@ index c979029..b8c35dd 100644
  
  void ff_volume_init_x86(VolumeContext *vol);
 diff --git a/libavfilter/f_ebur128.c b/libavfilter/f_ebur128.c
-index 49f68c0..7d2df6a 100644
+index a921602..39d0042 100644
 --- a/libavfilter/f_ebur128.c
 +++ b/libavfilter/f_ebur128.c
-@@ -549,10 +549,7 @@ static av_cold int init(AVFilterContext *ctx)
+@@ -550,10 +550,7 @@ static av_cold int init(AVFilterContext *ctx)
      if (ebur128->loglevel != AV_LOG_INFO &&
          ebur128->loglevel != AV_LOG_QUIET &&
          ebur128->loglevel != AV_LOG_VERBOSE) {
