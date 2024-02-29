@@ -2444,7 +2444,7 @@ build_my_ffmpeg_5.0.1() {
     local arch_opts="--enable-libmfx" # --enable-libmfx broken 2022-05-27
   fi
 
-  local extra_configure_opts="--enable-gpl --enable-version3 --enable-bzlib --enable-fontconfig --enable-frei0r --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libdav1d --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libx264 --enable-libx265 --enable-libaom --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va $arch_opts --enable-libxavs --enable-libxvid --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DLIBTWOLAME_STATIC --extra-cflags=-DMODPLUG_STATIC --extra-cflags=-DCACA_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng --extra-libs=-lm"
+  local extra_configure_opts="--enable-gpl --enable-version3 --enable-bzlib --enable-fontconfig --enable-frei0r --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libdav1d --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libx264 --enable-libx265 --enable-libaom --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-d3d11va $arch_opts --enable-libxavs --enable-libxvid --enable-zlib --enable-gray --enable-filter=frei0r --extra-cflags=-DLIBTWOLAME_STATIC --extra-cflags=-DMODPLUG_STATIC --extra-cflags=-DCACA_STATIC --extra-libs=-lstdc++ --extra-libs=-lpng --extra-libs=-lm"
 
   # can't mix and match --enable-static --enable-shared unfortunately, or the final executable seems to just use shared if the're both present
   if [[ $shared = "shared" ]] || [[ $shared = "minimal" ]] ; then
@@ -2506,12 +2506,12 @@ build_my_ffmpeg_5.0.1() {
       fi
       config_options="$config_options --disable-w32threads"
     fi
-    config_options="$config_options --enable-gpl --enable-libx264 --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va $arch_opts --disable-doc --enable-nonfree --enable-libfaac"
+    config_options="$config_options --enable-gpl --enable-libx264 --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-d3d11va $arch_opts --disable-doc --enable-nonfree --enable-libfaac"
   fi
 
   # minimal build for php_ffmpeg.dll
   if [[ $shared = "minimal" ]]; then
-    config_options="$build_options --enable-shared --disable-static --disable-w32threads --enable-gpl --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-nvenc --enable-nvdec --enable-d3d11va $arch_opts --disable-doc"
+    config_options="$build_options --enable-shared --disable-static --disable-w32threads --enable-gpl --enable-amf --enable-dxva2 --enable-ffnvcodec --enable-cuvid --enable-d3d11va $arch_opts --disable-doc"
     # avoid installing this to system
     cd ..
     final_install_dir=`pwd`/${output_dir}.installed
@@ -2877,8 +2877,8 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win32" ]]; then
 #    build_libfaac
 #    build_ffmpeg_dependencies
 #    build_apps
-    build_my_ffmpeg
-#    build_my_ffmpeg_5.0.1
+#    build_my_ffmpeg
+    build_my_ffmpeg_5.0.1
 #    build_my_ffmpeg_6.0
 #    build_my_ffmpeg_4.4
 #    build_my_ffmpeg_3.2
@@ -2903,8 +2903,8 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win64" ]]; then
 #    build_libfaac
 #    build_ffmpeg_dependencies
 #    build_apps
-    build_my_ffmpeg
-#    build_my_ffmpeg_5.0.1
+#    build_my_ffmpeg
+    build_my_ffmpeg_5.0.1
 #    build_my_ffmpeg_6.0
 #    build_my_ffmpeg_4.4
 #    build_my_ffmpeg_3.2
