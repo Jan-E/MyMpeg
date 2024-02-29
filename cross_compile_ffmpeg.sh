@@ -2430,11 +2430,11 @@ build_my_ffmpeg_4.4() {
   cd ..
 }
 
-build_my_ffmpeg_5.0.1() {
+build_my_ffmpeg_5.0.3() {
   local type="ffmpeg"
   local shared=$build_ffmpeg_shared
   local output_dir="ffmpeg_git"
-  local download_url="http://ffmpeg.org/releases/ffmpeg-5.0.1.tar.bz2"
+  local download_url="http://ffmpeg.org/releases/ffmpeg-5.0.3.tar.bz2"
 
   if [ "$bits_target" = "32" ]; then
     local arch=x86
@@ -2453,7 +2453,7 @@ build_my_ffmpeg_5.0.1() {
     download_and_unpack_file $download_url
     output_dir=ffmpeg_shared
 	mkdir ${output_dir}
-	cp -pR ffmpeg-5.0.1/* ${output_dir}/ && rm -rf ffmpeg-5.0.1
+	cp -pR ffmpeg-5.0.3/* ${output_dir}/ && rm -rf ffmpeg-5.0.3
 
     final_install_dir=`pwd`/${output_dir}.installed
     rm -rf $final_install_dir
@@ -2466,19 +2466,18 @@ build_my_ffmpeg_5.0.1() {
     download_and_unpack_file $download_url
     output_dir="ffmpeg"
 	mkdir ${output_dir}
-	cp -pR ffmpeg-5.0.1/* ${output_dir}/ && rm -rf ffmpeg-5.0.1
+	cp -pR ffmpeg-5.0.3/* ${output_dir}/ && rm -rf ffmpeg-5.0.3
     extra_configure_opts="--enable-static --disable-shared $extra_configure_opts"
   fi
   cd ${output_dir}
   if [[ ! -f 'my-ffmpeg-patches.done' ]]; then
     apply_my_ffmpeg_patches_no_git
-    patch -p1</mnt/winshare/MyMpeg/patches/suppress-skipping-nal-unit-63-5.0.1.patch
-	patch -p1</mnt/winshare/MyMpeg/ffmpeg_patches/enable_libfaac-5.0.1.patch
-	patch -p0</mnt/winshare/MyMpeg/patches/add-libfaac-5.0.1.patch
+    patch -p1</mnt/winshare/MyMpeg/patches/suppress-skipping-nal-unit-63-5.0.3.patch
+	patch -p1</mnt/winshare/MyMpeg/ffmpeg_patches/enable_libfaac-5.0.3.patch
+	patch -p0</mnt/winshare/MyMpeg/patches/add-libfaac-5.0.3.patch
   fi
   apply_patch file://$patch_dir/frei0r_load-shared-libraries-dynamically.diff
-  apply_patch file://$patch_dir/built-with-on-today-5.0.1.diff
-
+  apply_patch file://$patch_dir/built-with-on-today-5.0.3.diff
   if [ "$bits_target" = "32" ]; then
     local arch=x86
   else
@@ -2878,7 +2877,7 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win32" ]]; then
 #    build_ffmpeg_dependencies
 #    build_apps
 #    build_my_ffmpeg
-    build_my_ffmpeg_5.0.1
+    build_my_ffmpeg_5.0.3
 #    build_my_ffmpeg_6.0
 #    build_my_ffmpeg_4.4
 #    build_my_ffmpeg_3.2
@@ -2904,7 +2903,7 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win64" ]]; then
 #    build_ffmpeg_dependencies
 #    build_apps
 #    build_my_ffmpeg
-    build_my_ffmpeg_5.0.1
+    build_my_ffmpeg_5.0.3
 #    build_my_ffmpeg_6.0
 #    build_my_ffmpeg_4.4
 #    build_my_ffmpeg_3.2

@@ -1,0 +1,10 @@
+--- a/libavcodec/hevcdec.c.orig	2022-01-14 19:45:40.000000000 +0100
++++ a/libavcodec/hevcdec.c	2023-01-25 04:23:49.430540500 +0100
+@@ -3255,6 +3255,7 @@
+     case HEVC_NAL_AUD:
+     case HEVC_NAL_FD_NUT:
+     case HEVC_NAL_UNSPEC62:
++    case HEVC_NAL_UNSPEC63:
+         break;
+     default:
+         av_log(s->avctx, AV_LOG_INFO,

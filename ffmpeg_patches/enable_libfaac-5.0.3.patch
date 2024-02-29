@@ -1,0 +1,188 @@
+diff -u -r ffmpeg-5.0.1-orig/configure ffmpeg-5.0.1/configure
+--- ffmpeg-5.0.1-orig/configure	2022-04-04 16:40:22.000000000 +0200
++++ ffmpeg-5.0.1/configure	2022-05-29 21:39:57.106596123 +0200
+@@ -230,6 +230,7 @@
+   --enable-libdavs2        enable AVS2 decoding via libdavs2 [no]
+   --enable-libdc1394       enable IIDC-1394 grabbing using libdc1394
+                            and libraw1394 [no]
++  --enable-libfaac         enable AAC encoding via libfaac [no]
+   --enable-libfdk-aac      enable AAC de/encoding via libfdk-aac [no]
+   --enable-libflite        enable flite (voice synthesis) support via libflite [no]
+   --enable-libfontconfig   enable libfontconfig, useful for drawtext filter [no]
+@@ -1783,6 +1784,7 @@
+ 
+ EXTERNAL_LIBRARY_NONFREE_LIST="
+     decklink
++    libfaac
+     libfdk_aac
+     libtls
+ "
+@@ -3282,6 +3284,8 @@
+ avisynth_demuxer_select="riffdec"
+ eac3_at_decoder_deps="audiotoolbox"
+ eac3_at_decoder_select="ac3_parser"
++libfaac_encoder_deps="libfaac"
++libfaac_encoder_select="audio_frame_queue"
+ gsm_ms_at_decoder_deps="audiotoolbox"
+ ilbc_at_decoder_deps="audiotoolbox"
+ mp1_at_decoder_deps="audiotoolbox"
+@@ -6532,6 +6536,7 @@
+ enabled libdavs2          && require_pkg_config libdavs2 "davs2 >= 1.6.0" davs2.h davs2_decoder_open
+ enabled libdc1394         && require_pkg_config libdc1394 libdc1394-2 dc1394/dc1394.h dc1394_new
+ enabled libdrm            && require_pkg_config libdrm libdrm xf86drm.h drmGetVersion
++enabled libfaac           && require libfaac faac.h faacEncGetVersion -lfaac
+ enabled libfdk_aac        && { check_pkg_config libfdk_aac fdk-aac "fdk-aac/aacenc_lib.h" aacEncOpen ||
+                                { require libfdk_aac fdk-aac/aacenc_lib.h aacEncOpen -lfdk-aac &&
+                                  warn "using libfdk without pkg-config"; } }
+diff -u -r ffmpeg-5.0.1-orig/doc/encoders.texi ffmpeg-5.0.1/doc/encoders.texi
+--- ffmpeg-5.0.1-orig/doc/encoders.texi	2022-01-14 19:45:39.000000000 +0100
++++ ffmpeg-5.0.1/doc/encoders.texi	2022-05-29 21:39:57.106596123 +0200
+@@ -631,6 +631,111 @@
+ decrease quality.
+ @end table
+ 
++@anchor{libfaac}
++@section libfaac
++
++libfaac AAC (Advanced Audio Coding) encoder wrapper.
++
++This encoder is of much lower quality and is more unstable than any other AAC
++encoders, so it's highly recommended to instead use other encoders, like
++@ref{aacenc,,the native FFmpeg AAC encoder}.
++
++This encoder also requires the presence of the libfaac headers and library
++during configuration. You need to explicitly configure the build with
++@code{--enable-libfaac --enable-nonfree}.
++
++@subsection Options
++
++The following shared FFmpeg codec options are recognized.
++
++The following options are supported by the libfaac wrapper. The
++@command{faac}-equivalent of the options are listed in parentheses.
++
++@table @option
++@item b (@emph{-b})
++Set bit rate in bits/s for ABR (Average Bit Rate) mode. If the bit rate
++is not explicitly specified, it is automatically set to a suitable
++value depending on the selected profile. @command{faac} bitrate is
++expressed in kilobits/s.
++
++Note that libfaac does not support CBR (Constant Bit Rate) but only
++ABR (Average Bit Rate).
++
++If VBR mode is enabled this option is ignored.
++
++@item ar (@emph{-R})
++Set audio sampling rate (in Hz).
++
++@item ac (@emph{-c})
++Set the number of audio channels.
++
++@item cutoff (@emph{-C})
++Set cutoff frequency. If not specified (or explicitly set to 0) it
++will use a value automatically computed by the library. Default value
++is 0.
++
++@item profile
++Set audio profile.
++
++The following profiles are recognized:
++@table @samp
++@item aac_main
++Main AAC (Main)
++
++@item aac_low
++Low Complexity AAC (LC)
++
++@item aac_ssr
++Scalable Sample Rate (SSR)
++
++@item aac_ltp
++Long Term Prediction (LTP)
++@end table
++
++If not specified it is set to @samp{aac_low}.
++
++@item flags +qscale
++Set constant quality VBR (Variable Bit Rate) mode.
++
++@item global_quality
++Set quality in VBR mode as an integer number of lambda units.
++
++Only relevant when VBR mode is enabled with @code{flags +qscale}.  The
++value is converted to QP units by dividing it by @code{FF_QP2LAMBDA},
++and used to set the quality value used by libfaac. A reasonable range
++for the option value in QP units is [10-500], the higher the value the
++higher the quality.
++
++@item q (@emph{-q})
++Enable VBR mode when set to a non-negative value, and set constant
++quality value as a double floating point value in QP units.
++
++The value sets the quality value used by libfaac. A reasonable range
++for the option value is [10-500], the higher the value the higher the
++quality.
++
++This option is valid only using the @command{ffmpeg} command-line
++tool. For library interface users, use @option{global_quality}.
++@end table
++
++@subsection Examples
++
++@itemize
++@item
++Use @command{ffmpeg} to convert an audio file to ABR 128 kbps AAC in an M4A (MP4)
++container:
++@example
++ffmpeg -i input.wav -codec:a libfaac -b:a 128k -output.m4a
++@end example
++
++@item
++Use @command{ffmpeg} to convert an audio file to VBR AAC, using the
++LTP AAC profile:
++@example
++ffmpeg -i input.wav -c:a libfaac -profile:a aac_ltp -q:a 100 output.m4a
++@end example
++@end itemize
++
+ @anchor{libfdk-aac-enc}
+ @section libfdk_aac
+ 
+diff -u -r ffmpeg-5.0.1-orig/doc/muxers.texi ffmpeg-5.0.1/doc/muxers.texi
+--- ffmpeg-5.0.1-orig/doc/muxers.texi	2022-01-14 19:45:39.000000000 +0100
++++ ffmpeg-5.0.1/doc/muxers.texi	2022-05-29 21:39:57.106596123 +0200
+@@ -2486,9 +2486,9 @@
+ 
+ @item
+ Convert the @file{in.mkv} to TS segments using the @code{libx264}
+-and @code{aac} encoders:
++and @code{libfaac} encoders:
+ @example
+-ffmpeg -i in.mkv -map 0 -codec:v libx264 -codec:a aac -f ssegment -segment_list out.list out%03d.ts
++ffmpeg -i in.mkv -map 0 -codec:v libx264 -codec:a libfaac -f ssegment -segment_list out.list out%03d.ts
+ @end example
+ 
+ @item
+diff -u -r ffmpeg-5.0.1-orig/libavcodec/allcodecs.c ffmpeg-5.0.1/libavcodec/allcodecs.c
+--- ffmpeg-5.0.1-orig/libavcodec/allcodecs.c	2022-01-14 19:45:39.000000000 +0100
++++ ffmpeg-5.0.1/libavcodec/allcodecs.c	2022-05-29 21:40:26.406594836 +0200
+@@ -447,6 +447,7 @@
+ extern const AVCodec ff_dst_decoder;
+ extern const AVCodec ff_eac3_encoder;
+ extern const AVCodec ff_eac3_decoder;
++extern const AVCodec ff_libfaac_encoder;
+ extern const AVCodec ff_evrc_decoder;
+ extern const AVCodec ff_fastaudio_decoder;
+ extern const AVCodec ff_ffwavesynth_decoder;
+diff -u -r ffmpeg-5.0.1-orig/libavcodec/Makefile ffmpeg-5.0.1/libavcodec/Makefile
+--- ffmpeg-5.0.1-orig/libavcodec/Makefile	2022-01-14 19:45:39.000000000 +0100
++++ ffmpeg-5.0.1/libavcodec/Makefile	2022-05-29 21:39:57.106596123 +0200
+@@ -1023,6 +1023,7 @@
+ OBJS-$(CONFIG_ALAC_AT_DECODER)            += audiotoolboxdec.o
+ OBJS-$(CONFIG_AMR_NB_AT_DECODER)          += audiotoolboxdec.o
+ OBJS-$(CONFIG_EAC3_AT_DECODER)            += audiotoolboxdec.o
++OBJS-$(CONFIG_LIBFAAC_ENCODER)            += libfaac.o
+ OBJS-$(CONFIG_GSM_MS_AT_DECODER)          += audiotoolboxdec.o
+ OBJS-$(CONFIG_ILBC_AT_DECODER)            += audiotoolboxdec.o
+ OBJS-$(CONFIG_MP1_AT_DECODER)             += audiotoolboxdec.o
