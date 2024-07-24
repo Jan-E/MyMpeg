@@ -2348,7 +2348,7 @@ build_my_ffmpeg_4.4() {
   fi
   cd ${output_dir}
   if [[ ! -f 'my-ffmpeg-patches.done' ]]; then
-    patch -p1</mnt/winshare/MyMpeg/patches/suppress-skipping-nal-unit-62-4.4.patch
+    patch -p1</mnt/winshare/MyMpeg/patches/suppress-skipping-nal-unit-62.4.4.patch
     patch -p1</mnt/winshare/MyMpeg/patches/volnorm-4.4.patch
     patch -p1</mnt/winshare/MyMpeg/patches/volnorm-summary-stdout-4.4.patch
 	patch -p1</mnt/winshare/MyMpeg/patches/add_libfaac-4.4.patch
@@ -2876,10 +2876,10 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win32" ]]; then
 #    build_libfaac
 #    build_ffmpeg_dependencies
 #    build_apps
-#    build_my_ffmpeg
+    build_my_ffmpeg
 #    build_my_ffmpeg_5.0.3
 #    build_my_ffmpeg_6.0
-    build_my_ffmpeg_4.4
+#    build_my_ffmpeg_4.4
 #    build_my_ffmpeg_3.2
   cd ..
 fi
@@ -2902,10 +2902,10 @@ if [[ $compiler_flavors == "multi" || $compiler_flavors == "win64" ]]; then
 #    build_libfaac
 #    build_ffmpeg_dependencies
 #    build_apps
-#    build_my_ffmpeg
+    build_my_ffmpeg
 #    build_my_ffmpeg_5.0.3
 #    build_my_ffmpeg_6.0
-    build_my_ffmpeg_4.4
+#    build_my_ffmpeg_4.4
 #    build_my_ffmpeg_3.2
   cd ..
 fi
