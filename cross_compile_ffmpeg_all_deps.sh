@@ -2497,7 +2497,7 @@ build_ffmpeg_dependencies() {
   build_libvpx
   build_libx265
   build_libopenh264
-  build_libaom
+#  build_libaom
   build_dav1d
   build_librtmp
 #  build_librtmp_gnutls
